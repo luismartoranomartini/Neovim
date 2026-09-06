@@ -9,3 +9,4 @@
 -- =========================================================
 
 require("martini.languages.go")
+require("martini.languages.c")

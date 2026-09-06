@@ -67,10 +67,10 @@ local function aplicar_highlights()
   -- Escape sequences (\n, \t, \", etc.) → LARANJA
   hl(0, "@string.escape", { fg = cor.laranja })
 
-  -- Verbos de formatação do Go (%s, %d, %v, etc. — ver matchadd em
-  -- languages/go.lua, pois o Treesitter do Go não marca verbos de
-  -- printf como nó separado) → AMARELO, pra diferenciar dos escapes.
-  hl(0, "GoFormatVerb", { fg = cor.amarelo })
+  -- Verbos de formatação estilo printf (%s, %d, %v, etc.) — Go, C e
+  -- qualquer linguagem que siga a convenção printf (ver
+  -- utils/printf_highlight.lua) → AMARELO, pra diferenciar dos escapes.
+  hl(0, "PrintfVerb", { fg = cor.amarelo })
 
   -- Ações de template Go ({{ }}) dentro de arquivos .html/.tmpl → ROSA,
   -- via matchadd em languages/go.lua (aproximado, não semântico).

@@ -38,23 +38,11 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 
 -- =========================================================
 -- Highlight: verbos de formatação do Go (%s, %d, %v, %+v, %-10.2f,
--- etc.), via matchadd — o Treesitter do Go não trata verbos de
--- printf/Sprintf como nó separado dentro da string; fica tudo
--- achatado em @string. O grupo GoFormatVerb é definido em
--- config/colors.lua; aqui só aplicamos onde o cursor está.
--- matchadd() é POR JANELA, não por buffer — por isso também dispara
--- em BufWinEnter e WinEnter, com uma flag por janela (vim.w) pra não
--- empilhar matches repetidos toda vez que você troca de janela.
-local function destacar_verbos_go()
-  if vim.bo.filetype ~= "go" then return end
-  if vim.w.martini_go_verb_hl then return end
-  vim.fn.matchadd("GoFormatVerb", [=[%[-+ #0][0-9].?[0-9]*[sdvTtqxXobeEfFgGpc]]=])
-  vim.w.martini_go_verb_hl = true
-end
-
-vim.api.nvim_create_autocmd({ "FileType", "BufWinEnter", "WinEnter" }, {
-  callback = destacar_verbos_go,
-})
+-- etc.) — mecanismo compartilhado, ver utils/printf_highlight.lua.
+-- Conjunto de verbos do Go: v T t b c d o O q x X U e E f F g G s p %
+-- (fmt package — https://pkg.go.dev/fmt)
+-- =========================================================
+require("martini.utils.printf_highlight").register("go", "vTtbcdoOqxXUeEfFgGsp%")
 
 -- =========================================================
 -- Highlight: destaque aproximado dos blocos {{ ... }} de template Go
