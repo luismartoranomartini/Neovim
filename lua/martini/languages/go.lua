@@ -79,24 +79,17 @@ vim.api.nvim_create_autocmd({ "FileType", "BufWinEnter", "WinEnter" }, {
 pcall(function()
   local lint = require("lint")
 
-  -- Localiza o executável correto no Windows
-  local golangci = vim.fn.exepath("golangci-lint")
-  if golangci == "" then
+  if vim.fn.exepath("golangci-lint") == "" then
     vim.notify("golangci-lint não encontrado no PATH", vim.log.levels.WARN)
     return
   end
 
-  -- golangci-lint v2 usa --output.json.path=stdout (não o --out-format
-  -- json da v1).
-  lint.linters.golangcilint = {
-    cmd = golangci,
-    stdin = false,
-    args = { "run", "--output.json.path=stdout", "--issues-exit-code=1" },
-    stream = "stdout",
-    ignore_exitcode = true,
-    parser = require("lint.linters.golangcilint").parser,
-  }
-
+  -- Usa o linter "golangcilint" já embutido no nvim-lint — ele mesmo
+  -- detecta a versão instalada (v1 ou v2) e escolhe cmd/args/parser
+  -- corretos sozinho. NÃO sobrescrever isso aqui: uma versão anterior
+  -- desta config fixava a flag "--output.json.path=stdout" (só existe
+  -- na v2), e em ambiente com v1 instalada isso quebrava o parser
+  -- (erro "Parser failed" ao tentar decodificar saída que não é JSON).
   lint.linters_by_ft = lint.linters_by_ft or {}
   lint.linters_by_ft.go = { "golangcilint" }
 
