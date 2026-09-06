@@ -1,96 +1,103 @@
-# Resumo da redução (set/2026)
+# martini.nvim
 
-Escopo: Go + JavaScript/TypeScript (web) + C, com autocomplete e
-atualização automática de plugins. Todos os arquivos com sintaxe
-validada via `luac5.4 -p`.
+Configuração pessoal do Neovim, focada em Go, JavaScript/TypeScript (web) e C. Sem plugin manager hand-rolled — gerenciado via [lazy.nvim](https://github.com/folke/lazy.nvim).
 
-## CORREÇÃO IMPORTANTE (segunda rodada)
+## Requisitos
 
-A primeira versão desta pasta reescreveu `loader.lua` (carregador
-manual via `git clone`), mas você confirmou que o repositório real já
-tinha migrado para **lazy.nvim** — `loader.lua` foi substituído por
-`lua/martini/lazy.lua`, e o `init.lua` raiz chama
-`require("martini.lazy")`, não `require("martini.loader")`.
+- Neovim 0.12+
+- `git`
+- LSP: `gopls`, `typescript-language-server`, `vscode-html-language-server`, `vscode-css-language-server`, `clangd`
+- Lint/format: `golangci-lint` (v1 ou v2), `prettier`, `clang-format`
+- Debug: `dlv` (Delve, Go), `codelldb` (C/C++)
+- Runner/busca: `fd`, `fzf`, `ripgrep` (`rg`), `bat` (preview)
+- `xdg-open` (abrir HTML no navegador via runner)
 
-`loader.lua` foi **removido** desta pasta — não faz mais sentido
-usá-lo. A lista de plugins mínima e a atualização automática agora
-vivem em `lazy.lua`, usando a API do próprio lazy.nvim
-(`require("lazy").update({ show = false })` num `VimEnter`) em vez de
-`git pull` cru — isso preserva o lockfile (`lazy-lock.json`), que é a
-razão de o projeto ter trocado de mecanismo.
+## Instalação
 
-## Removido
-
-| Item | Motivo |
-|---|---|
-| `nvim-tree.lua`, `bufferline.lua` | Não pedidos; `<leader>e` agora abre `:Lexplore` (netrw nativo, zero plugin) |
-| `dashboard.lua` | Não pedido |
-| `onedark.nvim`, `nightfox.nvim` | Nunca usados (só `tokyonight` era aplicado em `colors.lua`) |
-| `pyright` (lsp.lua) | Python fora do escopo |
-| `dap-python` (debug.lua) | Python fora do escopo |
-| `nvim-lint`/formatters de Python | idem |
-| `<leader>ff`/`<leader>fg` (keymaps.lua) | Duplicavam `<C-p>`/`<C-g>` do fzf-lua. Os comandos `:find`/`:grep` continuam disponíveis, só sem atalho dedicado |
-| Python/Ruby/PHP/Perl/Rust/Java/sh (runner.lua) | Fora do escopo declarado |
-
-## Mantido (por decisão sua)
-
-multicursor.nvim, kulala.nvim (HTTP), fzf-lua, debugger para Go **e** C
-(codelldb), textobjects (Treesitter), editing.lua (autopairs/autotag/
-surround/emmet — relevante pra JSX/HTML).
-
-## Adicionado
-
-- **`c`/`cpp` em `conform.nvim`** (`clang-format`) — não existia antes.
-- **`typescriptreact`** no `ts_ls` e no Treesitter (`tsx`) — coerente
-  com `editing.lua`/`completion.lua`, que já assumiam `jsx`/`tsx`.
-- **Atualização automática de plugins no startup**: `loader.lua` agora
-  dispara `git pull --ff-only` em background (via `vim.system`,
-  assíncrono — não trava a abertura do Neovim) 500ms após o
-  `VimEnter`. `:MartiniUpdatePlugins` continua disponível pra rodar
-  na hora.
-
-## Bugs corrigidos nos arquivos que você enviou
-
-Os `.txt` enviados vieram com caracteres específicos apagados em
-vários pontos — `$`, `*` — aparentemente por alguma conversão/render
-anterior. Achei e corrigi os seguintes, comparando com a sintaxe
-correta de cada API:
-
-1. **`loader.lua`** — `repo:match("./(.)")` não extraía nada;
-   deveria ser `repo:match(".*/(.*)")` (nome do plugin a partir de
-   `"dono/repo"`).
-2. **`runner.lua`** — os comandos de C/C++ estavam sem o compilador:
-   `"cd fileName -o /tmp/fileNameWithoutExt"` (sem `$`, sem `gcc`).
-   Reconstruí como `"cd $dir && gcc -g $fileName -o /tmp/$fileNameWithoutExt && /tmp/$fileNameWithoutExt"`.
-3. **`debug.lua`** — o adapter do codelldb tinha
-   `port = "latex\n{port}"` (claramente corrompido); corrigido para
-   `port = "${port}"` e `args = { "--port", "${port}" }`.
-4. **`go.lua`** — `go = "cd $`dir && go run ."` → `"cd $dir && go run ."`;
-   e o regex de nome de teste `Test[%w_]` (sem quantificador) →
-   `Test[%w_]*`, senão só casava nomes de teste com exatamente um
-   caractere depois de `Test`.
-5. **`options.lua`** — `vim.opt.path:append("")` e
-   `wildignore` sem `*` nas pontas (`"/node_modules/"`) não faziam
-   nada; corrigido para `"**"` e `"*/node_modules/*"` etc.
-6. **`go.lua`** — `golangci-lint` ainda usava a flag da v1
-   (`--out-format json`); troquei para `--output.json.path=stdout`
-   (v2), conforme já era o padrão correto documentado.
-
-## Como aplicar
-
-Substitua a pasta `lua/martini/` do seu repositório pelo conteúdo
-desta pasta (mesma estrutura). Como a lista de plugins mudou
-(6 plugins removidos), o lazy.nvim vai detectar plugins órfãos —
-depois de colar, rode:
-
-```vim
-:Lazy clean
+```bash
+git clone https://github.com/luismartoranomartini/Neovim.git ~/.config/nvim
+nvim
 ```
 
-pra remover do disco (`~/.local/share/nvim/lazy/`) os plugins que
-saíram da lista (onedark.nvim, nightfox.nvim, nvim-tree.lua,
-nvim-web-devicons, bufferline.nvim, nvim-dap-python). Não precisa
-apagar a pasta inteira nem gerar um "primeiro boot" — o lazy.nvim só
-baixa o que é novo e limpa o que sobrou.
+No primeiro boot, o `lazy.nvim` se instala sozinho e baixa todos os plugins. Aguarde a janela terminar e reinicie o Neovim.
 
-O `lazy-lock.json` vai mudar (menos entradas) — comite ele junto.
+## Estrutura
+lua/martini/
+├── init.lua -- patch 0.12.2 + bootstrap + ordem de carregamento
+├── lazy.lua -- lista de plugins + atualização automática
+├── config/
+│ ├── init.lua -- agregador
+│ ├── options.lua -- vim.opt/vim.g
+│ ├── diagnostics.lua -- vim.diagnostic.config()
+│ ├── colors.lua -- tokyonight + highlights customizados
+│ └── keymaps.lua -- atalhos globais
+├── languages/
+│ ├── init.lua
+│ ├── go.lua -- highlight, lint, imports, testes, dap-go
+│ └── c.lua -- highlight de verbos printf/scanf
+├── plugins/
+│ ├── init.lua
+│ ├── treesitter.lua, textobjects.lua
+│ ├── completion.lua, lsp.lua, format.lua
+│ ├── debug.lua, runner.lua
+│ ├── editing.lua, finder.lua, multicursor.lua, http.lua
+│ └── dashboard.lua -- tela inicial (snacks.nvim)
+└── utils/
+├── path.lua -- gf, criação de arquivo
+├── terminal.lua -- abrir/toggle terminal
+└── printf_highlight.lua -- destaque de verbos %s/%d (Go, C)
+
+## Plugins
+
+| Plugin | Função |
+|---|---|
+| tokyonight.nvim | tema |
+| snacks.nvim | dashboard (só esse módulo é usado) |
+| nvim-treesitter (+ textobjects) | highlight + seleção por função/struct/parâmetro |
+| nvim-cmp, cmp-nvim-lsp, cmp-buffer, LuaSnip, cmp_luasnip, friendly-snippets | autocomplete |
+| nvim-autopairs, nvim-ts-autotag, nvim-surround, emmet-vim | edição (fecha par, tag JSX/HTML, delimitadores, abreviação) |
+| conform.nvim | format on save |
+| nvim-lint | golangci-lint |
+| nvim-dap, nvim-dap-ui, nvim-nio, nvim-dap-go | debug (Go + C via codelldb) |
+| code_runner.nvim | executa o arquivo atual |
+| kulala.nvim | cliente HTTP (`.http`/`.rest`) |
+| multicursor.nvim (branch `1.0`) | múltiplos cursores |
+| fzf-lua | busca fuzzy de arquivo/texto, com preview |
+
+## LSP
+
+| Servidor | Filetypes | Formatação |
+|---|---|---|
+| gopls | go, gomod, gowork | gofmt (fallback) + organizeImports automático |
+| ts_ls | javascript, typescript, typescriptreact | prettier |
+| html | html, gotmpl (templates Go) | prettier |
+| cssls | css, scss, less | prettier |
+| clangd | c, cpp, objc, objcpp | clang-format |
+
+## Atalhos
+
+`<leader>` = `Espaço`. Gramática: `<leader>` + domínio + verbo — `b` buffers, `f` find/arquivo, `g` Go, `m` multicursor, `d` debug, `r` run, `h` HTTP.
+
+**Arquivos:** `<leader>n` nova aba · `<leader>e` explorador (netrw) · `gf` abrir/criar arquivo sob o cursor · `<leader>fn` novo arquivo · `<leader>fd` reabrir dashboard · `<C-p>` buscar arquivo · `<C-g>` buscar texto
+
+**LSP:** `gd` definição · `K` hover · `[d`/`]d` diagnóstico anterior/próximo · `<leader>fr` rename · `<leader>fu` references
+
+**Go:** `<leader>gt` testar pacote · `<leader>ga` testar tudo · `<leader>gr` testar função sob o cursor
+
+**Debug:** `<F5>`/`<F10>`/`<F11>`/`<F12>` ou `<leader>d{b,x,c,o,i,k,r,t,u}` (breakpoint, limpar, continue, step over/into/out, REPL, terminar, UI)
+
+**Multicursor:** `<C-Up>`/`<C-Down>` cursor acima/abaixo · `<leader>mn`/`mp` próxima/anterior ocorrência · `<leader>ma` todas · `<leader>mx` remover · `<Esc>` sair
+
+**HTTP:** `<leader>hs` enviar · `<leader>ha` enviar todas · `<leader>hb` scratchpad · `<leader>hc` copiar como curl
+
+**Terminal:** `<leader>t` horizontal · `<leader>vs` vertical · `<C-t>` toggle
+
+**Runner:** `<leader>r` executar arquivo · `<leader>rp` executar projeto
+
+## Dashboard
+
+Tela inicial via `snacks.nvim`: banner, menu, arquivos recentes, git status (cacheado) e tempo de boot. Reabra a qualquer momento com `<leader>fd`.
+
+## Atualização automática
+
+`lazy.lua` roda `require("lazy").update({ show = false })` ~1s após abrir o Neovim, em background — atualiza os plugins e regrava o `lazy-lock.json` sozinho. `:Lazy` continua disponível pra checar/instalar/limpar manualmente.
