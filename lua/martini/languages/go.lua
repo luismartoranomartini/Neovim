@@ -95,18 +95,30 @@ end)
 -- separada (source.organizeImports) que precisa ser pedida
 -- explicitamente. Roda em BufWritePre, síncrono, ANTES do conform
 -- formatar/salvar, para que o resultado já saia formatado corretamente.
+--
+-- IMPORTANTE (Neovim 0.11+): make_range_params() exige o
+-- position_encoding do cliente LSP como segundo argumento — sem
+-- isso, funciona mas fica avisando toda hora ("position_encoding
+-- param is required..."). Por isso busca o cliente gopls conectado
+-- e usa client.offset_encoding em vez de deixar o Neovim adivinhar
+-- (e, se o gopls ainda não conectou, simplesmente não faz nada em
+-- vez de dar erro).
 -- =========================================================
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*.go",
   callback = function()
-    local params = vim.lsp.util.make_range_params()
+    local clients = vim.lsp.get_clients({ bufnr = 0, name = "gopls" })
+    local client = clients[1]
+    if not client then return end
+
+    local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
     params.context = { only = { "source.organizeImports" } }
 
     local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
     for _, res in pairs(result or {}) do
       for _, action in pairs(res.result or {}) do
         if action.edit then
-          vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
+          vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
         elseif action.command then
           vim.lsp.buf.execute_command(action.command)
         end

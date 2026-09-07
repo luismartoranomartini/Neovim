@@ -126,6 +126,11 @@ local function aplicar_highlights()
   hl(0, "DapBreakpointRejectedHl", { fg = cor.cinza })
   hl(0, "DapStoppedLine", { bg = "#2a2a1a" }) -- destaque sutil da linha atual
 
+  -- Indicador de arquivo não salvo na statusline (ver config/options.lua)
+  -- — fundo sólido em vez de só cor de texto, pra garantir contraste
+  -- não importa o que tokyonight definir pro fundo da statusline.
+  hl(0, "StatusLineModified", { fg = "#000000", bg = cor.laranja, bold = true })
+
   -- Fundo preto puro
   hl(0, "Normal", { fg = cor.branco, bg = "#000000" })
   hl(0, "NormalNC", { bg = "#000000" })

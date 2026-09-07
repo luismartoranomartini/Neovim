@@ -24,6 +24,19 @@ vim.opt.writebackup = false
 vim.opt.guifont = "FiraCode Nerd Font Mono:h11"
 vim.o.completeopt = "menu,menuone,noselect"
 
+-- Mantém o diretório de trabalho do Neovim sincronizado com a pasta
+-- que o netrw está navegando. Sem isso, R (renomear) preenche o
+-- caminho absoluto inteiro em vez de só o nome do arquivo sempre que
+-- os dois divergem (comum ao navegar entre volumes/pastas distantes
+-- de onde o Neovim foi aberto).
+vim.g.netrw_keepdir = 0
+
+-- Aviso visual de arquivo não salvo, mais chamativo que o [+] padrão
+-- do Neovim — usa o grupo de highlight DiagnosticWarn (já definido
+-- por config/diagnostics.lua), então a cor já combina com o resto.
+-- Fica na FRENTE do nome do arquivo (antes, não depois).
+vim.o.statusline = "%#StatusLineModified#%{&modified ? ' ● UNSAVED ' : ''}%*%f %h%r%=%-14.(%l,%c%V%) %P"
+
 -- Cursor em formato de barra vertical (em vez do bloco padrão) apenas
 -- dentro do modo Terminal ("t"). Não altera o cursor nos outros modos.
 vim.opt.guicursor:append("t:ver25")

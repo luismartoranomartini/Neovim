@@ -48,8 +48,9 @@ vim.opt.rtp:prepend(lazypath)
 -- multicursor.nvim — lazy.nvim entende esse formato nativamente.
 local plugins = {
   { "folke/tokyonight.nvim", lazy = false },
-  -- Dashboard (opção 2, set/2026): só o módulo dashboard é usado —
-  -- ver plugins/dashboard.lua pro resto desligado de propósito.
+  { "jmbuhr/otter.nvim", lazy = false },
+  -- Dashboard (snacks.nvim) — só o módulo dashboard é usado, ver
+  -- plugins/dashboard.lua pro resto desligado de propósito.
   { "folke/snacks.nvim", priority = 1000, lazy = false },
   { "nvim-treesitter/nvim-treesitter",             lazy = false },
   { "nvim-treesitter/nvim-treesitter-textobjects", lazy = false },
