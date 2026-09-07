@@ -8,6 +8,18 @@
 -- ESCOPO REDUZIDO (set/2026): gopls (Go), ts_ls (JS/TS), html/cssls
 -- (web + templates Go), clangd (C). pyright removido — Python fora
 -- do escopo atual.
+--
+-- CORREÇÃO (07/09/2026): [d/]d usavam vim.diagnostic.goto_prev/
+-- goto_next diretamente. Ambos deprecados desde o Neovim 0.11 (ver
+-- :help deprecated) em favor de vim.diagnostic.jump({count=...}) —
+-- continuam funcionando, mas emitem aviso de depreciação na PRIMEIRA
+-- vez que forem chamados na sessão (por isso não aparecia no
+-- :checkhealth: a checagem de depreciação só flagra o que já foi
+-- efetivamente executado, não o que está só mapeado). Trocado pela
+-- API atual, com float=true pra manter o comportamento de abrir a
+-- janela flutuante com a mensagem do diagnóstico (era o padrão
+-- implícito de goto_prev/goto_next; o jump() novo não abre por
+-- padrão, então precisa ser pedido explicitamente).
 -- =========================================================
 
 -- ── Keymaps LSP (ativados ao conectar) ───────────────────
@@ -18,8 +30,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local opts = { buffer = args.buf, silent = true }
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+    vim.keymap.set("n", "[d", function()
+      vim.diagnostic.jump({ count = -1, float = true })
+    end, opts)
+    vim.keymap.set("n", "]d", function()
+      vim.diagnostic.jump({ count = 1, float = true })
+    end, opts)
     vim.keymap.set("n", "<leader>fr", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "<leader>fu", vim.lsp.buf.references, opts)
   end,

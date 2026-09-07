@@ -2,9 +2,6 @@
 # martini.nvim — .gitignore
 # =========================================================
 
-# ---- Plugins clonados pelo loader.lua ----
-site/pack/
-
 # ---- Estado local do Neovim que não deve ser versionado ----
 .netrwhist
 *.swp

@@ -26,11 +26,24 @@
 -- bufferline.nvim (não pedidos; <leader>e agora usa :Lexplore nativo)
 -- e nvim-dap-python (Python fora do escopo atual).
 --
--- ATUALIZAÇÃO AUTOMÁTICA (set/2026): diferente do loader.lua antigo
--- (git pull cru), aqui usamos a API do próprio lazy.nvim —
--- require("lazy").update({ show = false }) — pra não violar o
--- lockfile. Roda em background, sem abrir a UI do lazy.nvim, ~1s
--- depois do VimEnter (não compete com o startup por I/O de rede).
+-- CORREÇÃO (07/09/2026): a versão anterior rodava
+-- require("lazy").update({ show = false }) sozinha ~1s depois do
+-- VimEnter, TODA VEZ que o Neovim abria. Isso contradizia o próprio
+-- motivo de ter o lazy-lock.json: o lockfile existe pra fixar os
+-- commits e tornar a instalação previsível/reprodutível, mas a
+-- atualização automática regravava esse mesmo arquivo sozinha a cada
+-- boot, sem aviso — ou seja, os commits "fixados" mudavam por conta
+-- própria, silenciosamente, antes de qualquer validação sua. Trocado
+-- por um comando explícito (:MartiniUpdate) — mesmo espírito do
+-- :MartiniUpdatePlugins que o loader.lua antigo tinha, só que
+-- delegando pra API do próprio lazy.nvim em vez de git pull cru.
+--
+-- ÍCONES NO NETRW (07/09/2026): nvim-web-devicons volta à lista, mas
+-- só como PROVEDOR de glyphs — não é o mesmo cenário do nvim-tree
+-- removido acima. Some junto prichrd/netrw.nvim, que não substitui o
+-- netrw (continua sendo o :Lexplore nativo, mesmas teclas mf/mt/mc/
+-- mm/mu), apenas intercepta a renderização do buffer pra desenhar um
+-- ícone por linha usando esse provedor. Nenhuma tecla muda.
 -- =========================================================
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local primeiro_boot_lazy = vim.fn.isdirectory(lazypath) == 0
@@ -74,6 +87,10 @@ local plugins = {
   { "mistweaverco/kulala.nvim", lazy = false },
   { "jake-stewart/multicursor.nvim", branch = "1.0", lazy = false },
   { "ibhagwan/fzf-lua", lazy = false },
+  -- Ícones no netrw (ver nota acima) — nvim-web-devicons é só o
+  -- provedor de glyphs, netrw.nvim é quem desenha na tela do :Lexplore.
+  { "nvim-tree/nvim-web-devicons", lazy = false },
+  { "prichrd/netrw.nvim", lazy = false },
 }
 
 -- Detecta se algum plugin ainda não foi clonado ANTES de chamar setup()
@@ -94,24 +111,23 @@ require("lazy").setup(plugins, {
   root = plugins_root,
   lockfile = vim.fn.stdpath("config") .. "/lazy-lock.json",
   install = { missing = true },
-  -- checker fica desligado: quem faz o update é o autocmd abaixo,
-  -- que já roda automaticamente — não precisamos do check+notify
-  -- nativo do lazy.nvim por cima disso (duplicaria o aviso).
+  -- checker fica desligado: a atualização agora é 100% manual, via
+  -- :MartiniUpdate (ver comando abaixo) — não queremos nem o
+  -- check+notify nativo do lazy.nvim rodando em background sozinho.
   checker          = { enabled = false },
   change_detection = { notify = false },
 })
 
--- Atualização automática de verdade: dispara update() sozinho ao
--- abrir o Neovim, sem abrir a janela do lazy.nvim (show = false) e
--- sem travar o startup (VimEnter + defer_fn). O lazy-lock.json é
--- regravado automaticamente pelo próprio lazy.nvim ao final.
-vim.api.nvim_create_autocmd("VimEnter", {
-  once = true,
-  callback = function()
-    vim.defer_fn(function()
-      require("lazy").update({ show = false })
-    end, 1000)
-  end,
-})
+-- =========================================================
+-- :MartiniUpdate — atualização MANUAL e explícita dos plugins.
+-- Substitui o autocmd de VimEnter que rodava update() sozinho a cada
+-- boot (ver nota de correção no topo do arquivo). Abre a UI do
+-- lazy.nvim (show = true, ao contrário do comportamento antigo) pra
+-- você ver o que mudou e decidir, em vez de aceitar tudo às cegas.
+-- O lazy-lock.json só é regravado quando você rodar isso de propósito.
+-- =========================================================
+vim.api.nvim_create_user_command("MartiniUpdate", function()
+  require("lazy").update()
+end, { desc = "Atualiza os plugins do lazy.nvim manualmente (regrava lazy-lock.json)" })
 
 return primeiro_boot_lazy or faltando
