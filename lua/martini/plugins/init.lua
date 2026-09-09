@@ -27,12 +27,12 @@
 --    Colocado DEPOIS de completion+lsp: otter.activate() precisa
 --    que ts_ls/cssls já estejam configurados em vim.lsp.config.
 --
--- ADIÇÃO (07/09/2026): require("martini.plugins.netrw-icons") — sem
--- essa linha, nvim-web-devicons e netrw.nvim ficam instalados pelo
--- lazy.nvim mas nunca configurados (mesmo bug do item 2, agora com
--- ícones no netrw). Colocado perto de finder por afinidade temática
--- (navegação/arquivos); não depende de LSP nem completion, então a
--- posição exata na lista não importa.
+-- NETRW → OIL (09/09/2026): require("martini.plugins.netrw-icons")
+-- REMOVIDO (arquivo excluído junto). No lugar,
+-- require("martini.plugins.oil") — netrw sai de cena por completo
+-- (ver notas em lazy.lua e plugins/oil.lua). Mantido na mesma posição
+-- da lista (afinidade temática: navegação/arquivos), sem dependência
+-- de LSP ou completion, então a posição exata não importa.
 -- =========================================================
 require("martini.languages") -- go.lua + c.lua — ver nota acima
 require("martini.plugins.treesitter")
@@ -47,5 +47,5 @@ require("martini.plugins.runner")
 require("martini.plugins.http")
 require("martini.plugins.multicursor")
 require("martini.plugins.finder")
-require("martini.plugins.netrw-icons") -- ver nota "ADIÇÃO" acima
+require("martini.plugins.oil") -- ver nota "NETRW → OIL" acima
 require("martini.plugins.dashboard")

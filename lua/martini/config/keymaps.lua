@@ -18,8 +18,21 @@
 -- os dois caminhos era duplicidade sem propósito real. Os comandos
 -- :find/:grep continuam disponíveis via linha de comando (ver
 -- config/options.lua), só sem atalho <leader> dedicado.
--- nvim-tree removido → <leader>e agora abre o netrw nativo
--- (:Lexplore), sem plugin extra.
+--
+-- NETRW → OIL (09/09/2026): <leader>e trocou de ":Lexplore" (netrw)
+-- pra ":Oil" (stevearc/oil.nvim, plugins/oil.lua) — netrw saiu de
+-- cena por completo, ver notas em lazy.lua e plugins/oil.lua.
+-- IMPORTANTE: o keymap real de <leader>e agora é registrado DENTRO
+-- de plugins/oil.lua (setup do plugin), não aqui — cada plugin
+-- registra seus próprios keymaps de invocação junto do setup(),
+-- mesmo padrão já usado por <leader>fd (dashboard, ver abaixo) e
+-- pelos atalhos de debug (ver dbg() mais abaixo neste arquivo).
+--
+-- PENDENTE (09/09/2026): <leader>n/<leader>w abaixo criam/fecham
+-- TABPAGES nativas — mas a tabline agora (config/tabline.lua) lista
+-- BUFFERS, não tabpages. Os dois continuam funcionando sem erro,
+-- só não geram mais "aba nova" na tabline visível. Decidir depois se
+-- isso fica assim, muda de gramática, ou os dois somem.
 -- =========================================================
 
 local path = require("martini.utils.path")
@@ -27,8 +40,10 @@ local terminal = require("martini.utils.terminal")
 
 -- ── Arquivos e navegação ─────────────────────────────────
 vim.keymap.set("n", "<leader>n", ":tabnew<CR>")
-vim.keymap.set("n", "<leader>e", ":Lexplore<CR>", { desc = "Explorador de arquivos (netrw)" })
 vim.keymap.set("n", "<leader>w", ":tabclose<CR>", { desc = "Fechar aba atual" })
+
+-- <leader>e (explorador de arquivos) é registrado em plugins/oil.lua,
+-- junto do setup do oil.nvim — ver nota "NETRW → OIL" acima.
 
 -- Cria/abre arquivo sob o cursor em nova aba (ver utils/path.lua)
 vim.keymap.set("n", "gf", path.goto_or_create,
@@ -45,6 +60,15 @@ vim.keymap.set("n", "<leader>fd", function() Snacks.dashboard() end, { desc = "F
 -- ── Buffers ───────────────────────────────────────────────
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Fechar buffer" })
 vim.keymap.set("n", "<leader>bx", ":bd!<CR>", { desc = "Fechar buffer (forçado)" })
+
+-- ]b/[b (09/09/2026): navega entre buffers — mesma lógica de ficar
+-- FORA da gramática <leader>+domínio+verbo que já vale pra gd/K/[d/]d
+-- (convenção universal do ecossistema Neovim, ver cabeçalho). Motivo
+-- de existir agora: a tabline (config/tabline.lua) lista buffers
+-- como abas, mas só clique de mouse trocava de buffer até aqui —
+-- isso dá um caminho de teclado equivalente.
+vim.keymap.set("n", "]b", ":bnext<CR>", { desc = "Próximo buffer" })
+vim.keymap.set("n", "[b", ":bprevious<CR>", { desc = "Buffer anterior" })
 
 -- ── Terminal ──────────────────────────────────────────────
 vim.keymap.set("n", "<leader>t", terminal.open_horizontal, { desc = "Abrir terminal (split horizontal)" })

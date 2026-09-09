@@ -46,13 +46,17 @@ local ok, erro = pcall(function()
   -- Aparencia dos cursores extras — combina com o tema tokyonight
   -- definido em colors.lua
   local hl = vim.api.nvim_set_hl
+  -- Fundo SÓLIDO em vez de link pra outros grupos (Visual/Search) —
+  -- link depende do que tokyonight/colors.lua define pra esses
+  -- grupos, e contra o fundo preto puro (config/colors.lua) o
+  -- contraste ficava baixo demais pra notar a seleção/preview.
   hl(0, "MultiCursorCursor", { reverse = true })
-  hl(0, "MultiCursorVisual", { link = "Visual" })
-  hl(0, "MultiCursorSign", { link = "SignColumn" })
-  hl(0, "MultiCursorMatchPreview", { link = "Search" })
+  hl(0, "MultiCursorVisual", { bg = "#bd93f9", fg = "#000000" })
+  hl(0, "MultiCursorSign", { bg = "#bd93f9" })
+  hl(0, "MultiCursorMatchPreview", { bg = "#ffd700", fg = "#000000" })
   hl(0, "MultiCursorDisabledCursor", { reverse = true })
-  hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
-  hl(0, "MultiCursorDisabledSign", { link = "SignColumn" })
+  hl(0, "MultiCursorDisabledVisual", { bg = "#7a8290", fg = "#000000" })
+  hl(0, "MultiCursorDisabledSign", { bg = "#7a8290" })
 end)
 
 if not ok then

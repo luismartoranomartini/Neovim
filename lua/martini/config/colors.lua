@@ -131,6 +131,13 @@ local function aplicar_highlights()
   -- não importa o que tokyonight definir pro fundo da statusline.
   hl(0, "StatusLineModified", { fg = "#000000", bg = cor.laranja, bold = true })
 
+  -- Tabline de buffers (09/09/2026, ver config/tabline.lua) — buffer
+  -- ativo em destaque (branco + fundo levemente mais claro), inativos
+  -- em cinza (mesmo tom dos comentários), fundo da tabline preto puro.
+  hl(0, "MartiniTabLineSel", { fg = cor.branco, bg = "#1a1a1a", bold = true })
+  hl(0, "MartiniTabLine", { fg = cor.cinza, bg = "#000000" })
+  hl(0, "MartiniTabLineFill", { bg = "#000000" })
+
   -- Fundo preto puro
   hl(0, "Normal", { fg = cor.branco, bg = "#000000" })
   hl(0, "NormalNC", { bg = "#000000" })

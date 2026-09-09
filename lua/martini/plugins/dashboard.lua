@@ -19,6 +19,12 @@
 -- sistema específicos de plataforma — ver conversa sobre "o que pesa
 -- menos"). Pra adicionar isso depois, é só entrar mais uma seção
 -- `terminal` na lista abaixo.
+--
+-- NETRW → OIL (09/09/2026): tecla "e" do menu trocada de ":Lexplore"
+-- pra ":Oil" — netrw saiu de cena por completo (ver notas em
+-- lazy.lua e plugins/oil.lua). Ícones deste preset (header/keys) são
+-- glyphs Unicode fixos, não vêm de nvim-web-devicons nem mini.icons —
+-- por isso a troca de provedor de ícone não afeta nada aqui.
 -- =========================================================
 require("snacks").setup({
   bigfile = { enabled = false },
@@ -69,13 +75,13 @@ require("snacks").setup({
         "╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝╚═╝  ╚═══╝╚═╝",
       }, "\n"),
       -- Mesmas ações do menu que você já usa no resto da config —
-      -- fzf-lua pra arquivo/texto, netrw pro explorador, :Lazy pros
+      -- fzf-lua pra arquivo/texto, oil pro explorador, :Lazy pros
       -- plugins.
       keys = {
         { icon = " ", key = "n", desc = "New File", action = ":enew" },
         { icon = " ", key = "f", desc = "Find File", action = function() require("fzf-lua").files() end },
         { icon = " ", key = "g", desc = "Find Text", action = function() require("fzf-lua").live_grep() end },
-        { icon = " ", key = "e", desc = "Explorer", action = ":Lexplore" },
+        { icon = " ", key = "e", desc = "Explorer", action = ":Oil" },
         { icon = "󰒲 ", key = "l", desc = "Plugins (Lazy)", action = ":Lazy" },
         { icon = " ", key = "c", desc = "Config", action = ":e $MYVIMRC" },
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },

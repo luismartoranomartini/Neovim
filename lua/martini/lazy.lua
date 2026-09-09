@@ -22,9 +22,12 @@
 --
 -- ESCOPO REDUZIDO (set/2026): lista trimada a Go, JS/TS (web) e C —
 -- removidos onedark.nvim, nightfox.nvim (nunca usados — só tokyonight
--- é aplicado em config/colors.lua), nvim-tree.lua, nvim-web-devicons,
--- bufferline.nvim (não pedidos; <leader>e agora usa :Lexplore nativo)
--- e nvim-dap-python (Python fora do escopo atual).
+-- é aplicado em config/colors.lua), nvim-tree.lua e nvim-dap-python
+-- (Python fora do escopo atual). bufferline.nvim continua fora: as
+-- abas de buffer que aparecem em vídeos de referência não vêm de
+-- plugin nenhum — são a tabline NATIVA do Neovim, que já aparece
+-- sozinha com 2+ tabpages abertas. <leader>n/<leader>w (config/
+-- keymaps.lua) já geram isso sem precisar de código adicional.
 --
 -- CORREÇÃO (07/09/2026): a versão anterior rodava
 -- require("lazy").update({ show = false }) sozinha ~1s depois do
@@ -38,12 +41,26 @@
 -- :MartiniUpdatePlugins que o loader.lua antigo tinha, só que
 -- delegando pra API do próprio lazy.nvim em vez de git pull cru.
 --
--- ÍCONES NO NETRW (07/09/2026): nvim-web-devicons volta à lista, mas
--- só como PROVEDOR de glyphs — não é o mesmo cenário do nvim-tree
--- removido acima. Some junto prichrd/netrw.nvim, que não substitui o
--- netrw (continua sendo o :Lexplore nativo, mesmas teclas mf/mt/mc/
--- mm/mu), apenas intercepta a renderização do buffer pra desenhar um
--- ícone por linha usando esse provedor. Nenhuma tecla muda.
+-- NETRW → OIL (09/09/2026): a troca de "ícones no netrw" (07/09/2026,
+-- ver histórico git) foi de vida curta. netrw nativo saiu de cena por
+-- completo, junto com prichrd/netrw.nvim e nvim-web-devicons (que só
+-- existia como provedor de glyph pro netrw — ver plugins/netrw-icons.lua,
+-- REMOVIDO, substituído por plugins/oil.lua).
+--
+-- ENTROU stevearc/oil.nvim: edita o filesystem como um buffer de texto
+-- normal (deletar linha = deletar arquivo, :w aplica). default_file_
+-- explorer = true faz oil assumir TODO diretório aberto (nvim ., :e
+-- <pasta>) — netrw nunca mais entra em cena, nem como fallback.
+--
+-- ENTROU echasnovski/mini.icons NO LUGAR de nvim-web-devicons como
+-- provedor de ícone — decisão, não default da lib (o README do
+-- próprio oil.nvim aceita os dois). Motivo: replicar o setup de
+-- referência (github.com/FractalCodeRicardo/dev-config/tree/master/
+-- nvim/lua/plugins/oil.lua), pedido explicitamente. Confirmado antes
+-- da troca que nada mais na config dependia de nvim-web-devicons:
+-- fzf-lua detecta qualquer provedor de ícone instalado em runtime, e
+-- os ícones do dashboard (plugins/dashboard.lua) são glyphs Unicode
+-- fixos no preset, não chamada a nenhuma lib de ícone.
 -- =========================================================
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local primeiro_boot_lazy = vim.fn.isdirectory(lazypath) == 0
@@ -87,10 +104,12 @@ local plugins = {
   { "mistweaverco/kulala.nvim", lazy = false },
   { "jake-stewart/multicursor.nvim", branch = "1.0", lazy = false },
   { "ibhagwan/fzf-lua", lazy = false },
-  -- Ícones no netrw (ver nota acima) — nvim-web-devicons é só o
-  -- provedor de glyphs, netrw.nvim é quem desenha na tela do :Lexplore.
-  { "nvim-tree/nvim-web-devicons", lazy = false },
-  { "prichrd/netrw.nvim", lazy = false },
+  -- Explorador de arquivos: oil.nvim edita o filesystem como buffer,
+  -- substituindo o netrw por completo (ver nota "NETRW → OIL" acima).
+  -- mini.icons é o provedor de glyph/cor (não nvim-web-devicons — ver
+  -- nota acima pro motivo da escolha).
+  { "stevearc/oil.nvim", lazy = false },
+  { "echasnovski/mini.icons", lazy = false },
 }
 
 -- Detecta se algum plugin ainda não foi clonado ANTES de chamar setup()
