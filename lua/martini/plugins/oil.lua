@@ -44,6 +44,20 @@ require("oil").setup({
   default_file_explorer = true,
   view_options = {
     show_hidden = true,
+    -- Pastas de sistema do NTFS (comuns em volumes Windows montados,
+    -- ver /run/media/.../Luis/ nas notas de ambiente) — permissão
+    -- restrita faz uv.fs_stat falhar nelas, e o fallback do oil pra
+    -- descobrir o tipo (vim.filetype.match -> vim.fs.abspath) crasha
+    -- com "assertion failed" em vez de simplesmente tratar como
+    -- arquivo comum. Escondidas sempre, mesmo com show_hidden = true
+    -- — não há motivo pra abrir essas pastas de dentro do oil.
+    is_always_hidden = function(name, _)
+      local pastas_sistema_ntfs = {
+        ["$RECYCLE.BIN"] = true,
+        ["System Volume Information"] = true,
+      }
+      return pastas_sistema_ntfs[name] == true or name:match("^%.Trash%-%d+$") ~= nil
+    end,
   },
 })
 
