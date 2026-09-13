@@ -21,6 +21,25 @@ local function aplicar_highlights()
     teal = "#5ccfe6",    -- parâmetros de função
   }
 
+  -- Chaves de mapeamento (YAML "services:", JSON, propriedades de
+  -- objeto em JS/TS) → CIANO — mesma família visual de "pacotes /
+  -- namespaces", já que semanticamente são "rótulos", não valores.
+  hl(0, "@property", { fg = cor.ciano })
+
+  -- Pontuação (":", ",", "-" de item de lista, "[]"/"{}") → CINZA,
+  -- deliberadamente discreta pra não competir com chave/valor.
+  hl(0, "@punctuation.delimiter", { fg = cor.cinza })
+  hl(0, "@punctuation.bracket", { fg = cor.cinza })
+
+  -- Marcadores especiais de YAML ("---", "...", "&"/"*" de âncora) →
+  -- ROSA, mesma cor de operadores (visualmente "estrutural", não dado).
+  hl(0, "@punctuation.special", { fg = cor.rosa })
+  hl(0, "@keyword.directive", { fg = cor.vermelho })
+
+  -- Nome de âncora/alias YAML (&base, *base) → ROXO, junto da família
+  -- de builtins/constantes especiais.
+  hl(0, "@label", { fg = cor.roxo })
+
   -- Funções e métodos → AZUL
   hl(0, "@lsp.type.function", { fg = cor.azul, italic = true })
   hl(0, "@lsp.type.function.go", { fg = cor.azul, italic = true })
@@ -137,6 +156,28 @@ local function aplicar_highlights()
   hl(0, "MartiniTabLineSel", { fg = cor.branco, bg = "#1a1a1a", bold = true })
   hl(0, "MartiniTabLine", { fg = cor.cinza, bg = "#000000" })
   hl(0, "MartiniTabLineFill", { bg = "#000000" })
+
+  -- fzf-lua (09/09/2026, ver plugins/finder.lua) — janela e borda em
+  -- preto/cinza (consistente com o resto da UI), matches de busca em
+  -- laranja (mesmo tom de números/constantes, alto contraste), linha
+  -- selecionada com o mesmo cinza-escuro da CursorLine/tabline ativa.
+  hl(0, "FzfLuaNormal", { bg = "#000000" })
+  hl(0, "FzfLuaBorder", { fg = cor.cinza, bg = "#000000" })
+  hl(0, "FzfLuaTitle", { fg = cor.azul, bold = true })
+  hl(0, "FzfLuaFzfNormal", { bg = "#000000" })
+  hl(0, "FzfLuaFzfBorder", { fg = cor.cinza, bg = "#000000" })
+  hl(0, "FzfLuaFzfPrompt", { fg = cor.azul, bold = true })
+  hl(0, "FzfLuaFzfQuery", { fg = cor.branco })
+  hl(0, "FzfLuaFzfMatch", { fg = cor.laranja, bold = true })
+  hl(0, "FzfLuaFzfPointer", { fg = cor.verde })
+  hl(0, "FzfLuaFzfMarker", { fg = cor.rosa })
+  hl(0, "FzfLuaFzfCursorLine", { bg = "#1a1a1a" })
+  hl(0, "FzfLuaCursorLine", { bg = "#1a1a1a" })
+  hl(0, "FzfLuaPreviewNormal", { bg = "#000000" })
+  hl(0, "FzfLuaPreviewBorder", { fg = cor.ciano, bg = "#000000" })
+  hl(0, "FzfLuaPreviewTitle", { fg = cor.ciano, bold = true })
+  hl(0, "FzfLuaHeaderText", { fg = cor.cinza })
+  hl(0, "FzfLuaHeaderBind", { fg = cor.cinza })
 
   -- Fundo preto puro
   hl(0, "Normal", { fg = cor.branco, bg = "#000000" })

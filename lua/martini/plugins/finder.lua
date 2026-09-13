@@ -10,6 +10,13 @@
 -- modo normal:
 --   <C-p> == equivalente a 'k' (sobe uma linha) — redundante
 --   <C-g> == mostra nome/status do arquivo atual — baixo uso no dia a dia
+--
+-- LAYOUT (09/09/2026): janela centralizada, mais compacta que o
+-- padrão da lib (0.85x0.80) e com preview fixo à direita, sem alternar
+-- de posição sozinho — decisão explícita, redesenho completo do
+-- winopts padrão. Cores dos highlights FzfLua* (borda, match, cursor,
+-- etc.) ficam centralizadas em config/colors.lua, junto de todo o
+-- resto da paleta — não aqui.
 -- =========================================================
 
 pcall(function()
@@ -17,11 +24,23 @@ pcall(function()
 
   fzf.setup({
     winopts = {
-      height = 0.85,
-      width = 0.85,
+      -- Janela centralizada e mais compacta que o padrão da lib
+      -- (0.85x0.80) — ocupa menos tela, foco no que importa.
+      height = 0.6,
+      width = 0.7,
+      row = 0.5,
+      col = 0.5,
+      border = "rounded",
+      title_pos = "center",
+      backdrop = 70, -- escurece o resto da tela, dá foco à janela
       preview = {
         default = "bat", -- usa bat se disponível; cai para cat se não
-        vertical = "up:45%",
+        border = "rounded",
+        layout = "horizontal", -- preview sempre à direita, sem alternar
+        horizontal = "right:45%",
+        title = true,
+        title_pos = "center",
+        scrollbar = "border",
       },
     },
     files = {

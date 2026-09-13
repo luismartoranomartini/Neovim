@@ -11,9 +11,10 @@
 --
 -- LISTA REDUZIDA (set/2026) ao que é realmente usado: Go, JS/TS/TSX
 -- (web), C, HTML/CSS (templates Go + front-end), Lua (edição da
--- própria config). Removidos: python, yaml.
+-- própria config), YAML (docker-compose, CI, configs). Removido:
+-- python (fora do escopo atual).
 -- =========================================================
-local ts_langs = { "lua", "javascript", "typescript", "tsx", "go", "c", "html", "css" }
+local ts_langs = { "lua", "javascript", "typescript", "tsx", "go", "c", "html", "css", "yaml" }
 
 pcall(function()
   require("nvim-treesitter").install(ts_langs)
