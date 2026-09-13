@@ -24,7 +24,12 @@
 -- carregamento e escolhendo o comando certo — mesma lógica que
 -- languages/go.lua e config/keymaps.lua já usam pra outras diferenças
 -- de plataforma (ver flag is_windows mencionada no restante da config).
+--
+-- SAFE_REQUIRE (09/09/2026): pcall mudo trocado por
+-- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
 -- =========================================================
+
+local safe_require = require("martini.utils.safe_require")
 
 -- Comando de abrir URL/arquivo no programa padrão do SO.
 -- macOS: "open" · Windows: "start" (via cmd, precisa do "" — primeiro
@@ -61,8 +66,8 @@ local base_filetypes = {
 local go = require("martini.languages.go")
 local filetypes = vim.tbl_extend("force", base_filetypes, go.runner_filetypes or {})
 
-pcall(function()
-  require("code_runner").setup({
+safe_require("code_runner", function(code_runner)
+  code_runner.setup({
     mode = "term",
     focus = true,
     startinsert = false,
@@ -72,4 +77,4 @@ pcall(function()
     },
     filetype = filetypes,
   })
-end)
+end, "executar arquivo/projeto (<leader>r/<leader>rp)")

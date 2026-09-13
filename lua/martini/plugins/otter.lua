@@ -17,10 +17,15 @@
 -- pro cmp-nvim-lsp automaticamente — não precisa de keymap especial,
 -- os atalhos normais (gd, K, autocomplete) já funcionam dentro do
 -- <script>.
+--
+-- SAFE_REQUIRE (09/09/2026): pcalls mudos trocados por
+-- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
 -- =========================================================
 
-pcall(function()
-  require("otter").setup({
+local safe_require = require("martini.utils.safe_require")
+
+safe_require("otter", function(otter)
+  otter.setup({
     lsp = {
       diagnostic_update_events = { "BufWritePost", "InsertLeave" },
     },
@@ -28,7 +33,7 @@ pcall(function()
       set_filetype = true,
     },
   })
-end)
+end, "autocomplete de JS/CSS dentro de <script>/<style> em HTML")
 
 -- Ativa pro JS dentro de <script> e CSS dentro de <style>. Cobre
 -- tanto .html "puro" quanto .tmpl/.gohtml (languages/go.lua já seta
@@ -37,8 +42,8 @@ end)
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "html",
   callback = function()
-    pcall(function()
-      require("otter").activate({ "javascript", "css" }, true, true)
-    end)
+    safe_require("otter", function(otter)
+      otter.activate({ "javascript", "css" }, true, true)
+    end, "autocomplete de JS/CSS dentro de <script>/<style> em HTML")
   end,
 })

@@ -13,12 +13,23 @@
 -- (web), C, HTML/CSS (templates Go + front-end), Lua (edição da
 -- própria config), YAML (docker-compose, CI, configs). Removido:
 -- python (fora do escopo atual).
+--
+-- SAFE_REQUIRE (09/09/2026): o pcall do install() foi trocado por
+-- utils/safe_require.lua (ver nota completa em plugins/editing.lua).
+-- O pcall(vim.treesitter.start, ...) no autocmd FileType NÃO mudou —
+-- não é um caso de "plugin ausente", é uma chamada defensiva de API
+-- por buffer (pode falhar legitimamente se o parser daquele filetype
+-- específico ainda não terminou de compilar), categoria diferente do
+-- que safe_require resolve.
 -- =========================================================
+
+local safe_require = require("martini.utils.safe_require")
+
 local ts_langs = { "lua", "javascript", "typescript", "tsx", "go", "c", "html", "css", "yaml" }
 
-pcall(function()
-  require("nvim-treesitter").install(ts_langs)
-end)
+safe_require("nvim-treesitter", function(nvim_treesitter)
+  nvim_treesitter.install(ts_langs)
+end, "parsers do Treesitter (highlight de sintaxe)")
 
 -- Força o início do Treesitter highlight ao abrir arquivos.
 -- Necessário no 0.12 onde não existe mais highlight={enable=true}.

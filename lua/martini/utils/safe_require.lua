@@ -14,19 +14,37 @@
 --   2. Módulo encontrado, mas setup() deu erro — plugin instalado,
 --      configuração (a função de callback) é que tem problema.
 --
--- USO (em qualquer plugins/*.lua):
---   local safe_require = require("martini.utils.safe_require")
+-- DUAS FORMAS DE USO:
 --
---   safe_require("nvim-autopairs", function(nvim_autopairs)
---     nvim_autopairs.setup({ check_ts = true })
---   end, "fecha parênteses/aspas automaticamente ao digitar")
+--   1. safe_require(nome, callback, funcionalidade) — require + setup
+--      imediato. Uso mais comum (ver plugins/editing.lua, format.lua,
+--      finder.lua, etc.):
 --
--- O 3º argumento é uma frase curta e livre descrevendo o IMPACTO pro
--- usuário se o plugin faltar — não o nome técnico de novo, que já
--- está no 1º argumento.
+--        local safe_require = require("martini.utils.safe_require")
+--        safe_require("nvim-autopairs", function(nvim_autopairs)
+--          nvim_autopairs.setup({ check_ts = true })
+--        end, "fecha parênteses/aspas automaticamente ao digitar")
+--
+--   2. safe_require.get(nome, funcionalidade) — só busca o módulo e
+--      devolve (ou nil, já notificando), sem chamar setup nenhum.
+--      Útil quando o resto do arquivo precisa decidir o que fazer
+--      com o módulo depois (ver plugins/completion.lua,
+--      textobjects.lua):
+--
+--        local cmp = safe_require.get("cmp", "autocomplete")
+--        if cmp then cmp.setup({...}) end
+--
+-- O último argumento (funcionalidade) é sempre uma frase curta e
+-- livre descrevendo o IMPACTO pro usuário se o plugin faltar — não o
+-- nome técnico de novo, que já está no 1º argumento.
 -- =========================================================
 
-local function safe_require(nome_modulo, callback, funcionalidade)
+local M = {}
+
+---@param nome_modulo string
+---@param funcionalidade? string
+---@return any|nil
+function M.get(nome_modulo, funcionalidade)
   local descricao = funcionalidade or "uma funcionalidade"
 
   local ok_require, modulo_ou_erro = pcall(require, nome_modulo)
@@ -42,7 +60,20 @@ local function safe_require(nome_modulo, callback, funcionalidade)
     return nil
   end
 
-  local ok_setup, erro_setup = pcall(callback, modulo_ou_erro)
+  return modulo_ou_erro
+end
+
+---@param nome_modulo string
+---@param callback fun(modulo: any)
+---@param funcionalidade? string
+---@return any|nil
+function M.setup(nome_modulo, callback, funcionalidade)
+  local descricao = funcionalidade or "uma funcionalidade"
+
+  local modulo = M.get(nome_modulo, descricao)
+  if not modulo then return nil end
+
+  local ok_setup, erro_setup = pcall(callback, modulo)
   if not ok_setup then
     vim.notify(
       string.format(
@@ -56,7 +87,14 @@ local function safe_require(nome_modulo, callback, funcionalidade)
     return nil
   end
 
-  return modulo_ou_erro
+  return modulo
 end
 
-return safe_require
+-- Torna M chamável diretamente: safe_require(nome, callback, desc) ==
+-- safe_require.setup(nome, callback, desc). Mantém compatível o uso
+-- que já foi aplicado em plugins/editing.lua antes de M.get existir.
+setmetatable(M, {
+  __call = function(_, ...) return M.setup(...) end,
+})
+
+return M

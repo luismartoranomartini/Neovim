@@ -17,11 +17,14 @@
 -- winopts padrão. Cores dos highlights FzfLua* (borda, match, cursor,
 -- etc.) ficam centralizadas em config/colors.lua, junto de todo o
 -- resto da paleta — não aqui.
+--
+-- SAFE_REQUIRE (09/09/2026): pcall mudo trocado por
+-- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
 -- =========================================================
 
-pcall(function()
-  local fzf = require("fzf-lua")
+local safe_require = require("martini.utils.safe_require")
 
+safe_require("fzf-lua", function(fzf)
   fzf.setup({
     winopts = {
       -- Janela centralizada e mais compacta que o padrão da lib
@@ -55,7 +58,7 @@ pcall(function()
   -- também code actions do LSP com múltiplas opções, pela mesma janela
   -- flutuante com borda usada no <C-p>/<C-g>.
   fzf.register_ui_select()
-end)
+end, "busca fuzzy de arquivo/texto (<C-p>/<C-g>)")
 
 -- =========================================================
 -- Atalhos — sem prefixo <leader>

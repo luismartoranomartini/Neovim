@@ -3,7 +3,16 @@
 -- nvim-cmp + LuaSnip + capabilities LSP + integração com Emmet no Tab.
 -- Carrega ANTES de plugins/lsp.lua: define vim.lsp.config["*"] com as
 -- capabilities do cmp_nvim_lsp, que os servidores individuais herdam.
+--
+-- SAFE_REQUIRE (09/09/2026): pcalls mudos trocados por
+-- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
+-- Usa safe_require.get() (não a forma chamável direta) porque cmp E
+-- luasnip precisam estar presentes ANTES de decidir configurar
+-- qualquer coisa — não dá pra fazer "setup imediato" de um sem saber
+-- se o outro também existe.
 -- =========================================================
+
+local safe_require = require("martini.utils.safe_require")
 
 -- Verifica se a posição atual tem uma abreviação Emmet válida
 local emmet_fts = { html = true, css = true, scss = true, jsx = true, tsx = true, gotmpl = true }
@@ -15,16 +24,19 @@ local function emmet_expandable()
   return before:match("[%w%.#%[%]>%)%*]+$") ~= nil
 end
 
-local ok_cmp, cmp = pcall(require, "cmp")
-local ok_snip, luasnip = pcall(require, "luasnip")
+local cmp = safe_require.get("cmp", "autocomplete (nvim-cmp)")
+local luasnip = safe_require.get("luasnip", "expansão de snippets")
 
-if ok_cmp and ok_snip then
-  pcall(function()
-    require("luasnip.loaders.from_vscode").lazy_load()
-  end)
+if cmp and luasnip then
+  safe_require("luasnip.loaders.from_vscode", function(loader)
+    loader.lazy_load()
+  end, "snippets prontos (friendly-snippets)")
 
-  local capabilities = require("cmp_nvim_lsp").default_capabilities()
-  vim.lsp.config["*"] = { capabilities = capabilities }
+  local cmp_nvim_lsp = safe_require.get("cmp_nvim_lsp", "capabilities de LSP pro autocomplete")
+  if cmp_nvim_lsp then
+    local capabilities = cmp_nvim_lsp.default_capabilities()
+    vim.lsp.config["*"] = { capabilities = capabilities }
+  end
 
   cmp.setup({
     snippet = {
@@ -76,8 +88,7 @@ if ok_cmp and ok_snip then
     },
   })
 
-  pcall(function()
-    cmp.event:on("confirm_done",
-      require("nvim-autopairs.completion.cmp").on_confirm_done())
-  end)
+  safe_require("nvim-autopairs.completion.cmp", function(autopairs_cmp)
+    cmp.event:on("confirm_done", autopairs_cmp.on_confirm_done())
+  end, "fechar par automaticamente ao confirmar item do autocomplete")
 end

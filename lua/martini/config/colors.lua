@@ -189,8 +189,10 @@ local function aplicar_highlights()
   hl(0, "CursorLine", { bg = "#1a1a1a" })
 end
 
-pcall(function()
-  require("tokyonight").setup({
+-- SAFE_REQUIRE (09/09/2026): pcall mudo trocado por
+-- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
+require("martini.utils.safe_require")("tokyonight", function(tokyonight)
+  tokyonight.setup({
     style = "night",
     styles = {
       comments = { italic = true },
@@ -199,7 +201,7 @@ pcall(function()
     },
   })
   vim.cmd.colorscheme("tokyonight-night")
-end)
+end, "tema de cores base (tokyonight-night)")
 
 aplicar_highlights()
 

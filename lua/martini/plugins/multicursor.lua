@@ -1,9 +1,17 @@
 -- =========================================================
 -- lua/martini/plugins/multicursor.lua
 -- Multiplos cursores (jake-stewart/multicursor.nvim, branch 1.0)
+--
+-- SAFE_REQUIRE (09/09/2026): já tinha tratamento de erro próprio
+-- (pcall + vim.notify genérico) — trocado por utils/safe_require.lua
+-- só pra ficar no mesmo padrão do resto da config (nome do plugin,
+-- funcionalidade afetada e comando de correção na mensagem, em vez
+-- de só o texto cru do erro). Ver nota completa em plugins/editing.lua.
 -- =========================================================
-local ok, erro = pcall(function()
-  local mc = require("multicursor-nvim")
+
+local safe_require = require("martini.utils.safe_require")
+
+safe_require("multicursor-nvim", function(mc)
   mc.setup()
   local map = vim.keymap.set
   -- Adiciona cursor na linha de cima/baixo (funciona em normal e visual)
@@ -57,8 +65,4 @@ local ok, erro = pcall(function()
   hl(0, "MultiCursorDisabledCursor", { reverse = true })
   hl(0, "MultiCursorDisabledVisual", { bg = "#7a8290", fg = "#000000" })
   hl(0, "MultiCursorDisabledSign", { bg = "#7a8290" })
-end)
-
-if not ok then
-  vim.notify("multicursor.lua ERRO: " .. tostring(erro), vim.log.levels.ERROR)
-end
+end, "múltiplos cursores (<leader>m*, <C-Up>/<C-Down>)")

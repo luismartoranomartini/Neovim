@@ -4,6 +4,25 @@
 -- Bootstrap: patch 0.12.2 + lazy.nvim + ordem de carregamento
 -- =========================================================
 -- =========================================================
+-- VERSÃO MÍNIMA (09/09/2026)
+-- A config depende de APIs específicas do Neovim 0.12 (ex.:
+-- vim.diagnostic.jump, ver plugins/lsp.lua) e tem um patch dedicado
+-- pro bug do 0.12.2 logo abaixo. Roda ANTES de tudo, inclusive do
+-- patch — se a versão já está errada, é a primeira coisa que você
+-- precisa saber. Abaixo de 0.12, não interrompe o carregamento (não
+-- dá pra afirmar com certeza o que quebra e o que não quebra em
+-- versões antigas sem testar) — só avisa alto e claro, em vez de
+-- deixar você descobrir via um traceback confuso mais adiante.
+-- =========================================================
+if vim.fn.has("nvim-0.12") == 0 then
+  vim.notify(
+    "martini.nvim requer Neovim 0.12+ (versão atual: " .. tostring(vim.version())
+      .. "). LSP/diagnostics usam APIs específicas do 0.12 — algumas partes da config"
+      .. " provavelmente vão falhar. Rode :checkhealth martini para mais detalhes.",
+    vim.log.levels.ERROR
+  )
+end
+-- =========================================================
 -- PATCH: Bug no Neovim 0.12.2 — chave 'buf' inválida
 -- =========================================================
 do

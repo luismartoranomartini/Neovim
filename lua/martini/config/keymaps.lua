@@ -39,7 +39,7 @@ local path = require("martini.utils.path")
 local terminal = require("martini.utils.terminal")
 
 -- ── Arquivos e navegação ─────────────────────────────────
-vim.keymap.set("n", "<leader>n", ":tabnew<CR>")
+vim.keymap.set("n", "<leader>n", ":tabnew<CR>", { desc = "Nova tabpage" })
 vim.keymap.set("n", "<leader>w", ":tabclose<CR>", { desc = "Fechar aba atual" })
 
 -- <leader>e (explorador de arquivos) é registrado em plugins/oil.lua,

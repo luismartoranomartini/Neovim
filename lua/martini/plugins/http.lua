@@ -2,7 +2,16 @@
 -- lua/martini/plugins/http.lua
 -- HTTP client (kulala.nvim) — testa APIs via arquivos .http
 -- Requisitos: Neovim 0.12+, curl, git, tree-sitter-cli (já presente)
+--
+-- SAFE_REQUIRE (09/09/2026): pcall mudo trocado por
+-- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
+-- Só no setup_kulala() — os require("kulala") dentro de cada atalho
+-- <leader>h* continuam diretos, já protegidos pelo gate kulala_ready
+-- (se o setup falhar, você já foi avisado antes de qualquer atalho
+-- ser pressionado).
 -- =========================================================
+
+local safe_require = require("martini.utils.safe_require")
 
 -- Ativa o filetype "http" para arquivos .http e .rest
 vim.filetype.add({
@@ -20,8 +29,8 @@ local function setup_kulala()
   if kulala_ready then return end
   kulala_ready = true
 
-  pcall(function()
-    require("kulala").setup({
+  safe_require("kulala", function(kulala)
+    kulala.setup({
       -- Ambiente padrão (dev/test/prod definidos em http-client.env.json)
       default_env = "dev",
 
@@ -42,7 +51,7 @@ local function setup_kulala()
       -- mantendo compatibilidade com arquivos .http existentes
       vscode_rest_client_environmentvars = true,
     })
-  end)
+  end, "cliente HTTP (.http/.rest, <leader>h*)")
 end
 
 vim.api.nvim_create_autocmd("FileType", {
