@@ -4,13 +4,41 @@ Configuração pessoal do Neovim, focada em Go, JavaScript/TypeScript (web) e C.
 
 ## Requisitos
 
-- Neovim 0.12+
-- `git`
+- Neovim 0.12+, `git`, `curl`
+- Toolchain: `go` (pra compilar `gopls`/`dlv`), `node`+`npm` (LSPs web, `prettier`, runner de `.ts`), `gcc`/`g++` (runner de `.c`/`.cpp`)
 - LSP: `gopls`, `typescript-language-server`, `vscode-html-language-server`, `vscode-css-language-server`, `clangd`
-- Lint/format: `golangci-lint` (v1 ou v2), `prettier`, `clang-format`
+- Lint/format: `golangci-lint`, `prettier`, `clang-format`
 - Debug: `dlv` (Delve, Go), `codelldb` (C/C++)
 - Runner/busca: `fd`, `fzf`, `ripgrep` (`rg`), `bat` (preview)
 - `xdg-open` (abrir HTML no navegador via runner)
+- `tree-sitter-cli` (parser do filetype `.http`/`.rest`, usado por `kulala.nvim`)
+
+Rode `:checkhealth martini` depois de instalar tudo, pra conferir de uma vez o que falta.
+
+Testado em **Arch Linux** e **Fedora** (as duas máquinas reais em uso). Sem suporte a Windows documentado — não é mais uma plataforma em uso.
+
+## Instalação das dependências (Arch / Fedora)
+
+| Ferramenta | Finalidade | Arch Linux | Fedora |
+|---|---|---|---|
+| `git`, `curl` | básico | `pacman -S git curl` | `dnf install git curl` |
+| `go` | toolchain Go (`gopls`, `dlv`) | `pacman -S go` | `dnf install golang` |
+| `nodejs`, `npm` | toolchain JS (LSPs web, prettier, runner `.ts`) | `pacman -S nodejs npm` | `dnf install nodejs` |
+| `gcc`, `g++` | compilar `.c`/`.cpp` no runner | `pacman -S gcc` | `dnf install gcc gcc-c++` |
+| `gopls` | LSP Go | `go install golang.org/x/tools/gopls@latest` | idêntico |
+| `typescript-language-server` | LSP JS/TS | `npm i -g typescript-language-server typescript` | idêntico |
+| `vscode-html-language-server`, `vscode-css-language-server` | LSP HTML/CSS | `npm i -g vscode-langservers-extracted` | idêntico |
+| `clangd`, `clang-format` | LSP C + formatação | `pacman -S clang` | `dnf install clang-tools-extra` |
+| `golangci-lint` | lint Go | script oficial: `curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \| sh -s -- -b $(go env GOPATH)/bin` | idêntico (não tem pacote `dnf` oficial) |
+| `prettier` | formatação JS/TS/HTML/CSS | `npm i -g prettier` | idêntico |
+| `tree-sitter-cli` | parser `.http`/`.rest` | `npm i -g tree-sitter-cli` | idêntico |
+| `dlv` (Delve) | debug Go | `go install github.com/go-delve/delve/cmd/dlv@latest` | idêntico |
+| `codelldb` | debug C/C++ | `yay -S codelldb-bin` (AUR) | sem pacote — baixe o `.vsix` da [release](https://github.com/vadimcn/codelldb/releases) pro seu SO, extraia, e coloque `extension/adapter/codelldb` no PATH |
+| `fd` | busca de arquivo (`<C-p>`) | `pacman -S fd` | `dnf install fd-find` (binário já sai como `fd`, sem alias) |
+| `fzf` | picker de busca | `pacman -S fzf` | `dnf install fzf` |
+| `ripgrep` (`rg`) | busca de texto (`<C-g>`) | `pacman -S ripgrep` | `dnf install ripgrep` |
+| `bat` | preview do fzf-lua | `pacman -S bat` | `dnf install bat` |
+| `xdg-utils` (`xdg-open`) | abrir HTML no navegador | `pacman -S xdg-utils` | `dnf install xdg-utils` |
 
 ## Instalação
 
