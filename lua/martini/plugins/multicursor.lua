@@ -17,6 +17,13 @@ safe_require("multicursor-nvim", function(mc)
   -- Adiciona cursor na linha de cima/baixo (funciona em normal e visual)
   map({ "n", "x" }, "<C-Up>", function() mc.lineAddCursor(-1) end, { desc = "Multicursor: cursor acima" })
   map({ "n", "x" }, "<C-Down>", function() mc.lineAddCursor(1) end, { desc = "Multicursor: cursor abaixo" })
+  -- Aliases <C-k>/<C-j> (09/09/2026), mesma ação de <C-Up>/<C-Down> —
+  -- pedido explícito, com ressalva registrada: em alguns terminais,
+  -- <C-j> é indistinguível de Enter (mesmo código de controle, \n),
+  -- então pode não disparar de forma confiável dependendo do setup.
+  -- <C-Up>/<C-Down> continuam sendo o caminho garantido.
+  map({ "n", "x" }, "<C-k>", function() mc.lineAddCursor(-1) end, { desc = "Multicursor: cursor acima" })
+  map({ "n", "x" }, "<C-j>", function() mc.lineAddCursor(1) end, { desc = "Multicursor: cursor abaixo" })
   -- Pula uma linha sem adicionar cursor (util pra saltar blocos)
   map({ "n", "x" }, "<leader>mj", function() mc.lineSkipCursor(1) end, { desc = "Multicursor: pular linha abaixo" })
   map({ "n", "x" }, "<leader>mk", function() mc.lineSkipCursor(-1) end, { desc = "Multicursor: pular linha acima" })
