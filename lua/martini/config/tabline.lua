@@ -31,6 +31,15 @@
 -- <leader>n/<leader>w continuam funcionando mecanicamente, mas não
 -- geram mais uma "aba nova" visualmente aqui. Ver conversa: decidir
 -- se remove/repensa esses dois depois.
+--
+-- MARCA DE GIT (09/09/2026): "±" aparece ao lado do nome quando o
+-- arquivo tem mudança em relação ao último commit — lido de
+-- vim.b[bufnr].gitsigns_status_dict, que o plugins/gitsigns.lua já
+-- calcula em background (não recalcula nada aqui, só lê). Cor
+-- própria (MartiniTabLineGit), separada do "●" de "buffer com edição
+-- não salva": são informações diferentes — "●" é sobre o que está na
+-- TELA agora, "±" é sobre o que está no DISCO vs o último commit. Um
+-- arquivo pode ter só um dos dois, os dois, ou nenhum.
 -- =========================================================
 
 local function nome_curto(bufnr)
@@ -48,9 +57,15 @@ local function render()
     local nome = nome_curto(buf.bufnr)
     local modificado = (buf.changed == 1) and " ●" or ""
 
+    local git_marcador = ""
+    local status = vim.b[buf.bufnr].gitsigns_status_dict
+    if status and ((status.added or 0) + (status.changed or 0) + (status.removed or 0)) > 0 then
+      git_marcador = " %#MartiniTabLineGit#±" .. grupo
+    end
+
     table.insert(partes, string.format(
-      "%s %%%d@v:lua.MartiniTabLineClick@ %s%s %%X",
-      grupo, buf.bufnr, nome, modificado
+      "%s %%%d@v:lua.MartiniTabLineClick@ %s%s%s %%X",
+      grupo, buf.bufnr, nome, modificado, git_marcador
     ))
   end
 

@@ -110,6 +110,15 @@ local plugins = {
   -- nota acima pro motivo da escolha).
   { "stevearc/oil.nvim", lazy = false },
   { "echasnovski/mini.icons", lazy = false },
+  -- Indicação visual de "arquivo mudou, falta git add/commit"
+  -- (09/09/2026): gitsigns.nvim mostra +/~/- por LINHA na coluna de
+  -- sinais, dentro do próprio arquivo aberto. oil-git-status.nvim
+  -- mostra o status por ARQUIVO dentro da listagem do oil (mesmas
+  -- letras do "git status --short": M, A, ?, D...) — dependência
+  -- explícita de oil.nvim, só faz sentido com ele instalado. Ver
+  -- plugins/gitsigns.lua e a config extra dentro de plugins/oil.lua.
+  { "lewis6991/gitsigns.nvim", lazy = false },
+  { "refractalize/oil-git-status.nvim", dependencies = { "stevearc/oil.nvim" }, lazy = false },
 }
 
 -- Detecta se algum plugin ainda não foi clonado ANTES de chamar setup()

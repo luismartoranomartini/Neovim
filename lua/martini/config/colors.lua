@@ -150,12 +150,52 @@ local function aplicar_highlights()
   -- não importa o que tokyonight definir pro fundo da statusline.
   hl(0, "StatusLineModified", { fg = "#000000", bg = cor.laranja, bold = true })
 
+  -- Sinais de git no gutter (09/09/2026, ver plugins/gitsigns.lua) —
+  -- verde/laranja/vermelho seguindo a mesma lógica de "adicionado /
+  -- modificado / removido" já usada nos breakpoints do DAP acima.
+  hl(0, "GitSignsAdd", { fg = cor.verde })
+  hl(0, "GitSignsChange", { fg = cor.laranja })
+  hl(0, "GitSignsDelete", { fg = cor.vermelho })
+  hl(0, "GitSignsTopdelete", { fg = cor.vermelho })
+  hl(0, "GitSignsChangedelete", { fg = cor.laranja })
+  hl(0, "GitSignsUntracked", { fg = cor.cinza })
+
+  -- Status de git na listagem do oil (09/09/2026, ver plugins/oil.lua)
+  -- — mesmas cores de gitsigns acima, working tree (o que você vê no
+  -- disco agora) em tom cheio, índice (o que já está staged) num tom
+  -- mais apagado, pra diferenciar os dois de relance.
+  hl(0, "OilGitStatusWorkingTreeModified", { fg = cor.laranja })
+  hl(0, "OilGitStatusWorkingTreeAdded", { fg = cor.verde })
+  hl(0, "OilGitStatusWorkingTreeDeleted", { fg = cor.vermelho })
+  hl(0, "OilGitStatusWorkingTreeUntracked", { fg = cor.ciano })
+  hl(0, "OilGitStatusWorkingTreeRenamed", { fg = cor.roxo })
+  hl(0, "OilGitStatusWorkingTreeCopied", { fg = cor.roxo })
+  hl(0, "OilGitStatusWorkingTreeTypeChanged", { fg = cor.laranja })
+  hl(0, "OilGitStatusWorkingTreeUnmerged", { fg = cor.vermelho, bold = true })
+  hl(0, "OilGitStatusWorkingTreeIgnored", { fg = cor.cinza })
+  hl(0, "OilGitStatusWorkingTreeUnmodified", { fg = cor.cinza })
+  hl(0, "OilGitStatusIndexModified", { fg = cor.laranja, italic = true })
+  hl(0, "OilGitStatusIndexAdded", { fg = cor.verde, italic = true })
+  hl(0, "OilGitStatusIndexDeleted", { fg = cor.vermelho, italic = true })
+  hl(0, "OilGitStatusIndexUntracked", { fg = cor.ciano, italic = true })
+  hl(0, "OilGitStatusIndexRenamed", { fg = cor.roxo, italic = true })
+  hl(0, "OilGitStatusIndexCopied", { fg = cor.roxo, italic = true })
+  hl(0, "OilGitStatusIndexTypeChanged", { fg = cor.laranja, italic = true })
+  hl(0, "OilGitStatusIndexUnmerged", { fg = cor.vermelho, bold = true, italic = true })
+  hl(0, "OilGitStatusIndexIgnored", { fg = cor.cinza, italic = true })
+  hl(0, "OilGitStatusIndexUnmodified", { fg = cor.cinza, italic = true })
+
   -- Tabline de buffers (09/09/2026, ver config/tabline.lua) — buffer
   -- ativo em destaque (branco + fundo levemente mais claro), inativos
   -- em cinza (mesmo tom dos comentários), fundo da tabline preto puro.
   hl(0, "MartiniTabLineSel", { fg = cor.branco, bg = "#1a1a1a", bold = true })
   hl(0, "MartiniTabLine", { fg = cor.cinza, bg = "#000000" })
   hl(0, "MartiniTabLineFill", { bg = "#000000" })
+  -- Marca "±" de arquivo com mudança de git não commitada (ver nota
+  -- "MARCA DE GIT" em config/tabline.lua) — mesmo laranja de
+  -- "modificado" usado em gitsigns/oil-git-status acima, consistência
+  -- de significado entre os 3 lugares.
+  hl(0, "MartiniTabLineGit", { fg = cor.laranja, bold = true })
 
   -- fzf-lua (09/09/2026, ver plugins/finder.lua) — janela e borda em
   -- preto/cinza (consistente com o resto da UI), matches de busca em

@@ -37,11 +37,23 @@
 -- :Lexplore antigo tinha por padrão, e <leader>e não tem mais desde
 -- a troca pro oil). Domínio "f" (find/arquivos — mesmo grupo de
 -- <leader>fn/<leader>fd), verbo "e" (explorer, em split).
+--
+-- GIT STATUS (09/09/2026): win_options.signcolumn = "yes:2" reserva
+-- 2 colunas de sinal — requisito do oil-git-status.nvim (plugin de
+-- terceiro, mantido pela própria lista de extensões do oil.nvim) pra
+-- desenhar status do índice E da working tree lado a lado, nas mesmas
+-- letras do "git status --short" (M, A, ?, D...). Cores em
+-- config/colors.lua, grupos OilGitStatus*.
 -- =========================================================
+local safe_require = require("martini.utils.safe_require")
+
 require("mini.icons").setup()
 
 require("oil").setup({
   default_file_explorer = true,
+  win_options = {
+    signcolumn = "yes:2",
+  },
   view_options = {
     show_hidden = true,
     -- Pastas de sistema do NTFS (comuns em volumes Windows montados,
@@ -60,6 +72,12 @@ require("oil").setup({
     end,
   },
 })
+
+safe_require("oil-git-status", function(oil_git_status)
+  oil_git_status.setup({
+    show_ignored = true,
+  })
+end, "status de git na listagem do oil (colunas M/A/?/D ao lado de cada arquivo)")
 
 vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Explorador de arquivos (oil)" })
 

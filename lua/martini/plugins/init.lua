@@ -47,5 +47,6 @@ require("martini.plugins.runner")
 require("martini.plugins.http")
 require("martini.plugins.multicursor")
 require("martini.plugins.finder")
+require("martini.plugins.gitsigns") -- sinais de git no gutter — ver nota "GIT STATUS" em oil.lua
 require("martini.plugins.oil") -- ver nota "NETRW → OIL" acima
 require("martini.plugins.dashboard")
