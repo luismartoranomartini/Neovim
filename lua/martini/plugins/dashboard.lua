@@ -25,24 +25,16 @@
 -- lazy.lua e plugins/oil.lua). Ícones deste preset (header/keys) são
 -- glyphs Unicode fixos, não vêm de nvim-web-devicons nem mini.icons —
 -- por isso a troca de provedor de ícone não afeta nada aqui.
--- =========================================================
--- LOGO EM IMAGEM (09/09/2026): trocado o banner de texto (header) por
--- uma imagem real, via chafa + protocolo gráfico do Kitty (Ghostty já
--- suporta — confirmado no :checkhealth). Mesmo mecanismo que a seção
--- "Git Status" abaixo já usava (rodar um comando de shell dentro de
--- uma seção "terminal"), só que o comando aqui é o chafa em vez do
--- git. O "; sleep .1" no fim é do próprio exemplo oficial do
--- snacks.nvim — dá tempo do terminal liberar a sequência de escape
--- antes do dashboard capturar a saída.
 --
--- REQUISITOS pra essa seção funcionar (fora do escopo deste arquivo):
---   1. `chafa` instalado no sistema (pacman -S chafa / dnf install chafa)
---   2. o arquivo assets/martini-logo.png existir dentro da pasta da
---      config (gerado via ImageMagick — comando fora da config, não
---      faz parte do boot do Neovim)
--- Se o arquivo não existir ou chafa não estiver instalado, essa seção
--- fica em branco/com erro do shell — não trava o resto do dashboard,
--- as outras seções continuam funcionando normalmente.
+-- LOGO (09/09/2026, revertido): chegou a ser testado um logo em
+-- imagem real (chafa + protocolo gráfico do Kitty, depois uma
+-- variante com Snacks.image.placement) — voltou pro banner de texto
+-- por decisão explícita: mais simples, sem dependência externa
+-- (chafa), sem arquivo PNG fora do repo, sem o problema de cache de
+-- 1h da seção "terminal" que apareceu no meio do processo. O
+-- primeiro banner de texto (toilet mono12, blocos sólidos) também
+-- não agradou — trocado por `figlet -f slant MARTINI` (linhas finas,
+-- itálico), fonte definitiva.
 -- =========================================================
 require("snacks").setup({
   bigfile = { enabled = false },
@@ -59,33 +51,7 @@ require("snacks").setup({
   dashboard = {
     enabled = true,
     sections = {
-      {
-        section = "terminal",
-        -- --format symbols (NÃO kitty — correção 09/09/2026): essa
-        -- seção roda dentro do terminal EMBUTIDO do Neovim
-        -- (nvim_open_term, biblioteca libvterm), que entende texto e
-        -- cor, mas NÃO o protocolo gráfico do Kitty — mesmo o Ghostty
-        -- suportando esse protocolo de verdade (testado fora do
-        -- Neovim, funcionou). O protocolo precisa alcançar o terminal
-        -- real diretamente; passando pelo terminal virtual do Neovim
-        -- no meio, a sequência de escape se perde. "symbols" desenha
-        -- com caracteres de meio-bloco Unicode (▀▄) coloridos em vez
-        -- de pixel de verdade — mesmo formato do exemplo oficial do
-        -- snacks.nvim pra esse caso exato.
-        cmd = "chafa " .. vim.fn.stdpath("config") .. "/assets/martini-logo.png --format symbols --symbols vhalf --size 60x17 --stretch; sleep .1",
-        height = 17,
-        padding = 1,
-        -- ttl baixo de propósito (09/09/2026): o padrão do snacks pra
-        -- seção "terminal" é 3600s (1h) de cache EM DISCO
-        -- (~/.cache/nvim/snacks/<hash>.txt) — inclusive de erro, se o
-        -- comando falhar na primeira vez. Foi exatamente isso que
-        -- aconteceu ao testar (nome de arquivo errado na primeira
-        -- tentativa): nem <leader>fd nem :restart resolviam, porque os
-        -- dois liam o mesmo cache antigo. ttl = 5 evita isso se você
-        -- trocar a imagem de novo no futuro — sem impacto real, essa
-        -- seção não é cara de rodar.
-        ttl = 5,
-      },
+      { section = "header" },
       { section = "keys", gap = 1, padding = 1 },
       {
         icon = " ",
@@ -110,6 +76,14 @@ require("snacks").setup({
       { section = "startup" },
     },
     preset = {
+      -- Banner "MARTINI" gerado via `figlet -f slant MARTINI`.
+      header = table.concat({
+        "    __  ______    ____  ___________   ______",
+        "   /  |/  /   |  / __ \\/_  __/  _/ | / /  _/",
+        "  / /|_/ / /| | / /_/ / / /  / //  |/ // /  ",
+        " / /  / / ___ |/ _, _/ / / _/ // /|  // /   ",
+        "/_/  /_/_/  |_/_/ |_| /_/ /___/_/ |_/___/   ",
+      }, "\n"),
       -- Mesmas ações do menu que você já usa no resto da config —
       -- fzf-lua pra arquivo/texto, oil pro explorador, :Lazy pros
       -- plugins.
