@@ -86,14 +86,8 @@ vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Explorador de arquivo
 vim.keymap.set("n", "<leader>fe", "<CMD>vsplit | Oil<CR>",
   { desc = "Find: explorador de arquivos (oil, split vertical)" })
 
--- Números de linha dentro do buffer do oil — absoluto + relativo,
--- igual ao repo de referência. Ajuda a mirar em mm/yy/dd por
--- quantidade de linhas quando movendo/copiando várias entradas.
-vim.api.nvim_create_autocmd("FileType", {
-  desc = "Números de linha (absoluto + relativo) no buffer do oil",
-  pattern = "oil",
-  callback = function()
-    vim.opt_local.number = true
-    vim.opt_local.relativenumber = true
-  end,
-})
+-- REMOVIDO (09/09/2026): override de number/relativenumber dentro do
+-- oil (herdado do repo de referência). relativenumber = false é
+-- escolha deliberada em config/options.lua — a exceção local
+-- contradizia isso sem você ter pedido. Agora o oil segue a mesma
+-- opção global de todo o resto (number = true, relativenumber = false).

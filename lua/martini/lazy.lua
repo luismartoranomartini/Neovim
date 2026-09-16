@@ -119,6 +119,14 @@ local plugins = {
   -- plugins/gitsigns.lua e a config extra dentro de plugins/oil.lua.
   { "lewis6991/gitsigns.nvim", lazy = false },
   { "refractalize/oil-git-status.nvim", dependencies = { "stevearc/oil.nvim" }, lazy = false },
+  -- Servidor HTTP local, live-reload (09/09/2026) — necessário pra
+  -- htmx (AJAX/fetch não funciona abrindo o HTML direto via file://,
+  -- que é o que o runner.lua faz hoje). Sem telescope.nvim nem
+  -- which-key.nvim: telescope é só "recomendado" pelo autor, cai em
+  -- vim.ui.select se faltar — que no seu caso já é o fzf-lua
+  -- (register_ui_select() em finder.lua); which-key é só cosmético
+  -- (rótulo do grupo no menu), sem ele os atalhos funcionam igual.
+  { "selimacerbas/live-server.nvim", lazy = false },
 }
 
 -- Detecta se algum plugin ainda não foi clonado ANTES de chamar setup()

@@ -90,6 +90,19 @@ configurar_lsp("cssls", "vscode-css-language-server",
   { "css", "scss", "less" },
   { ".git" })
 
+-- htmx-lsp (09/09/2026): autocomplete de atributos hx-* em HTML e
+-- templates Go. ATENÇÃO — diferente dos outros LSPs acima, esse é
+-- melhor esforço, não confirmado: o próprio projeto
+-- (rajasegar/htmx-lsp) marca só o Helix como testado, Neovim fica
+-- desmarcado no checklist do README, e não existe exemplo oficial de
+-- config pra nenhum dos dois. O --stdio é inferido pela convenção da
+-- lib que ele usa por baixo (vscode-languageserver — mesma base do
+-- html/cssls acima), não confirmado no README do htmx-lsp em si. Se
+-- não conectar, `:LspLog` é o primeiro lugar pra olhar.
+configurar_lsp("htmx", "htmx-lsp",
+  { "html", "gotmpl" },
+  { ".git" })
+
 -- clangd: LSP de C/C++. Não usa --stdio (já é o padrão).
 do
   local caminho = vim.fn.exepath("clangd")

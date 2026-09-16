@@ -150,6 +150,24 @@ local function aplicar_highlights()
   -- não importa o que tokyonight definir pro fundo da statusline.
   hl(0, "StatusLineModified", { fg = "#000000", bg = cor.laranja, bold = true })
 
+  -- Diagnósticos inline (09/09/2026, ver config/diagnostics.lua,
+  -- virtual_text estilo Error Lens) — cores próprias, sem fundo de
+  -- caixa, pra garantir contraste contra o preto puro. Sem isso,
+  -- ficava no padrão do tokyonight, que em alguns casos (hint/info em
+  -- azul claro) perdia contraste.
+  hl(0, "DiagnosticVirtualTextError", { fg = cor.vermelho, bg = "NONE" })
+  hl(0, "DiagnosticVirtualTextWarn", { fg = cor.laranja, bg = "NONE" })
+  hl(0, "DiagnosticVirtualTextInfo", { fg = cor.azul, bg = "NONE", bold = true })
+  hl(0, "DiagnosticVirtualTextHint", { fg = cor.verde, bg = "NONE", bold = true })
+  hl(0, "DiagnosticError", { fg = cor.vermelho })
+  hl(0, "DiagnosticWarn", { fg = cor.laranja })
+  hl(0, "DiagnosticInfo", { fg = cor.azul })
+  hl(0, "DiagnosticHint", { fg = cor.verde })
+  hl(0, "DiagnosticUnderlineError", { sp = cor.vermelho, undercurl = true })
+  hl(0, "DiagnosticUnderlineWarn", { sp = cor.laranja, undercurl = true })
+  hl(0, "DiagnosticUnderlineInfo", { sp = cor.azul, undercurl = true })
+  hl(0, "DiagnosticUnderlineHint", { sp = cor.verde, undercurl = true })
+
   -- Sinais de git no gutter (09/09/2026, ver plugins/gitsigns.lua) —
   -- verde/laranja/vermelho seguindo a mesma lógica de "adicionado /
   -- modificado / removido" já usada nos breakpoints do DAP acima.

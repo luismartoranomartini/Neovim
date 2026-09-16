@@ -92,6 +92,16 @@ require("snacks").setup({
         { icon = " ", key = "f", desc = "Find File", action = function() require("fzf-lua").files() end },
         { icon = " ", key = "g", desc = "Find Text", action = function() require("fzf-lua").live_grep() end },
         { icon = " ", key = "e", desc = "Explorer", action = ":Oil" },
+        -- Terminal (09/09/2026) — abre DIRETO (open_horizontal), não
+        -- usa toggle(). Motivo: toggle() varre as janelas existentes
+        -- e FECHA a primeira que achar de tipo terminal — se sobrar
+        -- alguma janela de terminal oculta de uso anterior na sessão,
+        -- a primeira tecla fecha essa sobra em vez de abrir, exigindo
+        -- apertar duas vezes. Partindo do dashboard (tela cheia, sem
+        -- edição em andamento por trás), não existe cenário real de
+        -- "alternar" — só faz sentido abrir. <C-t> global continua
+        -- com toggle(), onde alternar faz sentido de verdade.
+        { icon = " ", key = "t", desc = "Terminal", action = function() require("martini.utils.terminal").open_horizontal() end },
         { icon = "󰒲 ", key = "l", desc = "Plugins (Lazy)", action = ":Lazy" },
         { icon = " ", key = "c", desc = "Config", action = ":e $MYVIMRC" },
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },

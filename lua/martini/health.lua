@@ -56,6 +56,10 @@ function M.check()
   checar("vscode-html-language-server", "npm i -g vscode-langservers-extracted")
   checar("vscode-css-language-server", "npm i -g vscode-langservers-extracted")
   checar("clangd", "Pacote 'clang' ou 'clangd' do seu gerenciador (ex.: pacman -S clang)")
+  -- htmx-lsp (09/09/2026): suporte a Neovim não confirmado pelo
+  -- próprio projeto (ver nota em plugins/lsp.lua) — a checagem aqui
+  -- é só "o binário existe", não "está funcionando de verdade".
+  checar("htmx-lsp", "npm i -g htmx-lsp")
 
   -- ── Lint e formatação ────────────────────────────────────
   vim.health.start("martini.nvim — Lint e formatação (languages/go.lua, plugins/format.lua)")
