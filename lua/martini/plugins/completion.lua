@@ -1,6 +1,6 @@
 -- =========================================================
 -- lua/martini/plugins/completion.lua
--- nvim-cmp + LuaSnip + capabilities LSP + integração com Emmet no Tab.
+-- nvim-cmp + LuaSnip + capabilities LSP + Emmet com tecla própria (<C-y>).
 -- Carrega ANTES de plugins/lsp.lua: define vim.lsp.config["*"] com as
 -- capabilities do cmp_nvim_lsp, que os servidores individuais herdam.
 --
@@ -13,16 +13,6 @@
 -- =========================================================
 
 local safe_require = require("martini.utils.safe_require")
-
--- Verifica se a posição atual tem uma abreviação Emmet válida
-local emmet_fts = { html = true, css = true, scss = true, jsx = true, tsx = true, gotmpl = true }
-
-local function emmet_expandable()
-  if not emmet_fts[vim.bo.filetype] then return false end
-  local col = vim.fn.col(".") - 1
-  local before = vim.fn.getline("."):sub(1, col)
-  return before:match("[%w%.#%[%]>%)%*]+$") ~= nil
-end
 
 local cmp = safe_require.get("cmp", "autocomplete (nvim-cmp)")
 local luasnip = safe_require.get("luasnip", "expansão de snippets")
@@ -48,18 +38,21 @@ if cmp and luasnip then
       ["<C-e>"] = cmp.mapping.abort(),
       ["<C-d>"] = cmp.mapping.scroll_docs(4),
       ["<C-u>"] = cmp.mapping.scroll_docs(-4),
-      -- emmet_expandable() é checado ANTES de cmp.visible(). Se o
-      -- cursor está sobre uma abreviação Emmet válida, ela tem
-      -- prioridade e o popup do cmp é fechado antes de expandir.
+      -- MEIO TERMO (09/09/2026): Emmet saiu do <Tab> de vez — tecla
+      -- própria, sem disputa nenhuma. Antes, mesmo com cmp.visible()
+      -- checado primeiro, ainda dava pra imaginar caso de borda de
+      -- colisão. Com tecla dedicada, as duas coisas ficam sempre
+      -- disponíveis ao mesmo tempo, sem heurística decidindo por você.
+      ["<C-y>"] = cmp.mapping(function()
+        if cmp.visible() then cmp.close() end
+        vim.schedule(function()
+          vim.fn.feedkeys(
+            vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
+          )
+        end)
+      end, { "i" }),
       ["<Tab>"] = cmp.mapping(function(fallback)
-        if emmet_expandable() then
-          if cmp.visible() then cmp.close() end
-          vim.schedule(function()
-            vim.fn.feedkeys(
-              vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
-            )
-          end)
-        elseif cmp.visible() then
+        if cmp.visible() then
           cmp.select_next_item()
         elseif luasnip.expand_or_jumpable() then
           luasnip.expand_or_jump()

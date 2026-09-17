@@ -127,6 +127,13 @@ local plugins = {
   -- (register_ui_select() em finder.lua); which-key é só cosmético
   -- (rótulo do grupo no menu), sem ele os atalhos funcionam igual.
   { "selimacerbas/live-server.nvim", lazy = false },
+  -- Imagem de verdade dentro do Neovim (09/09/2026) — protocolo
+  -- gráfico do Kitty, CONFIRMADO funcionando no seu Ghostty via
+  -- teste isolado (nvim --clean) antes de integrar aqui. build =
+  -- false evita tentar compilar o "rock" do LuaRocks (magick_rock) —
+  -- usa magick_cli (processor abaixo), que só chama o ImageMagick
+  -- via linha de comando, já instalado no seu sistema.
+  { "3rd/image.nvim", build = false, lazy = false },
 }
 
 -- Detecta se algum plugin ainda não foi clonado ANTES de chamar setup()
