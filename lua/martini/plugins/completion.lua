@@ -22,6 +22,13 @@ if cmp and luasnip then
     loader.lazy_load()
   end, "snippets prontos (friendly-snippets)")
 
+  -- Snippets Go customizados (09/09/2026) — friendly-snippets não
+  -- cobre Go nenhum (conferido no pacote antes de escrever isso).
+  -- Ver lua/martini/snippets/go.lua pro conteúdo real.
+  safe_require("luasnip.loaders.from_lua", function(loader)
+    loader.load({ paths = vim.fn.stdpath("config") .. "/lua/martini/snippets" })
+  end, "snippets Go customizados (iferr, forr, main, test, struct)")
+
   local cmp_nvim_lsp = safe_require.get("cmp_nvim_lsp", "capabilities de LSP pro autocomplete")
   if cmp_nvim_lsp then
     local capabilities = cmp_nvim_lsp.default_capabilities()
