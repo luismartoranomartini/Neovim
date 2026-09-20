@@ -79,10 +79,6 @@ function M.check()
   checar("dlv", "go install github.com/go-delve/delve/cmd/dlv@latest")
   checar("codelldb", "yay -S codelldb-bin (AUR) — sem isso, debug de C/C++ fica desativado, mas o resto da config funciona normalmente")
 
-  -- ── Imagem (protocolo Kitty) ─────────────────────────────
-  vim.health.start("martini.nvim — Imagem (plugins/image.lua)")
-  checar("magick", "ImageMagick — necessário pra redimensionar/converter imagem (ex.: pacman -S imagemagick)")
-
   -- ── Busca e navegação ────────────────────────────────────
   vim.health.start("martini.nvim — Busca e navegação (plugins/finder.lua, plugins/oil.lua)")
   checar("fd", "Necessário pra <C-p> (fzf-lua files)")

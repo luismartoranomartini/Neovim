@@ -44,8 +44,10 @@ local function setup()
 
   dapui.setup()
 
-  -- Go: ver languages/go.lua (dap-go)
-  pcall(function() require("martini.languages.go").setup_debug() end)
+  -- Go: ver languages/go.lua — safe_require do dap-go já fica lá
+  -- dentro (ver nota "SAFE_REQUIRE" em setup_debug()), não precisa
+  -- de proteção duplicada aqui.
+  require("martini.languages.go").setup_debug()
 
   -- C/C++: codelldb (binário único — instalado via AUR:
   -- yay -S codelldb-bin — NÃO é um plugin Lua, então não entra no

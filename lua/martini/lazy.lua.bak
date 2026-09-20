@@ -136,7 +136,13 @@ local plugins = {
   -- (register_ui_select() em finder.lua); which-key é só cosmético
   -- (rótulo do grupo no menu), sem ele os atalhos funcionam igual.
   { "selimacerbas/live-server.nvim", lazy = false },
-  { "smart-splits-nvim/smart-splits.nvim", lazy = false },
+  -- Navegação contínua entre splits do Neovim e painéis do tmux
+  -- (09/09/2026) — teclas próprias em plugins/tmux-navigator.lua
+  -- (Alt+h/j/k/l, NÃO o padrão Ctrl+h/j/k/l do plugin — essas 4 já
+  -- eram alias do multicursor, Ctrl+j/k para cursor acima/abaixo;
+  -- decisão explícita de manter o multicursor e usar outra tecla
+  -- aqui em vez de remover o alias).
+  { "christoomey/vim-tmux-navigator", lazy = false },
 }
 
 -- Detecta se algum plugin ainda não foi clonado ANTES de chamar setup()

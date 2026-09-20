@@ -190,13 +190,24 @@ end, { desc = "Go: testar apenas a função de teste sob o cursor" })
 -- =========================================================
 -- Debug: dap-go. Chamado por plugins/debug.lua dentro do setup()
 -- lazy do debugger (não roda sozinho ao dar require neste módulo).
+--
+-- SAFE_REQUIRE (09/09/2026): pcall mudo (que estava em debug.lua,
+-- envolvendo a chamada inteira desta função) trocado por
+-- utils/safe_require.lua, aplicado direto onde o risco real está —
+-- dap-go é o plugin de terceiro que pode faltar, martini.languages.go
+-- em si é código seu, sem motivo pra proteger contra falha silenciosa
+-- (se quebrar, você quer saber na hora). Ver nota completa em
+-- plugins/editing.lua.
 -- =========================================================
 function M.setup_debug()
-  require("dap-go").setup({
-    delve = {
-      path = vim.fn.exepath("dlv"),
-    },
-  })
+  local safe_require = require("martini.utils.safe_require")
+  safe_require("dap-go", function(dap_go)
+    dap_go.setup({
+      delve = {
+        path = vim.fn.exepath("dlv"),
+      },
+    })
+  end, "debug de Go (F5/breakpoints em arquivos .go)")
 end
 
 return M

@@ -4,8 +4,21 @@
 -- Diagnósticos ficaram em config/diagnostics.lua.
 -- Ajustes específicos do netrw ficaram em config/netrw.lua (07/09/2026,
 -- migração de netrw_keepdir pra lá + fix de E471).
+--
+-- LEADER (09/09/2026, revertido de volta pra Space): tentamos
+-- vírgula pra resolver o "anda pro lado" (Space sozinho em modo
+-- Normal É o comando nativo "mover um caractere pra direita" — se o
+-- <leader>xx demorasse mais que o timeoutlen, o Neovim desistia de
+-- esperar e executava esse Space nativo). Mas a memória muscular de
+-- Space como leader já estava consolidada, e vírgula não pegou.
+-- Fix de verdade dessa vez: desativa o Space nativo em modo Normal
+-- (linha abaixo, <Nop>) — Space continua sendo leader normalmente,
+-- só não "anda pro lado" mais nem sozinho nem por timeout. "l"
+-- continua fazendo a mesma coisa (mover pra direita), então nada de
+-- funcionalidade se perde — só um atalho REDUNDANTE pra ela.
 -- =========================================================
 vim.g.mapleader = " "
+vim.keymap.set("n", "<Space>", "<Nop>", { silent = true })
 vim.opt.number = true
 vim.opt.relativenumber = false
 vim.opt.clipboard = "unnamedplus"

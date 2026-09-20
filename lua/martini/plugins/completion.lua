@@ -1,6 +1,6 @@
 -- =========================================================
 -- lua/martini/plugins/completion.lua
--- nvim-cmp + LuaSnip + capabilities LSP + Emmet com tecla própria (<C-y>).
+-- nvim-cmp + LuaSnip + capabilities LSP + Emmet no <Tab>.
 -- Carrega ANTES de plugins/lsp.lua: define vim.lsp.config["*"] com as
 -- capabilities do cmp_nvim_lsp, que os servidores individuais herdam.
 --
@@ -10,6 +10,27 @@
 -- luasnip precisam estar presentes ANTES de decidir configurar
 -- qualquer coisa — não dá pra fazer "setup imediato" de um sem saber
 -- se o outro também existe.
+--
+-- VOLTA DO <C-y> (18/09/2026): desfeito o "MEIO TERMO" de 09/09 —
+-- Emmet volta pro <Tab>, sem checar cmp.visible() nem luasnip antes.
+-- <C-y> não faz mais nada aqui, livre de novo. Navegar entre itens do
+-- autocomplete passa a ser <Down>/<Up>, não mais <Tab>/<S-Tab>. Jump
+-- de snippet (placeholders das snippets Go customizadas: iferr, forr,
+-- main, test, struct) foi pra <C-j>/<C-k>, em modo insert/select —
+-- sem colisão com <C-j>/<C-k> do multicursor (plugins/multicursor.lua),
+-- que só mapeia em modo normal/visual.
+--
+-- ISOLADO POR FILETYPE (18/09/2026): <Tab> só dispara Emmet em html,
+-- css, scss, jsx, tsx — mesma lista de plugins/editing.lua, onde
+-- :EmmetInstall roda (user_emmet_install_global = 0, emmet NUNCA
+-- instalado fora desses filetypes). Antes, <Tab> tentava expandir
+-- Emmet em QUALQUER buffer (Go, Lua, etc.), sem efeito nenhum — o
+-- <plug>(emmet-expand-abbr) não fazia nada porque o emmet nem estava
+-- instalado ali, e o <Tab> normal (indentar) ficava perdido. Fora
+-- desses 5 filetypes, <Tab> agora cai no fallback() — comportamento
+-- nativo do Neovim. LISTA DUPLICADA de propósito (mesma de
+-- editing.lua): são 5 nomes, não vale a pena um módulo compartilhado
+-- só pra isso — se mudar uma lista, mudar a outra também.
 -- =========================================================
 
 local safe_require = require("martini.utils.safe_require")
@@ -45,32 +66,46 @@ if cmp and luasnip then
       ["<C-e>"] = cmp.mapping.abort(),
       ["<C-d>"] = cmp.mapping.scroll_docs(4),
       ["<C-u>"] = cmp.mapping.scroll_docs(-4),
-      -- MEIO TERMO (09/09/2026): Emmet saiu do <Tab> de vez — tecla
-      -- própria, sem disputa nenhuma. Antes, mesmo com cmp.visible()
-      -- checado primeiro, ainda dava pra imaginar caso de borda de
-      -- colisão. Com tecla dedicada, as duas coisas ficam sempre
-      -- disponíveis ao mesmo tempo, sem heurística decidindo por você.
-      ["<C-y>"] = cmp.mapping(function()
-        if cmp.visible() then cmp.close() end
-        vim.schedule(function()
-          vim.fn.feedkeys(
-            vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
-          )
-        end)
-      end, { "i" }),
-      ["<Tab>"] = cmp.mapping(function(fallback)
+      ["<Down>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
-        elseif luasnip.expand_or_jumpable() then
+        else
+          fallback()
+        end
+      end, { "i" }),
+      ["<Up>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        else
+          fallback()
+        end
+      end, { "i" }),
+      -- Mesma lista de filetypes do :EmmetInstall em editing.lua —
+      -- ver nota no topo do arquivo.
+      ["<Tab>"] = cmp.mapping(function(fallback)
+        local emmet_filetypes = {
+          html = true, css = true, scss = true, jsx = true, tsx = true,
+        }
+        if emmet_filetypes[vim.bo.filetype] then
+          if cmp.visible() then cmp.close() end
+          vim.schedule(function()
+            vim.fn.feedkeys(
+              vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
+            )
+          end)
+        else
+          fallback()
+        end
+      end, { "i" }),
+      ["<C-j>"] = cmp.mapping(function(fallback)
+        if luasnip.expand_or_jumpable() then
           luasnip.expand_or_jump()
         else
           fallback()
         end
       end, { "i", "s" }),
-      ["<S-Tab>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
+      ["<C-k>"] = cmp.mapping(function(fallback)
+        if luasnip.jumpable(-1) then
           luasnip.jump(-1)
         else
           fallback()
