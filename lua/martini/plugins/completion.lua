@@ -31,6 +31,15 @@
 -- nativo do Neovim. LISTA DUPLICADA de propósito (mesma de
 -- editing.lua): são 5 nomes, não vale a pena um módulo compartilhado
 -- só pra isso — se mudar uma lista, mudar a outra também.
+--
+-- <Tab>/<S-Tab> NAVEGAM O MENU (23/09/2026): quando cmp.visible(),
+-- <Tab> agora seleciona o próximo item e <S-Tab> o anterior — antes
+-- disso era só <Down>/<Up> (ver nota "VOLTA DO <C-y>" acima, que
+-- ainda vale pro restante: Emmet e fallback nativo continuam do
+-- mesmo jeito quando o menu NÃO está visível). Motivo: <Tab> só
+-- indentava quando o menu estava aberto fora dos 5 filetypes de
+-- Emmet — não dava pra navegar sugestão nenhuma sem tirar a mão do
+-- home row pro <Down>/<Up>. <Down>/<Up> continuam funcionando iguais.
 -- =========================================================
 
 local safe_require = require("martini.utils.safe_require")
@@ -81,18 +90,27 @@ if cmp and luasnip then
         end
       end, { "i" }),
       -- Mesma lista de filetypes do :EmmetInstall em editing.lua —
-      -- ver nota no topo do arquivo.
+      -- ver nota no topo do arquivo. Prioridade: menu visível vence
+      -- Emmet, que vence fallback nativo.
       ["<Tab>"] = cmp.mapping(function(fallback)
         local emmet_filetypes = {
           html = true, css = true, scss = true, jsx = true, tsx = true,
         }
-        if emmet_filetypes[vim.bo.filetype] then
-          if cmp.visible() then cmp.close() end
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif emmet_filetypes[vim.bo.filetype] then
           vim.schedule(function()
             vim.fn.feedkeys(
               vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
             )
           end)
+        else
+          fallback()
+        end
+      end, { "i" }),
+      ["<S-Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
         else
           fallback()
         end
