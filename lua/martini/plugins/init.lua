@@ -30,6 +30,12 @@
 -- (ver notas em lazy.lua e plugins/oil.lua). Mantido na mesma posição
 -- da lista (afinidade temática: navegação/arquivos), sem dependência
 -- de LSP ou completion, então a posição exata não importa.
+--
+-- NEOGIT (23/09/2026): require("martini.plugins.neogit") adicionado
+-- logo depois do gitsigns — mesma afinidade temática (Git), sem
+-- dependência entre os dois (gitsigns lê sinais no gutter, Neogit
+-- abre a interface completa via <leader>v, ver config/keymaps.lua).
+-- Posição exata não importa pelo mesmo motivo do oil acima.
 -- =========================================================
 require("martini.languages") -- go.lua + c.lua — ver nota acima
 require("martini.plugins.treesitter")
@@ -44,6 +50,7 @@ require("martini.plugins.http")
 require("martini.plugins.multicursor")
 require("martini.plugins.finder")
 require("martini.plugins.gitsigns") -- sinais de git no gutter — ver nota "GIT STATUS" em oil.lua
+require("martini.plugins.neogit") -- interface Git interativa (status/stage/commit/push) — ver nota "NEOGIT" acima
 require("martini.plugins.live-server") -- servidor HTTP local (htmx precisa de servidor de verdade, não file://)
 require("martini.plugins.smart-splits") -- navegação Neovim ↔ painéis do WezTerm (Alt+h/j/k/l)
 require("martini.plugins.oil") -- ver nota "NETRW → OIL" acima

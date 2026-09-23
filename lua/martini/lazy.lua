@@ -71,6 +71,14 @@
 -- fzf-lua detecta qualquer provedor de ícone instalado em runtime, e
 -- os ícones do dashboard (plugins/dashboard.lua) são glyphs Unicode
 -- fixos no preset, não chamada a nenhuma lib de ícone.
+--
+-- NEOGIT (23/09/2026): interface Git interativa dentro do Neovim
+-- (status/stage/commit/push/pull), acionada via <leader>v (ver
+-- config/keymaps.lua e plugins/neogit.lua pro setup). Depende de
+-- nvim-lua/plenary.nvim (obrigatória, adicionada abaixo só por causa
+-- disso — nenhum outro plugin da lista precisava dela até agora) e
+-- reaproveita ibhagwan/fzf-lua (já instalado acima) pra seleção de
+-- menus, sem precisar de telescope.nvim.
 -- =========================================================
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local primeiro_boot_lazy = vim.fn.isdirectory(lazypath) == 0
@@ -128,6 +136,11 @@ local plugins = {
   -- plugins/gitsigns.lua e a config extra dentro de plugins/oil.lua.
   { "lewis6991/gitsigns.nvim", lazy = false },
   { "refractalize/oil-git-status.nvim", dependencies = { "stevearc/oil.nvim" }, lazy = false },
+  -- Interface Git interativa (23/09/2026) — ver nota "NEOGIT" acima.
+  -- plenary.nvim é dependência obrigatória do Neogit, exclusiva dele
+  -- na lista (nenhum outro plugin aqui precisa dela).
+  { "nvim-lua/plenary.nvim", lazy = false },
+  { "NeogitOrg/neogit", dependencies = { "nvim-lua/plenary.nvim" }, lazy = false },
   -- Servidor HTTP local, live-reload (09/09/2026) — necessário pra
   -- htmx (AJAX/fetch não funciona abrindo o HTML direto via file://,
   -- que é o que o runner.lua faz hoje). Sem telescope.nvim nem

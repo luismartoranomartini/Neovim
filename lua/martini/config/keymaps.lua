@@ -7,7 +7,8 @@
 --   b → buffers          f → find/arquivos (LSP + gf/fn)
 --   m → multicursor       g → Go
 --   d → debug             r → run (code_runner)
---   h → HTTP (kulala)
+--   h → HTTP (kulala)     t → terminal
+--   v → Git (Neogit)
 -- Sem maiúsculas nos atalhos <leader> (ergonômico — fácil de errar
 -- sob pressão). gd/K/[d/]d (LSP) ficam FORA dessa gramática de
 -- propósito — convenção universal do ecossistema Neovim.
@@ -33,6 +34,16 @@
 -- BUFFERS, não tabpages. Os dois continuam funcionando sem erro,
 -- só não geram mais "aba nova" na tabline visível. Decidir depois se
 -- isso fica assim, muda de gramática, ou os dois somem.
+--
+-- NEOGIT (23/09/2026): <leader>v abre a interface Git interativa
+-- (plugins/neogit.lua) — domínio novo na gramática. Isso colidia com
+-- <leader>vs (terminal split vertical, fora da gramática até então,
+-- "v" solto de "vertical"): os dois <leader>v... coexistiam sem
+-- relação nenhuma. Corrigido movendo o terminal vertical pra
+-- <leader>ts, dentro do domínio "t" (Terminal) que já existia em
+-- <leader>t (split horizontal) — "s" de "split", mesmo padrão de
+-- verbo+domínio do resto do arquivo. <leader>v fica livre e sem
+-- ambiguidade pro Neogit.
 -- =========================================================
 
 local path = require("martini.utils.path")
@@ -72,7 +83,7 @@ vim.keymap.set("n", "[b", ":bprevious<CR>", { desc = "Buffer anterior" })
 
 -- ── Terminal ──────────────────────────────────────────────
 vim.keymap.set("n", "<leader>t", terminal.open_horizontal, { desc = "Abrir terminal (split horizontal)" })
-vim.keymap.set("n", "<leader>vs", terminal.open_vertical, { desc = "Abrir terminal (split vertical)" })
+vim.keymap.set("n", "<leader>ts", terminal.open_vertical, { desc = "Abrir terminal (split vertical)" })
 vim.keymap.set("n", "<C-t>", terminal.toggle, { desc = "Toggle terminal" })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Sair do modo terminal" })
@@ -112,3 +123,10 @@ end, { desc = "Debug: interface visual" })
 -- ── Code runner ───────────────────────────────────────────
 vim.keymap.set("n", "<leader>r", ":RunCode<CR>", { desc = "Executar arquivo atual" })
 vim.keymap.set("n", "<leader>rp", ":RunProject<CR>", { desc = "Executar projeto" })
+
+-- ── Git (Neogit) ──────────────────────────────────────────
+-- Interface completa (status/stage/commit/push/pull) — ver
+-- plugins/neogit.lua pro setup. Uma vez dentro do status buffer, as
+-- ações usam as teclas nativas do próprio Neogit (s/u stage/unstage,
+-- c commit, p push, F pull...), sem precisar de mais atalhos aqui.
+vim.keymap.set("n", "<leader>v", ":Neogit<CR>", { desc = "Git: abrir Neogit" })
