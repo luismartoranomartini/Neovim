@@ -2,15 +2,23 @@
 -- lua/martini/lazy.lua
 -- Bootstrap do lazy.nvim, substituindo loader.lua (set/2026).
 --
--- CORTE (18/09/2026): removidos jmbuhr/otter.nvim (autocomplete de
--- JS/CSS embutido em HTML — uso raro) e 3rd/image.nvim (renderização
--- de imagem via protocolo Kitty — dependia de ImageMagick no
--- sistema). Nenhum dos dois tinha outro módulo dependendo dele.
+-- CORTE (18/09/2026): removido jmbuhr/otter.nvim (autocomplete de
+-- JS/CSS embutido em HTML — uso raro). Nenhum outro módulo dependia
+-- dele.
 --
 -- VOLTA (18/09/2026): echasnovski/mini.icons tinha entrado no mesmo
 -- corte acima (fica sem ícone/cor por tipo de arquivo na listagem do
 -- oil), mas voltou — reinstalado abaixo, na mesma posição de antes.
 -- require("mini.icons").setup() também voltou em plugins/oil.lua.
+--
+-- VOLTA (24/09/2026): 3rd/image.nvim também tinha entrado no corte de
+-- 18/09 (dependia de ImageMagick no sistema, sem sentido manter em 3
+-- plataformas — Arch/Fedora/Windows). Escopo mudou: Windows saiu de
+-- cena, Fedora é uso esporádico — sobra só Arch, onde instalar o
+-- ImageMagick (`sudo pacman -S imagemagick`) é trivial. Confirmado
+-- também que o backend "kitty" funciona no WezTerm (implementa o
+-- mesmo protocolo gráfico), que é o terminal usado. Plugin reinstalado
+-- abaixo, ver plugins/image.lua pro setup.
 --
 -- POR QUE A TROCA: loader.lua fazia git clone --depth 1 no branch padrão
 -- de cada plugin, sem trava de versão nenhuma — uma config que funciona
@@ -141,6 +149,10 @@ local plugins = {
   -- na lista (nenhum outro plugin aqui precisa dela).
   { "nvim-lua/plenary.nvim", lazy = false },
   { "NeogitOrg/neogit", dependencies = { "nvim-lua/plenary.nvim" }, lazy = false },
+  -- Renderização de imagem no buffer (24/09/2026) — ver nota "VOLTA
+  -- (24/09/2026)" acima e plugins/image.lua pro setup. Exige
+  -- ImageMagick instalado no sistema (fora do controle do lazy.nvim).
+  { "3rd/image.nvim", lazy = false },
   -- Servidor HTTP local, live-reload (09/09/2026) — necessário pra
   -- htmx (AJAX/fetch não funciona abrindo o HTML direto via file://,
   -- que é o que o runner.lua faz hoje). Sem telescope.nvim nem

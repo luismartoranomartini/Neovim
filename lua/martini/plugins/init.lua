@@ -19,10 +19,15 @@
 --    (runner, debug), embora Lua cacheie o módulo e a ordem exata
 --    entre eles não quebre nada se invertida.
 --
--- CORTE (18/09/2026): require("martini.plugins.otter") e
--- require("martini.plugins.image") removidos — otter.nvim e
--- image.nvim saíram de lazy.lua (ver nota lá). plugins/otter.lua e
--- plugins/image.lua também foram apagados, não só desativados.
+-- CORTE (18/09/2026): require("martini.plugins.otter") removido —
+-- otter.nvim saiu de lazy.lua (ver nota lá). plugins/otter.lua também
+-- foi apagado, não só desativado.
+--
+-- VOLTA (24/09/2026): require("martini.plugins.image") de volta —
+-- image.nvim tinha sido cortado junto do otter acima, mas voltou (ver
+-- nota "VOLTA (24/09/2026)" em lazy.lua). Posicionado perto do
+-- gitsigns/oil-git-status por não ter dependência de LSP ou
+-- completion — mesma lógica de posição livre já usada pro oil abaixo.
 --
 -- NETRW → OIL (09/09/2026): require("martini.plugins.netrw-icons")
 -- REMOVIDO (arquivo excluído junto). No lugar,
@@ -30,12 +35,6 @@
 -- (ver notas em lazy.lua e plugins/oil.lua). Mantido na mesma posição
 -- da lista (afinidade temática: navegação/arquivos), sem dependência
 -- de LSP ou completion, então a posição exata não importa.
---
--- NEOGIT (23/09/2026): require("martini.plugins.neogit") adicionado
--- logo depois do gitsigns — mesma afinidade temática (Git), sem
--- dependência entre os dois (gitsigns lê sinais no gutter, Neogit
--- abre a interface completa via <leader>v, ver config/keymaps.lua).
--- Posição exata não importa pelo mesmo motivo do oil acima.
 -- =========================================================
 require("martini.languages") -- go.lua + c.lua — ver nota acima
 require("martini.plugins.treesitter")
@@ -50,7 +49,7 @@ require("martini.plugins.http")
 require("martini.plugins.multicursor")
 require("martini.plugins.finder")
 require("martini.plugins.gitsigns") -- sinais de git no gutter — ver nota "GIT STATUS" em oil.lua
-require("martini.plugins.neogit") -- interface Git interativa (status/stage/commit/push) — ver nota "NEOGIT" acima
+require("martini.plugins.image") -- ver nota "VOLTA (24/09/2026)" acima
 require("martini.plugins.live-server") -- servidor HTTP local (htmx precisa de servidor de verdade, não file://)
 require("martini.plugins.smart-splits") -- navegação Neovim ↔ painéis do WezTerm (Alt+h/j/k/l)
 require("martini.plugins.oil") -- ver nota "NETRW → OIL" acima
