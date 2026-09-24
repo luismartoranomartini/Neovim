@@ -1,265 +1,163 @@
 -- =========================================================
 -- lua/martini/config/colors.lua
--- Fundo preto · paleta forte com muitas categorias distintas
+-- Teste: tokyonight customizado (fundo azul-marinho), inspirado no
+-- setup do josean-dev/dev-environment-files
+--
+-- MUDANÇA DE ABORDAGEM (24/09/2026): as versões anteriores desta
+-- paleta (terrosa, depois roxo-ardósia) definiam manualmente TODOS os
+-- grupos de sintaxe (@function, @keyword, @string, etc.) por cima do
+-- tokyonight base. Essa versão faz diferente: usa on_colors() do
+-- próprio tokyonight.nvim pra só trocar fundo/frente/realces, e deixa
+-- o plugin decidir as cores de sintaxe sozinho (é o que ele já faz
+-- bem — replicar isso manualmente era trabalho redundante). Só
+-- mantemos highlight manual pro que o tokyonight NÃO conhece: nossos
+-- grupos próprios (MartiniTabLine*, OilGitStatus*, FzfLua*) e sinais
+-- de DAP — usando as cores oficiais da paleta tokyonight-night, pra
+-- ficar visualmente consistente com o resto.
+--
+-- CIANO VOLTA DE PROPÓSITO: essa é a mudança mais significativa em
+-- relação às versões anteriores — o tokyonight usa ciano pra
+-- namespaces/propriedades por padrão. Confirmado explicitamente antes
+-- de aplicar (ver conversa).
 -- =========================================================
+
+-- Cores oficiais tokyonight-night (confirmadas em tokyonight.org/palette
+-- e no repo folke/tokyonight.nvim) — usadas nos grupos manuais abaixo
+local tn = {
+  bg_dark  = "#011423", -- override de Josean (era #16161e no tokyonight puro)
+  bg       = "#011628", -- override de Josean (era #1a1b26 no tokyonight puro)
+  bg_hl    = "#143652", -- override de Josean (era #292e42 no tokyonight puro)
+  fg       = "#CBE0F0", -- override de Josean (era #c0caf5 no tokyonight puro)
+  comment  = "#565f89",
+  red      = "#f7768e",
+  orange   = "#ff9e64",
+  yellow   = "#e0af68",
+  green    = "#9ece6a",
+  cyan     = "#7dcfff",
+  blue     = "#7aa2f7",
+  magenta  = "#bb9af7",
+  purple   = "#9d7cd8",
+}
 
 local function aplicar_highlights()
   local hl = vim.api.nvim_set_hl
 
-  -- Paleta de cores fortes e saturadas
-  local cor = {
-    azul = "#4fc1ff",    -- funções, métodos
-    ciano = "#00e5ff",   -- pacotes / namespaces
-    amarelo = "#ffd700", -- tipos e structs
-    vermelho = "#ff3b5c",-- keywords (func, return, if, for)
-    verde = "#39ff14",   -- strings
-    laranja = "#ff8c00", -- números e constantes
-    rosa = "#ff4fd8",    -- operadores
-    roxo = "#bd93f9",    -- booleanos, nil, builtins
-    cinza = "#7a8290",   -- comentários
-    branco = "#ffffff",  -- variáveis e texto
-    teal = "#5ccfe6",    -- parâmetros de função
-  }
+  -- Verbos de formatação estilo printf (Go, C — ver
+  -- utils/printf_highlight.lua) → AMARELO, mesma cor de tipos.
+  hl(0, "PrintfVerb", { fg = tn.yellow })
 
-  -- Chaves de mapeamento (YAML "services:", JSON, propriedades de
-  -- objeto em JS/TS) → CIANO — mesma família visual de "pacotes /
-  -- namespaces", já que semanticamente são "rótulos", não valores.
-  hl(0, "@property", { fg = cor.ciano })
-
-  -- Pontuação (":", ",", "-" de item de lista, "[]"/"{}") → CINZA,
-  -- deliberadamente discreta pra não competir com chave/valor.
-  hl(0, "@punctuation.delimiter", { fg = cor.cinza })
-  hl(0, "@punctuation.bracket", { fg = cor.cinza })
-
-  -- Marcadores especiais de YAML ("---", "...", "&"/"*" de âncora) →
-  -- ROSA, mesma cor de operadores (visualmente "estrutural", não dado).
-  hl(0, "@punctuation.special", { fg = cor.rosa })
-  hl(0, "@keyword.directive", { fg = cor.vermelho })
-
-  -- Nome de âncora/alias YAML (&base, *base) → ROXO, junto da família
-  -- de builtins/constantes especiais.
-  hl(0, "@label", { fg = cor.roxo })
-
-  -- Funções e métodos → AZUL
-  hl(0, "@lsp.type.function", { fg = cor.azul, italic = true })
-  hl(0, "@lsp.type.function.go", { fg = cor.azul, italic = true })
-  hl(0, "@lsp.type.method", { fg = cor.azul, italic = true })
-  hl(0, "@lsp.type.method.go", { fg = cor.azul, italic = true })
-  hl(0, "@function.call", { fg = cor.azul, italic = true })
-  hl(0, "@method.call", { fg = cor.azul, italic = true })
-  hl(0, "@function", { fg = cor.azul, italic = true })
-  hl(0, "@function.method", { fg = cor.azul, italic = true })
-
-  -- Pacotes / namespaces → CIANO
-  hl(0, "@lsp.type.namespace", { fg = cor.ciano })
-  hl(0, "@lsp.type.namespace.go", { fg = cor.ciano })
-  hl(0, "@namespace", { fg = cor.ciano })
-  hl(0, "@module", { fg = cor.ciano })
-
-  -- Tipos e structs → AMARELO
-  hl(0, "@lsp.type.type", { fg = cor.amarelo })
-  hl(0, "@lsp.type.type.go", { fg = cor.amarelo })
-  hl(0, "@type", { fg = cor.amarelo })
-  hl(0, "@type.builtin", { fg = cor.amarelo })
-  hl(0, "@type.definition", { fg = cor.amarelo })
-  hl(0, "Type", { fg = cor.amarelo })
-
-  -- Keywords → VERMELHO
-  hl(0, "@keyword", { fg = cor.vermelho })
-  hl(0, "@keyword.return", { fg = cor.vermelho })
-  hl(0, "@keyword.import", { fg = cor.vermelho })
-  hl(0, "@conditional", { fg = cor.vermelho })
-  hl(0, "@repeat", { fg = cor.vermelho })
-  hl(0, "Keyword", { fg = cor.vermelho })
-  hl(0, "Statement", { fg = cor.vermelho })
-
-  -- Keywords de DECLARAÇÃO (func — via highlights.scm customizado em
-  -- after/queries/go/ — chan/map/interface/struct) → mesmo vermelho,
-  -- em itálico, separadas do resto (if/for/return continuam retas).
-  hl(0, "@keyword.function", { fg = cor.vermelho, italic = true })
-  hl(0, "@keyword.type", { fg = cor.vermelho, italic = true })
-
-  -- Strings → VERDE
-  hl(0, "@string", { fg = cor.verde })
-  hl(0, "String", { fg = cor.verde })
-
-  -- Escape sequences (\n, \t, \", etc.) → LARANJA
-  hl(0, "@string.escape", { fg = cor.laranja })
-
-  -- Verbos de formatação estilo printf (%s, %d, %v, etc.) — Go, C e
-  -- qualquer linguagem que siga a convenção printf (ver
-  -- utils/printf_highlight.lua) → AMARELO, pra diferenciar dos escapes.
-  hl(0, "PrintfVerb", { fg = cor.amarelo })
-
-  -- Ações de template Go ({{ }}) dentro de arquivos .html/.tmpl → ROSA,
-  -- via matchadd em languages/go.lua (aproximado, não semântico).
-  hl(0, "GoTemplateAction", { fg = cor.rosa, bold = true })
-
-  -- IMPORTANTE: limpa o override do gopls (semantic tokens), que
-  -- achata a string inteira numa cor só e esconde o highlight de
-  -- escape sequences do Treesitter.
-  hl(0, "@lsp.type.string", {})
-  hl(0, "@lsp.type.string.go", {})
-
-  -- Números e constantes → LARANJA
-  hl(0, "@number", { fg = cor.laranja })
-  hl(0, "@float", { fg = cor.laranja })
-  hl(0, "@constant", { fg = cor.laranja })
-  hl(0, "Number", { fg = cor.laranja })
-  hl(0, "Constant", { fg = cor.laranja })
-
-  -- Operadores → ROSA
-  hl(0, "@operator", { fg = cor.rosa })
-  hl(0, "Operator", { fg = cor.rosa })
-
-  -- Booleanos, nil, builtins → ROXO
-  hl(0, "@boolean", { fg = cor.roxo })
-  hl(0, "@constant.builtin", { fg = cor.roxo })
-  hl(0, "@function.builtin", { fg = cor.roxo })
-  hl(0, "Boolean", { fg = cor.roxo })
-
-  -- Comentários → CINZA (itálico)
-  hl(0, "@comment", { fg = cor.cinza, italic = true })
-  hl(0, "Comment", { fg = cor.cinza, italic = true })
-
-  -- Variáveis → BRANCO
-  hl(0, "@lsp.type.variable", { fg = cor.branco })
-  hl(0, "@lsp.type.variable.go", { fg = cor.branco })
-  hl(0, "@variable", { fg = cor.branco })
-  hl(0, "@variable.member", { fg = cor.branco })
-  hl(0, "Identifier", { fg = cor.branco })
-
-  -- Parâmetros de função → TEAL + ITÁLICO
-  hl(0, "@lsp.type.parameter", { fg = cor.teal, italic = true })
-  hl(0, "@lsp.type.parameter.go", { fg = cor.teal, italic = true })
-  hl(0, "@parameter", { fg = cor.teal, italic = true })
-  hl(0, "@variable.parameter", { fg = cor.teal, italic = true })
+  -- Ações de template Go ({{ }}) em .html/.tmpl → MAGENTA.
+  hl(0, "GoTemplateAction", { fg = tn.magenta, bold = true })
 
   -- nvim-dap: cores dos signs de breakpoint (ver plugins/debug.lua e
-  -- languages/go.lua). Usa highlight group + caractere Unicode simples
-  -- em vez de emoji, que renderiza grande e sem controle de tamanho.
-  hl(0, "DapBreakpointHl", { fg = cor.vermelho })
-  hl(0, "DapBreakpointConditionHl", { fg = cor.laranja })
-  hl(0, "DapLogPointHl", { fg = cor.azul })
-  hl(0, "DapStoppedHl", { fg = cor.verde })
-  hl(0, "DapBreakpointRejectedHl", { fg = cor.cinza })
-  hl(0, "DapStoppedLine", { bg = "#2a2a1a" }) -- destaque sutil da linha atual
+  -- languages/go.lua).
+  hl(0, "DapBreakpointHl", { fg = tn.red })
+  hl(0, "DapBreakpointConditionHl", { fg = tn.orange })
+  hl(0, "DapLogPointHl", { fg = tn.blue })
+  hl(0, "DapStoppedHl", { fg = tn.green })
+  hl(0, "DapBreakpointRejectedHl", { fg = tn.comment })
+  hl(0, "DapStoppedLine", { bg = tn.bg_hl })
 
   -- Indicador de arquivo não salvo na statusline (ver config/options.lua)
-  -- — fundo sólido em vez de só cor de texto, pra garantir contraste
-  -- não importa o que tokyonight definir pro fundo da statusline.
-  hl(0, "StatusLineModified", { fg = "#000000", bg = cor.laranja, bold = true })
+  hl(0, "StatusLineModified", { fg = "#000000", bg = tn.orange, bold = true })
 
-  -- Diagnósticos inline (09/09/2026, ver config/diagnostics.lua,
-  -- virtual_text estilo Error Lens) — cores próprias, sem fundo de
-  -- caixa, pra garantir contraste contra o preto puro. Sem isso,
-  -- ficava no padrão do tokyonight, que em alguns casos (hint/info em
-  -- azul claro) perdia contraste.
-  hl(0, "DiagnosticVirtualTextError", { fg = cor.vermelho, bg = "NONE" })
-  hl(0, "DiagnosticVirtualTextWarn", { fg = cor.laranja, bg = "NONE" })
-  hl(0, "DiagnosticVirtualTextInfo", { fg = cor.azul, bg = "NONE", bold = true })
-  hl(0, "DiagnosticVirtualTextHint", { fg = cor.verde, bg = "NONE", bold = true })
-  hl(0, "DiagnosticError", { fg = cor.vermelho })
-  hl(0, "DiagnosticWarn", { fg = cor.laranja })
-  hl(0, "DiagnosticInfo", { fg = cor.azul })
-  hl(0, "DiagnosticHint", { fg = cor.verde })
-  hl(0, "DiagnosticUnderlineError", { sp = cor.vermelho, undercurl = true })
-  hl(0, "DiagnosticUnderlineWarn", { sp = cor.laranja, undercurl = true })
-  hl(0, "DiagnosticUnderlineInfo", { sp = cor.azul, undercurl = true })
-  hl(0, "DiagnosticUnderlineHint", { sp = cor.verde, undercurl = true })
+  -- Sinais de git no gutter (ver plugins/gitsigns.lua)
+  hl(0, "GitSignsAdd", { fg = tn.green })
+  hl(0, "GitSignsChange", { fg = tn.orange })
+  hl(0, "GitSignsDelete", { fg = tn.red })
+  hl(0, "GitSignsTopdelete", { fg = tn.red })
+  hl(0, "GitSignsChangedelete", { fg = tn.orange })
+  hl(0, "GitSignsUntracked", { fg = tn.comment })
 
-  -- Sinais de git no gutter (09/09/2026, ver plugins/gitsigns.lua) —
-  -- verde/laranja/vermelho seguindo a mesma lógica de "adicionado /
-  -- modificado / removido" já usada nos breakpoints do DAP acima.
-  hl(0, "GitSignsAdd", { fg = cor.verde })
-  hl(0, "GitSignsChange", { fg = cor.laranja })
-  hl(0, "GitSignsDelete", { fg = cor.vermelho })
-  hl(0, "GitSignsTopdelete", { fg = cor.vermelho })
-  hl(0, "GitSignsChangedelete", { fg = cor.laranja })
-  hl(0, "GitSignsUntracked", { fg = cor.cinza })
+  -- Status de git na listagem do oil (ver plugins/oil.lua) — working
+  -- tree em tom cheio, índice (staged) em itálico pra diferenciar.
+  hl(0, "OilGitStatusWorkingTreeModified", { fg = tn.orange })
+  hl(0, "OilGitStatusWorkingTreeAdded", { fg = tn.green })
+  hl(0, "OilGitStatusWorkingTreeDeleted", { fg = tn.red })
+  hl(0, "OilGitStatusWorkingTreeUntracked", { fg = tn.cyan })
+  hl(0, "OilGitStatusWorkingTreeRenamed", { fg = tn.purple })
+  hl(0, "OilGitStatusWorkingTreeCopied", { fg = tn.purple })
+  hl(0, "OilGitStatusWorkingTreeTypeChanged", { fg = tn.orange })
+  hl(0, "OilGitStatusWorkingTreeUnmerged", { fg = tn.red, bold = true })
+  hl(0, "OilGitStatusWorkingTreeIgnored", { fg = tn.comment })
+  hl(0, "OilGitStatusWorkingTreeUnmodified", { fg = tn.comment })
+  hl(0, "OilGitStatusIndexModified", { fg = tn.orange, italic = true })
+  hl(0, "OilGitStatusIndexAdded", { fg = tn.green, italic = true })
+  hl(0, "OilGitStatusIndexDeleted", { fg = tn.red, italic = true })
+  hl(0, "OilGitStatusIndexUntracked", { fg = tn.cyan, italic = true })
+  hl(0, "OilGitStatusIndexRenamed", { fg = tn.purple, italic = true })
+  hl(0, "OilGitStatusIndexCopied", { fg = tn.purple, italic = true })
+  hl(0, "OilGitStatusIndexTypeChanged", { fg = tn.orange, italic = true })
+  hl(0, "OilGitStatusIndexUnmerged", { fg = tn.red, bold = true, italic = true })
+  hl(0, "OilGitStatusIndexIgnored", { fg = tn.comment, italic = true })
+  hl(0, "OilGitStatusIndexUnmodified", { fg = tn.comment, italic = true })
 
-  -- Status de git na listagem do oil (09/09/2026, ver plugins/oil.lua)
-  -- — mesmas cores de gitsigns acima, working tree (o que você vê no
-  -- disco agora) em tom cheio, índice (o que já está staged) num tom
-  -- mais apagado, pra diferenciar os dois de relance.
-  hl(0, "OilGitStatusWorkingTreeModified", { fg = cor.laranja })
-  hl(0, "OilGitStatusWorkingTreeAdded", { fg = cor.verde })
-  hl(0, "OilGitStatusWorkingTreeDeleted", { fg = cor.vermelho })
-  hl(0, "OilGitStatusWorkingTreeUntracked", { fg = cor.ciano })
-  hl(0, "OilGitStatusWorkingTreeRenamed", { fg = cor.roxo })
-  hl(0, "OilGitStatusWorkingTreeCopied", { fg = cor.roxo })
-  hl(0, "OilGitStatusWorkingTreeTypeChanged", { fg = cor.laranja })
-  hl(0, "OilGitStatusWorkingTreeUnmerged", { fg = cor.vermelho, bold = true })
-  hl(0, "OilGitStatusWorkingTreeIgnored", { fg = cor.cinza })
-  hl(0, "OilGitStatusWorkingTreeUnmodified", { fg = cor.cinza })
-  hl(0, "OilGitStatusIndexModified", { fg = cor.laranja, italic = true })
-  hl(0, "OilGitStatusIndexAdded", { fg = cor.verde, italic = true })
-  hl(0, "OilGitStatusIndexDeleted", { fg = cor.vermelho, italic = true })
-  hl(0, "OilGitStatusIndexUntracked", { fg = cor.ciano, italic = true })
-  hl(0, "OilGitStatusIndexRenamed", { fg = cor.roxo, italic = true })
-  hl(0, "OilGitStatusIndexCopied", { fg = cor.roxo, italic = true })
-  hl(0, "OilGitStatusIndexTypeChanged", { fg = cor.laranja, italic = true })
-  hl(0, "OilGitStatusIndexUnmerged", { fg = cor.vermelho, bold = true, italic = true })
-  hl(0, "OilGitStatusIndexIgnored", { fg = cor.cinza, italic = true })
-  hl(0, "OilGitStatusIndexUnmodified", { fg = cor.cinza, italic = true })
+  -- Tabline de buffers (ver config/tabline.lua)
+  hl(0, "MartiniTabLineSel", { fg = tn.fg, bg = tn.bg_hl, bold = true })
+  hl(0, "MartiniTabLine", { fg = tn.comment, bg = tn.bg_dark })
+  hl(0, "MartiniTabLineFill", { bg = tn.bg_dark })
+  hl(0, "MartiniTabLineGit", { fg = tn.orange, bold = true })
 
-  -- Tabline de buffers (09/09/2026, ver config/tabline.lua) — buffer
-  -- ativo em destaque (branco + fundo levemente mais claro), inativos
-  -- em cinza (mesmo tom dos comentários), fundo da tabline preto puro.
-  hl(0, "MartiniTabLineSel", { fg = cor.branco, bg = "#1a1a1a", bold = true })
-  hl(0, "MartiniTabLine", { fg = cor.cinza, bg = "#000000" })
-  hl(0, "MartiniTabLineFill", { bg = "#000000" })
-  -- Marca "±" de arquivo com mudança de git não commitada (ver nota
-  -- "MARCA DE GIT" em config/tabline.lua) — mesmo laranja de
-  -- "modificado" usado em gitsigns/oil-git-status acima, consistência
-  -- de significado entre os 3 lugares.
-  hl(0, "MartiniTabLineGit", { fg = cor.laranja, bold = true })
-
-  -- fzf-lua (09/09/2026, ver plugins/finder.lua) — janela e borda em
-  -- preto/cinza (consistente com o resto da UI), matches de busca em
-  -- laranja (mesmo tom de números/constantes, alto contraste), linha
-  -- selecionada com o mesmo cinza-escuro da CursorLine/tabline ativa.
-  hl(0, "FzfLuaNormal", { bg = "#000000" })
-  hl(0, "FzfLuaBorder", { fg = cor.cinza, bg = "#000000" })
-  hl(0, "FzfLuaTitle", { fg = cor.azul, bold = true })
-  hl(0, "FzfLuaFzfNormal", { bg = "#000000" })
-  hl(0, "FzfLuaFzfBorder", { fg = cor.cinza, bg = "#000000" })
-  hl(0, "FzfLuaFzfPrompt", { fg = cor.azul, bold = true })
-  hl(0, "FzfLuaFzfQuery", { fg = cor.branco })
-  hl(0, "FzfLuaFzfMatch", { fg = cor.laranja, bold = true })
-  hl(0, "FzfLuaFzfPointer", { fg = cor.verde })
-  hl(0, "FzfLuaFzfMarker", { fg = cor.rosa })
-  hl(0, "FzfLuaFzfCursorLine", { bg = "#1a1a1a" })
-  hl(0, "FzfLuaCursorLine", { bg = "#1a1a1a" })
-  hl(0, "FzfLuaPreviewNormal", { bg = "#000000" })
-  hl(0, "FzfLuaPreviewBorder", { fg = cor.ciano, bg = "#000000" })
-  hl(0, "FzfLuaPreviewTitle", { fg = cor.ciano, bold = true })
-  hl(0, "FzfLuaHeaderText", { fg = cor.cinza })
-  hl(0, "FzfLuaHeaderBind", { fg = cor.cinza })
-
-  -- Fundo preto puro
-  hl(0, "Normal", { fg = cor.branco, bg = "#000000" })
-  hl(0, "NormalNC", { bg = "#000000" })
-  hl(0, "NormalFloat", { bg = "#000000" })
-  hl(0, "SignColumn", { bg = "#000000" })
-  hl(0, "LineNr", { bg = "#000000", fg = "#5c6370" })
-  hl(0, "EndOfBuffer", { bg = "#000000" })
-  hl(0, "CursorLine", { bg = "#1a1a1a" })
+  -- fzf-lua (ver plugins/finder.lua)
+  hl(0, "FzfLuaNormal", { bg = tn.bg_dark })
+  hl(0, "FzfLuaBorder", { fg = tn.comment, bg = tn.bg_dark })
+  hl(0, "FzfLuaTitle", { fg = tn.blue, bold = true })
+  hl(0, "FzfLuaFzfNormal", { bg = tn.bg_dark })
+  hl(0, "FzfLuaFzfBorder", { fg = tn.comment, bg = tn.bg_dark })
+  hl(0, "FzfLuaFzfPrompt", { fg = tn.blue, bold = true })
+  hl(0, "FzfLuaFzfQuery", { fg = tn.fg })
+  hl(0, "FzfLuaFzfMatch", { fg = tn.orange, bold = true })
+  hl(0, "FzfLuaFzfPointer", { fg = tn.green })
+  hl(0, "FzfLuaFzfMarker", { fg = tn.magenta })
+  hl(0, "FzfLuaFzfCursorLine", { bg = tn.bg_hl })
+  hl(0, "FzfLuaCursorLine", { bg = tn.bg_hl })
+  hl(0, "FzfLuaPreviewNormal", { bg = tn.bg_dark })
+  hl(0, "FzfLuaPreviewBorder", { fg = tn.cyan, bg = tn.bg_dark })
+  hl(0, "FzfLuaPreviewTitle", { fg = tn.cyan, bold = true })
+  hl(0, "FzfLuaHeaderText", { fg = tn.comment })
+  hl(0, "FzfLuaHeaderBind", { fg = tn.comment })
 end
 
--- SAFE_REQUIRE (09/09/2026): pcall mudo trocado por
--- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
+-- SAFE_REQUIRE: pcall mudo trocado por utils/safe_require.lua — ver
+-- nota completa em plugins/editing.lua.
 require("martini.utils.safe_require")("tokyonight", function(tokyonight)
+  local transparent = false
+
   tokyonight.setup({
     style = "night",
+    transparent = transparent,
     styles = {
       comments = { italic = true },
       keywords = { bold = false },
       functions = { bold = false },
+      sidebars = transparent and "transparent" or "dark",
+      floats = transparent and "transparent" or "dark",
     },
+    -- Override de fundo/frente pro tom azul-marinho de Josean, em vez
+    -- do preto/cinza-azulado padrão do tokyonight-night. Isso é o que
+    -- muda a "cara" do tema sem redefinir cada grupo de sintaxe à mão
+    -- — o tokyonight recalcula os grupos derivados sozinho.
+    on_colors = function(colors)
+      colors.bg = tn.bg
+      colors.bg_dark = transparent and colors.none or tn.bg_dark
+      colors.bg_float = transparent and colors.none or tn.bg_dark
+      colors.bg_highlight = tn.bg_hl
+      colors.bg_popup = tn.bg_dark
+      colors.bg_search = "#0A64AC"
+      colors.bg_sidebar = transparent and colors.none or tn.bg_dark
+      colors.bg_statusline = transparent and colors.none or tn.bg_dark
+      colors.bg_visual = "#275378"
+      colors.border = "#547998"
+      colors.fg = tn.fg
+      colors.fg_dark = "#B4D0E9"
+      colors.fg_float = tn.fg
+      colors.fg_gutter = "#627E97"
+      colors.fg_sidebar = "#B4D0E9"
+    end,
   })
+
   vim.cmd.colorscheme("tokyonight-night")
-end, "tema de cores base (tokyonight-night)")
+end, "tema de cores base (tokyonight-night, override de Josean)")
 
 aplicar_highlights()
 
