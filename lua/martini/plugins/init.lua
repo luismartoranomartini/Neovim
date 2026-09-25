@@ -29,6 +29,16 @@
 -- gitsigns/oil-git-status por não ter dependência de LSP ou
 -- completion — mesma lógica de posição livre já usada pro oil abaixo.
 --
+-- CORREÇÃO (25/09/2026): require("martini.plugins.neogit") tinha
+-- sumido da lista — erro cometido ao reescrever esse arquivo pra
+-- readicionar o image.nvim acima (24/09/2026), sem querer omitindo a
+-- linha do Neogit no meio do processo. Restaurado agora, na mesma
+-- posição de antes (logo depois do gitsigns, afinidade temática Git).
+--
+-- FLASH (25/09/2026): require("martini.plugins.flash") adicionado —
+-- navegação por labels, ver nota em lazy.lua e plugins/flash.lua pro
+-- setup. Sem dependência de LSP/completion, posição livre na lista.
+--
 -- NETRW → OIL (09/09/2026): require("martini.plugins.netrw-icons")
 -- REMOVIDO (arquivo excluído junto). No lugar,
 -- require("martini.plugins.oil") — netrw sai de cena por completo
@@ -49,7 +59,9 @@ require("martini.plugins.http")
 require("martini.plugins.multicursor")
 require("martini.plugins.finder")
 require("martini.plugins.gitsigns") -- sinais de git no gutter — ver nota "GIT STATUS" em oil.lua
+require("martini.plugins.neogit") -- interface Git interativa — ver nota "CORREÇÃO (25/09/2026)" acima
 require("martini.plugins.image") -- ver nota "VOLTA (24/09/2026)" acima
+require("martini.plugins.flash") -- navegação por labels — ver nota "FLASH" acima
 require("martini.plugins.live-server") -- servidor HTTP local (htmx precisa de servidor de verdade, não file://)
 require("martini.plugins.smart-splits") -- navegação Neovim ↔ painéis do WezTerm (Alt+h/j/k/l)
 require("martini.plugins.oil") -- ver nota "NETRW → OIL" acima

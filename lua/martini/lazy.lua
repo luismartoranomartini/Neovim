@@ -87,6 +87,10 @@
 -- disso — nenhum outro plugin da lista precisava dela até agora) e
 -- reaproveita ibhagwan/fzf-lua (já instalado acima) pra seleção de
 -- menus, sem precisar de telescope.nvim.
+--
+-- FLASH (25/09/2026): navegação por labels — ver plugins/flash.lua
+-- pro setup e as teclas (s/S/r/R/<C-s>, fora da gramática <leader>,
+-- convenção do próprio plugin).
 -- =========================================================
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local primeiro_boot_lazy = vim.fn.isdirectory(lazypath) == 0
@@ -153,6 +157,9 @@ local plugins = {
   -- (24/09/2026)" acima e plugins/image.lua pro setup. Exige
   -- ImageMagick instalado no sistema (fora do controle do lazy.nvim).
   { "3rd/image.nvim", lazy = false },
+  -- Navegação por labels (25/09/2026) — ver nota "FLASH" acima e
+  -- plugins/flash.lua pro setup.
+  { "folke/flash.nvim", lazy = false },
   -- Servidor HTTP local, live-reload (09/09/2026) — necessário pra
   -- htmx (AJAX/fetch não funciona abrindo o HTML direto via file://,
   -- que é o que o runner.lua faz hoje). Sem telescope.nvim nem

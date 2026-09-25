@@ -19,6 +19,13 @@
 -- relação às versões anteriores — o tokyonight usa ciano pra
 -- namespaces/propriedades por padrão. Confirmado explicitamente antes
 -- de aplicar (ver conversa).
+--
+-- BUG DE TRANSPARÊNCIA (25/09/2026): `colors.bg` estava fixo em
+-- `tn.bg`, sem checar `transparent` — diferente de bg_dark/bg_float/
+-- bg_sidebar/bg_statusline, que já viravam `colors.none` corretamente.
+-- Resultado: com `transparent = true`, TUDO ficava transparente MENOS
+-- o fundo principal (`Normal`), que continuava sólido em `#011628` e
+-- cobria a opacidade do WezTerm por cima do texto. Corrigido abaixo.
 -- =========================================================
 
 -- Cores oficiais tokyonight-night (confirmadas em tokyonight.org/palette
@@ -138,7 +145,11 @@ require("martini.utils.safe_require")("tokyonight", function(tokyonight)
     -- muda a "cara" do tema sem redefinir cada grupo de sintaxe à mão
     -- — o tokyonight recalcula os grupos derivados sozinho.
     on_colors = function(colors)
-      colors.bg = tn.bg
+      -- CORRIGIDO (25/09/2026): faltava o `transparent and ... or ...`
+      -- aqui — era o único campo de fundo que ficava sólido mesmo com
+      -- transparent=true, cobrindo a opacidade do WezTerm. Ver nota
+      -- "BUG DE TRANSPARÊNCIA" no topo do arquivo.
+      colors.bg = transparent and colors.none or tn.bg
       colors.bg_dark = transparent and colors.none or tn.bg_dark
       colors.bg_float = transparent and colors.none or tn.bg_dark
       colors.bg_highlight = tn.bg_hl
