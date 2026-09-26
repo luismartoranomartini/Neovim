@@ -1,40 +1,43 @@
 -- =========================================================
 -- lua/martini/config/colors.lua
--- Teste: tokyonight customizado (fundo azul-marinho), inspirado no
--- setup do josean-dev/dev-environment-files
+-- Tema base: tokyonight customizado, fundo roxo saturado.
 --
 -- MUDANÇA DE ABORDAGEM (24/09/2026): as versões anteriores desta
--- paleta (terrosa, depois roxo-ardósia) definiam manualmente TODOS os
--- grupos de sintaxe (@function, @keyword, @string, etc.) por cima do
--- tokyonight base. Essa versão faz diferente: usa on_colors() do
--- próprio tokyonight.nvim pra só trocar fundo/frente/realces, e deixa
--- o plugin decidir as cores de sintaxe sozinho (é o que ele já faz
--- bem — replicar isso manualmente era trabalho redundante). Só
--- mantemos highlight manual pro que o tokyonight NÃO conhece: nossos
--- grupos próprios (MartiniTabLine*, OilGitStatus*, FzfLua*) e sinais
--- de DAP — usando as cores oficiais da paleta tokyonight-night, pra
--- ficar visualmente consistente com o resto.
+-- paleta (terrosa, depois roxo-ardósia, depois azul-marinho estilo
+-- josean-dev) definiam manualmente TODOS os grupos de sintaxe
+-- (@function, @keyword, @string, etc.) por cima do tokyonight base.
+-- Essa versão faz diferente: usa on_colors() do próprio
+-- tokyonight.nvim pra só trocar fundo/frente/realces, e deixa o
+-- plugin decidir as cores de sintaxe sozinho (é o que ele já faz bem
+-- — replicar isso manualmente era trabalho redundante). Só mantemos
+-- highlight manual pro que o tokyonight NÃO conhece: nossos grupos
+-- próprios (MartiniTabLine*, OilGitStatus*, FzfLua*) e sinais de DAP
+-- — usando as cores oficiais da paleta tokyonight-night, pra ficar
+-- visualmente consistente com o resto.
 --
--- CIANO VOLTA DE PROPÓSITO: essa é a mudança mais significativa em
--- relação às versões anteriores — o tokyonight usa ciano pra
--- namespaces/propriedades por padrão. Confirmado explicitamente antes
--- de aplicar (ver conversa).
+-- BUG DE TRANSPARÊNCIA (25/09/2026): `colors.bg` estava fixo,
+-- sem checar `transparent` — diferente de bg_dark/bg_float/
+-- bg_sidebar/bg_statusline, que já viravam `colors.none`
+-- corretamente. Resultado: com `transparent = true`, TUDO ficava
+-- transparente MENOS o fundo principal (`Normal`), que continuava
+-- sólido e cobria a opacidade do WezTerm por cima do texto.
+-- Corrigido abaixo.
 --
--- BUG DE TRANSPARÊNCIA (25/09/2026): `colors.bg` estava fixo em
--- `tn.bg`, sem checar `transparent` — diferente de bg_dark/bg_float/
--- bg_sidebar/bg_statusline, que já viravam `colors.none` corretamente.
--- Resultado: com `transparent = true`, TUDO ficava transparente MENOS
--- o fundo principal (`Normal`), que continuava sólido em `#011628` e
--- cobria a opacidade do WezTerm por cima do texto. Corrigido abaixo.
+-- FUNDO ROXO (26/09/2026): trocado o fundo azul-marinho (estilo
+-- josean-dev) por roxo. Primeira tentativa (`#211e26`) ficou
+-- amarronzada por falta de saturação — corrigido para um roxo mais
+-- saturado (`#2e2440`, opção "B" testada visualmente contra `#211e26`
+-- e `#2a2438`). bg_dark e bg_hl escalados proporcionalmente na mesma
+-- família de cor (mais escuro/mais claro que o bg principal).
 -- =========================================================
 
 -- Cores oficiais tokyonight-night (confirmadas em tokyonight.org/palette
 -- e no repo folke/tokyonight.nvim) — usadas nos grupos manuais abaixo
 local tn = {
-  bg_dark  = "#011423", -- override de Josean (era #16161e no tokyonight puro)
-  bg       = "#011628", -- override de Josean (era #1a1b26 no tokyonight puro)
-  bg_hl    = "#143652", -- override de Josean (era #292e42 no tokyonight puro)
-  fg       = "#CBE0F0", -- override de Josean (era #c0caf5 no tokyonight puro)
+  bg_dark  = "#211934", -- roxo saturado, variante mais escura (sidebars/statusline/tabline)
+  bg       = "#2e2440", -- roxo saturado (fundo principal) — opção "B"
+  bg_hl    = "#453465", -- roxo saturado, variante mais clara (CursorLine, buffer ativo)
+  fg       = "#CBE0F0",
   comment  = "#565f89",
   red      = "#f7768e",
   orange   = "#ff9e64",
@@ -49,15 +52,9 @@ local tn = {
 local function aplicar_highlights()
   local hl = vim.api.nvim_set_hl
 
-  -- Verbos de formatação estilo printf (Go, C — ver
-  -- utils/printf_highlight.lua) → AMARELO, mesma cor de tipos.
   hl(0, "PrintfVerb", { fg = tn.yellow })
-
-  -- Ações de template Go ({{ }}) em .html/.tmpl → MAGENTA.
   hl(0, "GoTemplateAction", { fg = tn.magenta, bold = true })
 
-  -- nvim-dap: cores dos signs de breakpoint (ver plugins/debug.lua e
-  -- languages/go.lua).
   hl(0, "DapBreakpointHl", { fg = tn.red })
   hl(0, "DapBreakpointConditionHl", { fg = tn.orange })
   hl(0, "DapLogPointHl", { fg = tn.blue })
@@ -65,10 +62,8 @@ local function aplicar_highlights()
   hl(0, "DapBreakpointRejectedHl", { fg = tn.comment })
   hl(0, "DapStoppedLine", { bg = tn.bg_hl })
 
-  -- Indicador de arquivo não salvo na statusline (ver config/options.lua)
   hl(0, "StatusLineModified", { fg = "#000000", bg = tn.orange, bold = true })
 
-  -- Sinais de git no gutter (ver plugins/gitsigns.lua)
   hl(0, "GitSignsAdd", { fg = tn.green })
   hl(0, "GitSignsChange", { fg = tn.orange })
   hl(0, "GitSignsDelete", { fg = tn.red })
@@ -76,8 +71,6 @@ local function aplicar_highlights()
   hl(0, "GitSignsChangedelete", { fg = tn.orange })
   hl(0, "GitSignsUntracked", { fg = tn.comment })
 
-  -- Status de git na listagem do oil (ver plugins/oil.lua) — working
-  -- tree em tom cheio, índice (staged) em itálico pra diferenciar.
   hl(0, "OilGitStatusWorkingTreeModified", { fg = tn.orange })
   hl(0, "OilGitStatusWorkingTreeAdded", { fg = tn.green })
   hl(0, "OilGitStatusWorkingTreeDeleted", { fg = tn.red })
@@ -99,13 +92,11 @@ local function aplicar_highlights()
   hl(0, "OilGitStatusIndexIgnored", { fg = tn.comment, italic = true })
   hl(0, "OilGitStatusIndexUnmodified", { fg = tn.comment, italic = true })
 
-  -- Tabline de buffers (ver config/tabline.lua)
   hl(0, "MartiniTabLineSel", { fg = tn.fg, bg = tn.bg_hl, bold = true })
   hl(0, "MartiniTabLine", { fg = tn.comment, bg = tn.bg_dark })
   hl(0, "MartiniTabLineFill", { bg = tn.bg_dark })
   hl(0, "MartiniTabLineGit", { fg = tn.orange, bold = true })
 
-  -- fzf-lua (ver plugins/finder.lua)
   hl(0, "FzfLuaNormal", { bg = tn.bg_dark })
   hl(0, "FzfLuaBorder", { fg = tn.comment, bg = tn.bg_dark })
   hl(0, "FzfLuaTitle", { fg = tn.blue, bold = true })
@@ -140,15 +131,7 @@ require("martini.utils.safe_require")("tokyonight", function(tokyonight)
       sidebars = transparent and "transparent" or "dark",
       floats = transparent and "transparent" or "dark",
     },
-    -- Override de fundo/frente pro tom azul-marinho de Josean, em vez
-    -- do preto/cinza-azulado padrão do tokyonight-night. Isso é o que
-    -- muda a "cara" do tema sem redefinir cada grupo de sintaxe à mão
-    -- — o tokyonight recalcula os grupos derivados sozinho.
     on_colors = function(colors)
-      -- CORRIGIDO (25/09/2026): faltava o `transparent and ... or ...`
-      -- aqui — era o único campo de fundo que ficava sólido mesmo com
-      -- transparent=true, cobrindo a opacidade do WezTerm. Ver nota
-      -- "BUG DE TRANSPARÊNCIA" no topo do arquivo.
       colors.bg = transparent and colors.none or tn.bg
       colors.bg_dark = transparent and colors.none or tn.bg_dark
       colors.bg_float = transparent and colors.none or tn.bg_dark
@@ -168,7 +151,7 @@ require("martini.utils.safe_require")("tokyonight", function(tokyonight)
   })
 
   vim.cmd.colorscheme("tokyonight-night")
-end, "tema de cores base (tokyonight-night, override de Josean)")
+end, "tema de cores base (tokyonight-night, override roxo saturado)")
 
 aplicar_highlights()
 
