@@ -194,7 +194,7 @@ local plugins = {
   -- Cmdline em janela flutuante centralizada (27/09/2026) — ver nota
   -- "TINY-CMDLINE" acima e plugins/tiny-cmdline.lua. Requer Neovim
   -- 0.12+ (já é o mínimo desta config).
-  -- { "rachartier/tiny-cmdline.nvim", lazy = false },
+  { "rachartier/tiny-cmdline.nvim", lazy = false },
   -- Servidor HTTP local, live-reload (09/09/2026) — necessário pra
   -- htmx (AJAX/fetch não funciona abrindo o HTML direto via file://,
   -- que é o que o runner.lua faz hoje). Sem telescope.nvim nem

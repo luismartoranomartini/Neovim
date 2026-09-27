@@ -23,6 +23,25 @@ if vim.fn.has("nvim-0.12") == 0 then
   )
 end
 -- =========================================================
+-- =========================================================
+-- UI2 (27/09/2026, REATIVADO)
+-- A causa real da quebra de <leader> era config/init.lua estar com o
+-- conteudo errado (copia de plugins/init.lua), nao o ui2. Reativado
+-- agora que a causa raiz foi corrigida - teste <leader> logo depois de
+-- reabrir, antes de mexer em mais nada.
+-- =========================================================
+do
+  local ok_ui2, ui2 = pcall(require, "vim._core.ui2")
+  if ok_ui2 then
+    ui2.enable({})
+  else
+    vim.notify(
+      "martini.nvim: vim._core.ui2 nao encontrado - tiny-cmdline.nvim nao vai funcionar.",
+      vim.log.levels.WARN
+    )
+  end
+end
+-- =========================================================
 -- PATCH: Bug no Neovim 0.12.2 — chave 'buf' inválida
 -- =========================================================
 do
