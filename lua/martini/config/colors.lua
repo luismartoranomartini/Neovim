@@ -29,6 +29,13 @@
 -- saturado (`#2e2440`, opção "B" testada visualmente contra `#211e26`
 -- e `#2a2438`). bg_dark e bg_hl escalados proporcionalmente na mesma
 -- família de cor (mais escuro/mais claro que o bg principal).
+--
+-- CONTRASTE DE TAGS CSS/HTML (26/09/2026): seletores de elemento
+-- (`header`, `div`, `<html>`, etc.) caindo no grupo padrão do
+-- tokyonight pra @tag, que usa um tom apagado (próximo de
+-- tn.comment) — quase invisível contra o fundo roxo saturado.
+-- Forçado abaixo pra tn.blue, com bom contraste de matiz e
+-- luminância contra o fundo.
 -- =========================================================
 
 -- Cores oficiais tokyonight-night (confirmadas em tokyonight.org/palette
@@ -37,7 +44,7 @@ local tn = {
   bg_dark  = "#211934", -- roxo saturado, variante mais escura (sidebars/statusline/tabline)
   bg       = "#2e2440", -- roxo saturado (fundo principal) — opção "B"
   bg_hl    = "#453465", -- roxo saturado, variante mais clara (CursorLine, buffer ativo)
-  fg       = "#CBE0F0",
+  fg       = "#F5FAFF",
   comment  = "#565f89",
   red      = "#f7768e",
   orange   = "#ff9e64",
@@ -45,16 +52,22 @@ local tn = {
   green    = "#9ece6a",
   cyan     = "#7dcfff",
   blue     = "#7aa2f7",
-  magenta  = "#bb9af7",
-  purple   = "#9d7cd8",
+  magenta  = "#d0b3ff",
+  purple   = "#b8a0f0",
 }
 
 local function aplicar_highlights()
   local hl = vim.api.nvim_set_hl
 
+  -- Verbos de formatação estilo printf (Go, C — ver
+  -- utils/printf_highlight.lua) → AMARELO, mesma cor de tipos.
   hl(0, "PrintfVerb", { fg = tn.yellow })
+
+  -- Ações de template Go ({{ }}) em .html/.tmpl → MAGENTA.
   hl(0, "GoTemplateAction", { fg = tn.magenta, bold = true })
 
+  -- nvim-dap: cores dos signs de breakpoint (ver plugins/debug.lua e
+  -- languages/go.lua).
   hl(0, "DapBreakpointHl", { fg = tn.red })
   hl(0, "DapBreakpointConditionHl", { fg = tn.orange })
   hl(0, "DapLogPointHl", { fg = tn.blue })
@@ -62,8 +75,10 @@ local function aplicar_highlights()
   hl(0, "DapBreakpointRejectedHl", { fg = tn.comment })
   hl(0, "DapStoppedLine", { bg = tn.bg_hl })
 
+  -- Indicador de arquivo não salvo na statusline (ver config/options.lua)
   hl(0, "StatusLineModified", { fg = "#000000", bg = tn.orange, bold = true })
 
+  -- Sinais de git no gutter (ver plugins/gitsigns.lua)
   hl(0, "GitSignsAdd", { fg = tn.green })
   hl(0, "GitSignsChange", { fg = tn.orange })
   hl(0, "GitSignsDelete", { fg = tn.red })
@@ -71,6 +86,8 @@ local function aplicar_highlights()
   hl(0, "GitSignsChangedelete", { fg = tn.orange })
   hl(0, "GitSignsUntracked", { fg = tn.comment })
 
+  -- Status de git na listagem do oil (ver plugins/oil.lua) — working
+  -- tree em tom cheio, índice (staged) em itálico pra diferenciar.
   hl(0, "OilGitStatusWorkingTreeModified", { fg = tn.orange })
   hl(0, "OilGitStatusWorkingTreeAdded", { fg = tn.green })
   hl(0, "OilGitStatusWorkingTreeDeleted", { fg = tn.red })
@@ -92,11 +109,13 @@ local function aplicar_highlights()
   hl(0, "OilGitStatusIndexIgnored", { fg = tn.comment, italic = true })
   hl(0, "OilGitStatusIndexUnmodified", { fg = tn.comment, italic = true })
 
+  -- Tabline de buffers (ver config/tabline.lua)
   hl(0, "MartiniTabLineSel", { fg = tn.fg, bg = tn.bg_hl, bold = true })
   hl(0, "MartiniTabLine", { fg = tn.comment, bg = tn.bg_dark })
   hl(0, "MartiniTabLineFill", { bg = tn.bg_dark })
   hl(0, "MartiniTabLineGit", { fg = tn.orange, bold = true })
 
+  -- fzf-lua (ver plugins/finder.lua)
   hl(0, "FzfLuaNormal", { bg = tn.bg_dark })
   hl(0, "FzfLuaBorder", { fg = tn.comment, bg = tn.bg_dark })
   hl(0, "FzfLuaTitle", { fg = tn.blue, bold = true })
@@ -114,12 +133,80 @@ local function aplicar_highlights()
   hl(0, "FzfLuaPreviewTitle", { fg = tn.cyan, bold = true })
   hl(0, "FzfLuaHeaderText", { fg = tn.comment })
   hl(0, "FzfLuaHeaderBind", { fg = tn.comment })
+
+  -- Tags/seletores de elemento em CSS/HTML/JSX (26/09/2026) — ver nota
+  -- "CONTRASTE DE TAGS CSS/HTML" no topo do arquivo. Cobre tanto os
+  -- captures de treesitter (@tag*) quanto os grupos legados de vim
+  -- regex (cssTagName/htmlTagName), porque dependendo do filetype um
+  -- ou outro é quem efetivamente pinta a tela.
+  hl(0, "@tag", { fg = tn.orange, bold = true })
+  hl(0, "@tag.builtin", { fg = tn.orange, bold = true })
+  hl(0, "@tag.attribute", { fg = tn.cyan })
+  hl(0, "cssTagName", { fg = tn.blue })
+  hl(0, "htmlTagName", { fg = tn.blue })
+  hl(0, "htmlTag", { fg = tn.comment })
+  hl(0, "htmlEndTag", { fg = tn.comment })
+
+  hl(0, "@keyword", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@keyword.function", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.return", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.operator", { fg = "#FFFFFF", bold = true })
+  hl(0, "Keyword", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "Statement", { fg = "#FFFFFF", bold = true })
+  hl(0, "@type", { fg = "#FFD966", bold = true })
+  hl(0, "@type.builtin", { fg = "#FFD966", bold = true })
+  hl(0, "Type", { fg = "#FFD966", bold = true })
+  hl(0, "@function", { fg = "#8ab4ff", bold = true })
+  hl(0, "@function.call", { fg = "#8ab4ff", bold = true })
+  hl(0, "Function", { fg = "#8ab4ff", bold = true })
+  hl(0, "@variable", { fg = "#F5FAFF" })
+  hl(0, "Identifier", { fg = "#F5FAFF" })
+  hl(0, "@keyword.conditional", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@keyword.repeat", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@keyword.exception", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@keyword.import", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.coroutine", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.type", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.modifier", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.debug", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.directive", { fg = "#FFFFFF", bold = true })
+  hl(0, "@conditional", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@repeat", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@exception", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@include", { fg = "#FFFFFF", bold = true })
+  hl(0, "@storageclass", { fg = "#FFFFFF", bold = true })
+  hl(0, "Conditional", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "Repeat", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "Exception", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "Include", { fg = "#FFFFFF", bold = true })
+  hl(0, "StorageClass", { fg = "#FFFFFF", bold = true })
+  hl(0, "PreProc", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.conditional", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@keyword.repeat", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@keyword.exception", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@keyword.import", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.coroutine", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.type", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.modifier", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.debug", { fg = "#FFFFFF", bold = true })
+  hl(0, "@keyword.directive", { fg = "#FFFFFF", bold = true })
+  hl(0, "@conditional", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@repeat", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@exception", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "@include", { fg = "#FFFFFF", bold = true })
+  hl(0, "@storageclass", { fg = "#FFFFFF", bold = true })
+  hl(0, "Conditional", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "Repeat", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "Exception", { fg = "#FFFFFF", bold = true, italic = true })
+  hl(0, "Include", { fg = "#FFFFFF", bold = true })
+  hl(0, "StorageClass", { fg = "#FFFFFF", bold = true })
+  hl(0, "PreProc", { fg = "#FFFFFF", bold = true })
 end
 
 -- SAFE_REQUIRE: pcall mudo trocado por utils/safe_require.lua — ver
 -- nota completa em plugins/editing.lua.
 require("martini.utils.safe_require")("tokyonight", function(tokyonight)
-  local transparent = false
+  local transparent = true
 
   tokyonight.setup({
     style = "night",
@@ -131,7 +218,15 @@ require("martini.utils.safe_require")("tokyonight", function(tokyonight)
       sidebars = transparent and "transparent" or "dark",
       floats = transparent and "transparent" or "dark",
     },
+    -- Override de fundo/frente pro roxo saturado, em vez do
+    -- preto/cinza-azulado padrão do tokyonight-night. Isso é o que
+    -- muda a "cara" do tema sem redefinir cada grupo de sintaxe à mão
+    -- — o tokyonight recalcula os grupos derivados sozinho.
     on_colors = function(colors)
+      -- CORRIGIDO (25/09/2026): faltava o `transparent and ... or ...`
+      -- aqui — era o único campo de fundo que ficava sólido mesmo com
+      -- transparent=true, cobrindo a opacidade do WezTerm. Ver nota
+      -- "BUG DE TRANSPARÊNCIA" no topo do arquivo.
       colors.bg = transparent and colors.none or tn.bg
       colors.bg_dark = transparent and colors.none or tn.bg_dark
       colors.bg_float = transparent and colors.none or tn.bg_dark
@@ -143,10 +238,18 @@ require("martini.utils.safe_require")("tokyonight", function(tokyonight)
       colors.bg_visual = "#275378"
       colors.border = "#547998"
       colors.fg = tn.fg
-      colors.fg_dark = "#B4D0E9"
+      colors.fg_dark = "#E9F4FF"
       colors.fg_float = tn.fg
       colors.fg_gutter = "#627E97"
-      colors.fg_sidebar = "#B4D0E9"
+      colors.fg_sidebar = "#E9F4FF"
+      colors.purple = "#c9b3ff"
+      colors.magenta = "#e0c3ff"
+      colors.magenta2 = "#ff5fa8"
+      colors.blue = "#8ab4ff"
+      colors.blue1 = "#5fd0f0"
+      colors.cyan = "#a0e9ff"
+      colors.green = "#b3e896"
+      colors.yellow = "#f0c674"
     end,
   })
 

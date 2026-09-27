@@ -130,7 +130,7 @@ local plugins = {
   { "rcarriga/nvim-dap-ui",   lazy = false },
   { "leoluz/nvim-dap-go",     lazy = false },
   { "CRAG666/code_runner.nvim", lazy = false },
-  { "mistweaverco/kulala.nvim", lazy = false },
+--   { "mistweaverco/kulala.nvim", lazy = false },
   { "jake-stewart/multicursor.nvim", branch = "1.0", lazy = false },
   { "ibhagwan/fzf-lua", lazy = false },
   -- Explorador de arquivos: oil.nvim edita o filesystem como buffer,
@@ -148,6 +148,8 @@ local plugins = {
   -- plugins/gitsigns.lua e a config extra dentro de plugins/oil.lua.
   { "lewis6991/gitsigns.nvim", lazy = false },
   { "refractalize/oil-git-status.nvim", dependencies = { "stevearc/oil.nvim" }, lazy = false },
+  { "mason-org/mason.nvim", lazy = false },
+  { "abecodes/tabout.nvim", lazy = false },
   -- Interface Git interativa (23/09/2026) — ver nota "NEOGIT" acima.
   -- plenary.nvim é dependência obrigatória do Neogit, exclusiva dele
   -- na lista (nenhum outro plugin aqui precisa dela).

@@ -23,23 +23,26 @@
 -- ISOLADO POR FILETYPE (18/09/2026): <Tab> só dispara Emmet em html,
 -- css, scss, jsx, tsx — mesma lista de plugins/editing.lua, onde
 -- :EmmetInstall roda (user_emmet_install_global = 0, emmet NUNCA
--- instalado fora desses filetypes). Antes, <Tab> tentava expandir
--- Emmet em QUALQUER buffer (Go, Lua, etc.), sem efeito nenhum — o
--- <plug>(emmet-expand-abbr) não fazia nada porque o emmet nem estava
--- instalado ali, e o <Tab> normal (indentar) ficava perdido. Fora
--- desses 5 filetypes, <Tab> agora cai no fallback() — comportamento
--- nativo do Neovim. LISTA DUPLICADA de propósito (mesma de
--- editing.lua): são 5 nomes, não vale a pena um módulo compartilhado
--- só pra isso — se mudar uma lista, mudar a outra também.
+-- instalado fora desses filetypes). LISTA DUPLICADA de propósito
+-- (mesma de editing.lua): são 5 nomes, não vale a pena um módulo
+-- compartilhado só pra isso — se mudar uma lista, mudar a outra
+-- também.
 --
 -- <Tab>/<S-Tab> NAVEGAM O MENU (23/09/2026): quando cmp.visible(),
--- <Tab> agora seleciona o próximo item e <S-Tab> o anterior — antes
--- disso era só <Down>/<Up> (ver nota "VOLTA DO <C-y>" acima, que
--- ainda vale pro restante: Emmet e fallback nativo continuam do
--- mesmo jeito quando o menu NÃO está visível). Motivo: <Tab> só
--- indentava quando o menu estava aberto fora dos 5 filetypes de
--- Emmet — não dava pra navegar sugestão nenhuma sem tirar a mão do
--- home row pro <Down>/<Up>. <Down>/<Up> continuam funcionando iguais.
+-- <Tab> seleciona o próximo item e <S-Tab> o anterior.
+--
+-- TABOUT (26/09/2026): o <Tab> GENÉRICO (fora dos 5 filetypes de
+-- Emmet) saiu do cmp.mapping e passou a ser 100% do tabout.nvim (ver
+-- plugins/tabout.lua) — ele pula pra fora de aspas/parênteses/chaves
+-- quando o cursor está logo antes de um fechamento, e ainda coopera
+-- com o cmp (completion = true: menu visível, o cmp navega; menu
+-- fechado, o tabout tenta pular). Os 5 filetypes de Emmet continuam
+-- com <Tab> definido AQUI, mas agora como mapeamento LOCAL AO BUFFER
+-- (via autocmd FileType logo abaixo do cmp.setup) — mapeamento local
+-- tem prioridade sobre o global do tabout, então o Emmet nesses
+-- filetypes específicos continua intocado. <S-Tab> não muda: segue
+-- 100% do cmp.mapping abaixo, o tabout nem registra tecla pra trás
+-- (backwards_tabkey = "" em tabout.lua).
 -- =========================================================
 
 local safe_require = require("martini.utils.safe_require")
@@ -89,25 +92,9 @@ if cmp and luasnip then
           fallback()
         end
       end, { "i" }),
-      -- Mesma lista de filetypes do :EmmetInstall em editing.lua —
-      -- ver nota no topo do arquivo. Prioridade: menu visível vence
-      -- Emmet, que vence fallback nativo.
-      ["<Tab>"] = cmp.mapping(function(fallback)
-        local emmet_filetypes = {
-          html = true, css = true, scss = true, jsx = true, tsx = true,
-        }
-        if cmp.visible() then
-          cmp.select_next_item()
-        elseif emmet_filetypes[vim.bo.filetype] then
-          vim.schedule(function()
-            vim.fn.feedkeys(
-              vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
-            )
-          end)
-        else
-          fallback()
-        end
-      end, { "i" }),
+      -- <Tab> genérico REMOVIDO daqui (26/09/2026) — ver nota
+      -- "TABOUT" no topo do arquivo. Fora dos filetypes de Emmet,
+      -- quem cuida do <Tab> agora é tabout.nvim (plugins/tabout.lua).
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
@@ -144,4 +131,27 @@ if cmp and luasnip then
   safe_require("nvim-autopairs.completion.cmp", function(autopairs_cmp)
     cmp.event:on("confirm_done", autopairs_cmp.on_confirm_done())
   end, "fechar par automaticamente ao confirmar item do autocomplete")
+
+  -- <Tab> LOCAL AO BUFFER pros filetypes de Emmet (26/09/2026) — ver
+  -- nota "TABOUT" no topo do arquivo. Mapeamento por buffer (não
+  -- global) tem prioridade sobre o <Tab> global do tabout.nvim, então
+  -- nesses 5 filetypes o comportamento continua: menu do cmp visível
+  -- → navega; senão → expande Emmet.
+  local emmet_filetypes = { "html", "css", "scss", "jsx", "tsx" }
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = emmet_filetypes,
+    callback = function(args)
+      vim.keymap.set("i", "<Tab>", function()
+        if cmp.visible() then
+          cmp.select_next_item()
+        else
+          vim.schedule(function()
+            vim.fn.feedkeys(
+              vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
+            )
+          end)
+        end
+      end, { buffer = args.buf, desc = "cmp: próximo item, ou expandir Emmet" })
+    end,
+  })
 end

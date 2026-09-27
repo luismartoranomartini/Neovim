@@ -20,6 +20,24 @@
 -- janela flutuante com a mensagem do diagnóstico (era o padrão
 -- implícito de goto_prev/goto_next; o jump() novo não abre por
 -- padrão, então precisa ser pedido explicitamente).
+--
+-- TABOUT vs <Tab> NATIVO DE SNIPPET (26/09/2026): descoberto ao
+-- depurar por que tabout.nvim (plugins/tabout.lua) não pulava fora de
+-- aspas/parênteses em NENHUM arquivo com LSP conectado (Go, TS, C):
+-- o Neovim 0.11+ registra, neste MESMO evento LspAttach, um <Tab>
+-- NATIVO e LOCAL AO BUFFER (vim.snippet.jump, ver vim._defaults do
+-- próprio runtime). Mapeamento local ao buffer SEMPRE vence o global
+-- do tabout, não importa em que ordem os plugins carregam — por isso
+-- só funcionava depois de chamar require("tabout").setup() nA MÃO,
+-- depois do LSP já ter conectado. Corrigido sobrescrevendo <Tab> pro
+-- <Plug>(Tabout) aqui dentro, DEPOIS do autocmd nativo (autocmds do
+-- mesmo evento rodam na ordem em que foram registrados — o nosso,
+-- definido durante o carregamento dos plugins, roda depois do
+-- embutido no runtime). EXCLUI os filetypes de Emmet: completion.lua
+-- já define um <Tab> local ao buffer pra eles (cmp → Emmet) e
+-- QUEREMOS que esse vença ali, não o tabout — html/cssls também
+-- passam por este LspAttach, então a checagem de filetype é
+-- necessária pra não quebrar o Emmet.
 -- =========================================================
 
 -- ── Keymaps LSP (ativados ao conectar) ───────────────────
@@ -38,6 +56,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end, opts)
     vim.keymap.set("n", "<leader>fr", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "<leader>fu", vim.lsp.buf.references, opts)
+
+    -- Ver nota "TABOUT vs <Tab> NATIVO DE SNIPPET" no topo do arquivo.
+    local emmet_filetypes = { html = true, css = true, scss = true, jsx = true, tsx = true }
+    if not emmet_filetypes[vim.bo[args.buf].filetype] then
+      vim.keymap.set("i", "<Tab>", "<Plug>(Tabout)", opts)
+    end
   end,
 })
 
