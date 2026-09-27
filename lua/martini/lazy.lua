@@ -91,6 +91,29 @@
 -- FLASH (25/09/2026): navegação por labels — ver plugins/flash.lua
 -- pro setup e as teclas (s/S/r/R/<C-s>, fora da gramática <leader>,
 -- convenção do próprio plugin).
+--
+-- MINI.AI (27/09/2026): text objects a/i genéricos (colchetes, aspas,
+-- tag, chamada de função, argumento). Repo mudou de dono em algum
+-- momento — hoje mora em nvim-mini/mini.ai, não mais em
+-- echasnovski/mini.ai (conta pessoal do autor original). SEM campo
+-- "version": README recomenda version=false/'*' pro lazy.nvim, mas
+-- esta config já trava tudo por commit exato via lazy-lock.json (ver
+-- nota "POR QUE A TROCA" acima) — igual a todo o resto da lista,
+-- então o campo ficaria redundante. Substituiu a metade "select" de
+-- nvim-treesitter-textobjects (af/if/ac/ic/aa/ia) — ver notas em
+-- plugins/textobjects.lua e o novo plugins/mini-ai.lua.
+--
+-- TINY-INLINE-DIAGNOSTIC (27/09/2026): mensagem de diagnóstico inline
+-- com mais destaque que o virtual_text nativo — ver plugins/
+-- tiny-inline-diagnostic.lua e a nota "virtual_text NATIVO DESLIGADO"
+-- em config/diagnostics.lua (os dois juntos duplicavam a mensagem).
+--
+-- TINY-CMDLINE (27/09/2026): cmdline como janela flutuante
+-- centralizada, via sistema "ui2" nativo do Neovim 0.12 — ver
+-- plugins/tiny-cmdline.lua. ATENÇÃO: depende de
+-- require("vim._core.ui2"), API interna (prefixo "_core", não em
+-- :h), sem garantia de estabilidade entre patches do 0.12.x — ver nota
+-- completa no arquivo do plugin.
 -- =========================================================
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local primeiro_boot_lazy = vim.fn.isdirectory(lazypath) == 0
@@ -162,6 +185,16 @@ local plugins = {
   -- Navegação por labels (25/09/2026) — ver nota "FLASH" acima e
   -- plugins/flash.lua pro setup.
   { "folke/flash.nvim", lazy = false },
+  -- Text objects a/i genéricos (27/09/2026) — ver nota "MINI.AI"
+  -- acima e plugins/mini-ai.lua pro setup.
+  { "nvim-mini/mini.ai", lazy = false },
+  -- Diagnóstico inline com mais destaque (27/09/2026) — ver nota
+  -- "TINY-INLINE-DIAGNOSTIC" acima e plugins/tiny-inline-diagnostic.lua.
+  { "rachartier/tiny-inline-diagnostic.nvim", lazy = false },
+  -- Cmdline em janela flutuante centralizada (27/09/2026) — ver nota
+  -- "TINY-CMDLINE" acima e plugins/tiny-cmdline.lua. Requer Neovim
+  -- 0.12+ (já é o mínimo desta config).
+  -- { "rachartier/tiny-cmdline.nvim", lazy = false },
   -- Servidor HTTP local, live-reload (09/09/2026) — necessário pra
   -- htmx (AJAX/fetch não funciona abrindo o HTML direto via file://,
   -- que é o que o runner.lua faz hoje). Sem telescope.nvim nem
@@ -210,4 +243,4 @@ vim.api.nvim_create_user_command("MartiniUpdate", function()
   require("lazy").update()
 end, { desc = "Atualiza os plugins do lazy.nvim manualmente (regrava lazy-lock.json)" })
 
-return primeiro_boot_lazy or faltando
+return primeiro_boot_lazy

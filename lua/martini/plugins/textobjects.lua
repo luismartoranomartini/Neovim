@@ -1,16 +1,27 @@
 -- =========================================================
 -- lua/martini/plugins/textobjects.lua
--- Text objects via Treesitter (nvim-treesitter-textobjects, branch main)
--- Aplicável a qualquer filetype com parser instalado — por isso vive
--- em plugins/, não em languages/go.lua.
+-- nvim-treesitter-textobjects (branch main) — usado aqui só pra
+-- NAVEGAÇÃO entre função/struct (]f/[f, ]c/[c, via .move).
+--
+-- SELEÇÃO SAIU DAQUI (27/09/2026): af/if (função), ac/ic (struct/
+-- class) e aa/ia (parâmetro) via .select() foram substituídos pelo
+-- mini.ai — ver plugins/mini-ai.lua. Motivo: mini.ai cobre bem mais
+-- casos com a mesma mecânica a/i (colchetes, aspas, tag, chamada de
+-- função) e evita manter dois plugins de text object fazendo a
+-- mesma coisa. O plugin nvim-treesitter-textobjects continua
+-- instalado só por causa do módulo .move (usado abaixo) e das
+-- queries de Treesitter que ele registra (as mesmas que
+-- MiniAi.gen_spec.treesitter reaproveita em mini-ai.lua, pras teclas
+-- novas aF/iF e aC/iC).
+--
 -- API nova (pós-reescrita): sem require("nvim-treesitter.configs").
--- Keymaps setados manualmente via os módulos .select e .move.
+-- Keymap setado manualmente via o módulo .move.
 --
 -- SAFE_REQUIRE (09/09/2026): pcalls mudos trocados por
 -- utils/safe_require.lua — ver nota completa em plugins/editing.lua.
--- select/move usam safe_require.get() (não a forma chamável) porque
--- os keymaps só fazem sentido condicionados à presença do módulo,
--- não é um "setup imediato".
+-- move usa safe_require.get() (não a forma chamável) porque os
+-- keymaps só fazem sentido condicionados à presença do módulo, não é
+-- um "setup imediato".
 -- =========================================================
 
 local safe_require = require("martini.utils.safe_require")
@@ -21,32 +32,11 @@ vim.g.no_plugin_maps = true
 
 safe_require("nvim-treesitter-textobjects", function(textobjects)
   textobjects.setup({
-    select = {
-      lookahead = true, -- pula pro próximo objeto se não estiver dentro de um
-      selection_modes = {
-        ["@parameter.outer"] = "v",
-        ["@function.outer"] = "V",
-        ["@class.outer"] = "V",
-      },
-    },
     move = {
       set_jumps = true, -- registra posição na jumplist (Ctrl-o/Ctrl-i funcionam)
     },
   })
-end, "textobjects de função/struct/parâmetro (af/if, ac/ic, aa/ia)")
-
--- ── Select: if/af (function), ic/ac (class/struct), ia/aa (parameter) ──
-local select = safe_require.get("nvim-treesitter-textobjects.select", "seleção de função/struct/parâmetro (af/if, ac/ic, aa/ia)")
-if select then
-  local function sel(query) return function() select.select_textobject(query, "textobjects") end end
-
-  vim.keymap.set({ "x", "o" }, "af", sel("@function.outer"), { desc = "Selecionar função (outer)" })
-  vim.keymap.set({ "x", "o" }, "if", sel("@function.inner"), { desc = "Selecionar função (inner)" })
-  vim.keymap.set({ "x", "o" }, "ac", sel("@class.outer"), { desc = "Selecionar struct/class (outer)" })
-  vim.keymap.set({ "x", "o" }, "ic", sel("@class.inner"), { desc = "Selecionar struct/class (inner)" })
-  vim.keymap.set({ "x", "o" }, "aa", sel("@parameter.outer"), { desc = "Selecionar parâmetro (outer)" })
-  vim.keymap.set({ "x", "o" }, "ia", sel("@parameter.inner"), { desc = "Selecionar parâmetro (inner)" })
-end
+end, "navegação entre função/struct (]f/[f, ]c/[c)")
 
 -- ── Move: ]f / [f pula entre funções, ]c / [c entre structs/classes ──
 local move = safe_require.get("nvim-treesitter-textobjects.move", "navegação entre função/struct (]f/[f, ]c/[c)")

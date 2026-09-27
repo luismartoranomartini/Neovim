@@ -38,6 +38,10 @@ vim.opt.backup = false
 vim.opt.writebackup = false
 vim.opt.guifont = "FiraCode Nerd Font Mono:h11"
 vim.o.completeopt = "menu,menuone,noselect"
+-- Esconde a área da cmdline nativa (27/09/2026) — requisito do
+-- tiny-cmdline.nvim (ver plugins/tiny-cmdline.lua), que reposiciona a
+-- cmdline como janela flutuante centralizada em cima dela.
+vim.opt.cmdheight = 0
 -- Aviso visual de arquivo não salvo, mais chamativo que o [+] padrão
 -- do Neovim — usa o grupo de highlight DiagnosticWarn (já definido
 -- por config/diagnostics.lua), então a cor já combina com o resto.
