@@ -42,11 +42,11 @@ vim.o.completeopt = "menu,menuone,noselect"
 -- tiny-cmdline.nvim (ver plugins/tiny-cmdline.lua), que reposiciona a
 -- cmdline como janela flutuante centralizada em cima dela.
 vim.opt.cmdheight = 0
--- Aviso visual de arquivo não salvo, mais chamativo que o [+] padrão
--- do Neovim — usa o grupo de highlight DiagnosticWarn (já definido
--- por config/diagnostics.lua), então a cor já combina com o resto.
--- Fica na FRENTE do nome do arquivo (antes, não depois).
-vim.o.statusline = "%#StatusLineModified#%{&modified ? ' ● UNSAVED ' : ''}%*%f %h%r%=%-14.(%l,%c%V%) %P"
+-- STATUSLINE (27/09/2026): a string manual acima saiu daqui — vira
+-- lualine.nvim (plugins/lualine.lua), que ja cobre branch/diagnostics/
+-- filetype sem precisar montar a string 'statusline' a mao. O aviso de
+-- "arquivo nao salvo" (antes vim.o.statusline aqui) foi reimplementado
+-- la como componente customizado, mesma cor (DiagnosticWarn).
 -- Cursor em formato de barra vertical (em vez do bloco padrão) apenas
 -- dentro do modo Terminal ("t"). Não altera o cursor nos outros modos.
 vim.opt.guicursor:append("t:ver25")

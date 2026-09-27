@@ -63,4 +63,5 @@ require("martini.plugins.neogit")
 require("martini.plugins.live-server") -- servidor HTTP local (htmx precisa de servidor de verdade, não file://)
 require("martini.plugins.smart-splits") -- navegação Neovim ↔ painéis do WezTerm (Alt+h/j/k/l)
 require("martini.plugins.oil") -- ver nota "NETRW → OIL" acima
+require("martini.plugins.lualine") -- ver nota "BLINK.CMP / MINI.PAIRS / MINI.SURROUND / LUALINE" em lazy.lua
 require("martini.plugins.dashboard")

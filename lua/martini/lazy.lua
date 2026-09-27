@@ -115,6 +115,36 @@
 -- :h), sem garantia de estabilidade entre patches do 0.12.x — ver nota
 -- completa no arquivo do plugin.
 -- =========================================================
+
+-- BLINK.CMP / MINI.PAIRS / MINI.SURROUND / LUALINE (27/09/2026):
+-- troca de stack de completion e de dois plugins de edicao, feita
+-- depois que o bug real do <leader> (config/init.lua corrompido) foi
+-- corrigido — nada disso tem relacao com aquele bug.
+--
+-- nvim-cmp + cmp-nvim-lsp + cmp-buffer + cmp_luasnip SAIRAM, entrou
+-- saghen/blink.cmp (motor de completion com fuzzy matching nativo,
+-- 1 plugin no lugar de 4). LuaSnip continua — vira so o "motor de
+-- snippet" que o blink chama (snippets = { preset = "luasnip" } em
+-- plugins/completion.lua), nao mais fonte de completion separada.
+-- version = "1.*"/"v2.*" (excecao deliberada a convenção de so travar
+-- por commit via lazy-lock.json — ver nota "POR QUE A TROCA" no topo
+-- deste arquivo): blink.cmp baixa um binario pre-compilado da release
+-- marcada por essa tag; sem isso, lazy.nvim tentaria buildar do
+-- commit exato e exigiria toolchain Rust (cargo) instalado.
+--
+-- windwp/nvim-autopairs → nvim-mini/mini.pairs — mesma familia do
+-- mini.ai/mini.icons ja em uso. Perde o hook de "depois de aceitar
+-- completion" que o nvim-autopairs tinha (nvim-autopairs.completion.cmp)
+-- mas mini.pairs nao precisa dele (so reage a tecla digitada).
+--
+-- kylechui/nvim-surround → nvim-mini/mini.surround — mesma familia.
+-- Mapeamentos remapeados pra manter a convencao ys/cs/ds — ver nota
+-- completa em plugins/editing.lua.
+--
+-- ENTROU nvim-lualine/lualine.nvim — substitui a statusline nativa
+-- manual (config/options.lua) por branch/diagnostics/filetype prontos.
+-- Ver plugins/lualine.lua.
+-- =========================================================
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local primeiro_boot_lazy = vim.fn.isdirectory(lazypath) == 0
 if primeiro_boot_lazy then
@@ -131,20 +161,18 @@ vim.opt.rtp:prepend(lazypath)
 -- multicursor.nvim — lazy.nvim entende esse formato nativamente.
 local plugins = {
   { "folke/tokyonight.nvim", lazy = false },
+  { "nvim-lualine/lualine.nvim", lazy = false }, -- ver nota "BLINK.CMP / MINI.PAIRS / MINI.SURROUND / LUALINE" acima
   -- Dashboard (snacks.nvim) — só o módulo dashboard é usado, ver
   -- plugins/dashboard.lua pro resto desligado de propósito.
   { "folke/snacks.nvim", priority = 1000, lazy = false },
   { "nvim-treesitter/nvim-treesitter",             lazy = false },
   { "nvim-treesitter/nvim-treesitter-textobjects", lazy = false },
-  { "hrsh7th/nvim-cmp",         lazy = false },
-  { "hrsh7th/cmp-nvim-lsp",     lazy = false },
-  { "hrsh7th/cmp-buffer",       lazy = false },
-  { "L3MON4D3/LuaSnip",         lazy = false },
-  { "saadparwaiz1/cmp_luasnip", lazy = false },
+  { "L3MON4D3/LuaSnip", version = "v2.*", lazy = false }, -- versao pinada, exigencia do blink.cmp — ver nota "BLINK.CMP" acima
   { "rafamadriz/friendly-snippets", lazy = false },
-  { "windwp/nvim-autopairs",  lazy = false },
+  { "saghen/blink.cmp", version = "1.*", lazy = false }, -- idem — baixa binario pre-compilado da release
+  { "nvim-mini/mini.pairs", lazy = false },
   { "windwp/nvim-ts-autotag", lazy = false },
-  { "kylechui/nvim-surround", lazy = false },
+  { "nvim-mini/mini.surround", lazy = false },
   { "mattn/emmet-vim",        lazy = false },
   { "stevearc/conform.nvim",  lazy = false },
   { "mfussenegger/nvim-lint", lazy = false },
