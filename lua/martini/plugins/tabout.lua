@@ -24,7 +24,7 @@ require("martini.utils.safe_require")("tabout", function(tabout)
     act_as_tab = true, -- sem nada pra pular, <Tab> volta a indentar normalmente
     act_as_shift_tab = false,
     enable_backwards = false,
-    completion = true,
+    completion = false, -- (27/09/2026) desligado: essa flag detecta o nvim-cmp especificamente, que saiu quando trocamos pro blink.cmp; sem isso, <Tab> corrompia (inseria "<Plug>(Tabout)" literal). blink.cmp usa <Down>/<Up> pro menu, nao <Tab>, entao nao perde nada.
     tabouts = {
       { open = "'", close = "'" },
       { open = '"', close = '"' },

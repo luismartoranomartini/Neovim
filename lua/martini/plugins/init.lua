@@ -49,6 +49,7 @@ require("martini.plugins.treesitter")
 require("martini.plugins.textobjects") -- depende dos parsers registrados acima
 require("martini.plugins.editing")
 require("martini.plugins.completion")
+require("martini.plugins.tabout") -- (27/09/2026) FALTAVA esse require -- tabout.setup() nunca rodava, <Plug>(Tabout) nunca existia, <Tab> inseria o texto literal
 require("martini.plugins.mason") -- ver nota "MASON" acima — precisa vir antes de lsp
 require("martini.plugins.lsp")
 require("martini.plugins.format")
