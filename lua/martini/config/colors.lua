@@ -156,6 +156,24 @@ local function aplicar_highlights()
   hl(0, "@type", { fg = "#FFD966", bold = true })
   hl(0, "@type.builtin", { fg = "#FFD966", bold = true })
   hl(0, "Type", { fg = "#FFD966", bold = true })
+
+  -- Parâmetros de função → cinza, sempre (pedido do usuário:
+  -- parâmetro não deve competir visualmente com tipo/variável)
+  hl(0, "@lsp.type.parameter", { fg = tn.comment, italic = true })
+  hl(0, "@lsp.type.parameter.go", { fg = tn.comment, italic = true })
+  hl(0, "@variable.parameter", { fg = tn.comment, italic = true })
+  hl(0, "@parameter", { fg = tn.comment, italic = true })
+
+  -- Tipos builtin: cada um com cor PRÓPRIA e fixa, independente de
+  -- onde aparecem (ver utils/type_highlight.lua — usa Treesitter de
+  -- verdade, só pinta nó que o parser classificou como tipo, nunca
+  -- uma variável que por acaso se chame "int")
+  hl(0, "TypeInt", { fg = "#5ccfe6" })       -- int, int8/16/32/64, uint*
+  hl(0, "TypeString", { fg = "#c3e88d" })    -- string
+  hl(0, "TypeBool", { fg = "#ff79c6" })      -- bool
+  hl(0, "TypeFloat", { fg = "#f78c6c" })     -- float32/float64
+  hl(0, "TypeError", { fg = "#ff6e6e" })     -- error
+  hl(0, "TypeByteRune", { fg = "#c792ea" })  -- byte/rune
   hl(0, "@function", { fg = "#8ab4ff", bold = true })
   hl(0, "@function.call", { fg = "#8ab4ff", bold = true })
   hl(0, "Function", { fg = "#8ab4ff", bold = true })

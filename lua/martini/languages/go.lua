@@ -45,6 +45,29 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 require("martini.utils.printf_highlight").register("go", "vTtbcdoOqxXUeEfFgGsp%")
 
 -- =========================================================
+-- Highlight: cada tipo builtin do Go (int, string, bool, error,
+-- float32/64, byte, rune...) com cor PRÓPRIA e fixa, via Treesitter
+-- de verdade (ver utils/type_highlight.lua) — não regex/matchadd.
+-- A query só captura @type_identifier: é assim que o parser do Go
+-- marca tanto tipo builtin quanto tipo definido pelo usuário (Go
+-- não tem palavra reservada pra tipo builtin — é o mesmo mecanismo
+-- que o nvim-treesitter usa pra colorir builtin diferente de custom).
+-- O módulo só pinta o nó se o texto literal bater com um nome do
+-- mapa abaixo; qualquer outro tipo (struct, interface custom, etc.)
+-- continua caindo no @type genérico (ver config/colors.lua).
+-- =========================================================
+require("martini.utils.type_highlight").register("go", "(type_identifier) @type", {
+  int = "TypeInt", int8 = "TypeInt", int16 = "TypeInt", int32 = "TypeInt", int64 = "TypeInt",
+  uint = "TypeInt", uint8 = "TypeInt", uint16 = "TypeInt", uint32 = "TypeInt", uint64 = "TypeInt",
+  uintptr = "TypeInt",
+  string = "TypeString",
+  bool = "TypeBool",
+  float32 = "TypeFloat", float64 = "TypeFloat",
+  error = "TypeError",
+  byte = "TypeByteRune", rune = "TypeByteRune",
+})
+
+-- =========================================================
 -- Highlight: destaque aproximado dos blocos {{ ... }} de template Go
 -- dentro de arquivos HTML — via matchadd (não há parser Treesitter
 -- funcional pra essa sintaxe). Não dá autocomplete — só contraste
