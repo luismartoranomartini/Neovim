@@ -4,13 +4,13 @@
 --
 -- Objetivo: menos cores, mais leve. A sintaxe usa só 4 cores de
 -- destaque + cinza + texto:
---   roxo    -> palavras-chave
---   azul    -> funções e tags
+--   branco  -> palavras-chave (negrito + itálico)
+--   azul    -> funções (negrito + itálico) e tags
 --   amarelo -> tipos, números e constantes
 --   verde   -> strings
 --   cinza   -> comentários e parâmetros
 --   texto   -> variáveis, operadores e pontuação
--- Sem negrito/itálico forçado. Vermelho/laranja ficam só para
+-- Negrito/itálico só em palavras-chave e funções. Vermelho/laranja ficam só para
 -- sinais funcionais (erro, git, DAP).
 --
 -- O fundo é transparente: o roxo vem da imagem do WezTerm.
@@ -21,12 +21,13 @@ local tn = {
   bg_dark = "#211934",
   bg      = "#2e2440",
   bg_hl   = "#453465",
-  fg      = "#e6e1f0",
-  gray    = "#7a7f9e",
-  purple  = "#c9b3ff",
-  blue    = "#8ab4ff",
-  yellow  = "#f0c674",
-  green   = "#b3e896",
+  fg      = "#f5faff",
+  white   = "#ffffff",
+  gray    = "#a3a9cc",
+  purple  = "#d6c4ff",
+  blue    = "#9cc2ff",
+  yellow  = "#ffd980",
+  green   = "#c2f0a4",
   -- só sinais funcionais (não usados em sintaxe)
   red     = "#f7768e",
   orange  = "#ff9e64",
@@ -36,32 +37,32 @@ local function aplicar_highlights()
   local hl = vim.api.nvim_set_hl
 
   -- ---------- Sintaxe ----------
-  hl(0, "Keyword", { fg = tn.purple })
-  hl(0, "Statement", { fg = tn.purple })
-  hl(0, "Conditional", { fg = tn.purple })
-  hl(0, "Repeat", { fg = tn.purple })
-  hl(0, "Exception", { fg = tn.purple })
-  hl(0, "Include", { fg = tn.purple })
-  hl(0, "StorageClass", { fg = tn.purple })
-  hl(0, "PreProc", { fg = tn.purple })
-  hl(0, "@keyword", { fg = tn.purple })
-  hl(0, "@keyword.function", { fg = tn.purple })
-  hl(0, "@keyword.return", { fg = tn.purple })
-  hl(0, "@keyword.operator", { fg = tn.purple })
-  hl(0, "@keyword.conditional", { fg = tn.purple })
-  hl(0, "@keyword.repeat", { fg = tn.purple })
-  hl(0, "@keyword.exception", { fg = tn.purple })
-  hl(0, "@keyword.import", { fg = tn.purple })
-  hl(0, "@keyword.coroutine", { fg = tn.purple })
-  hl(0, "@keyword.type", { fg = tn.purple })
-  hl(0, "@keyword.modifier", { fg = tn.purple })
-  hl(0, "@keyword.directive", { fg = tn.purple })
+  hl(0, "Keyword", { fg = tn.white, bold = true, italic = true })
+  hl(0, "Statement", { fg = tn.white, bold = true, italic = true })
+  hl(0, "Conditional", { fg = tn.white, bold = true, italic = true })
+  hl(0, "Repeat", { fg = tn.white, bold = true, italic = true })
+  hl(0, "Exception", { fg = tn.white, bold = true, italic = true })
+  hl(0, "Include", { fg = tn.white, bold = true, italic = true })
+  hl(0, "StorageClass", { fg = tn.white, bold = true, italic = true })
+  hl(0, "PreProc", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.function", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.return", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.operator", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.conditional", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.repeat", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.exception", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.import", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.coroutine", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.type", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.modifier", { fg = tn.white, bold = true, italic = true })
+  hl(0, "@keyword.directive", { fg = tn.white, bold = true, italic = true })
 
-  hl(0, "Function", { fg = tn.blue })
-  hl(0, "@function", { fg = tn.blue })
-  hl(0, "@function.call", { fg = tn.blue })
-  hl(0, "@function.method", { fg = tn.blue })
-  hl(0, "@function.method.call", { fg = tn.blue })
+  hl(0, "Function", { fg = tn.blue, bold = true, italic = true })
+  hl(0, "@function", { fg = tn.blue, bold = true, italic = true })
+  hl(0, "@function.call", { fg = tn.blue, bold = true, italic = true })
+  hl(0, "@function.method", { fg = tn.blue, bold = true, italic = true })
+  hl(0, "@function.method.call", { fg = tn.blue, bold = true, italic = true })
 
   hl(0, "Type", { fg = tn.yellow })
   hl(0, "@type", { fg = tn.yellow })
@@ -184,8 +185,8 @@ require("martini.utils.safe_require")("tokyonight", function(tokyonight)
     transparent = transparent,
     styles = {
       comments = { italic = true },
-      keywords = { bold = false, italic = false },
-      functions = { bold = false },
+      keywords = { bold = true, italic = true },
+      functions = { bold = true, italic = true },
       sidebars = transparent and "transparent" or "dark",
       floats = transparent and "transparent" or "dark",
     },
@@ -206,7 +207,7 @@ require("martini.utils.safe_require")("tokyonight", function(tokyonight)
       colors.fg = tn.fg
       colors.fg_dark = tn.fg
       colors.fg_float = tn.fg
-      colors.fg_gutter = "#5a5478"
+      colors.fg_gutter = "#9a94c4"
       colors.fg_sidebar = tn.fg
 
       colors.purple = tn.purple
