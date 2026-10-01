@@ -176,13 +176,43 @@ local plugins = {
   { "mattn/emmet-vim",        lazy = false },
   { "stevearc/conform.nvim",  lazy = false },
   { "mfussenegger/nvim-lint", lazy = false },
-  { "mfussenegger/nvim-dap",  lazy = false },
-  { "nvim-neotest/nvim-nio",  lazy = false },
-  { "rcarriga/nvim-dap-ui",   lazy = false },
-  { "leoluz/nvim-dap-go",     lazy = false },
-  { "CRAG666/code_runner.nvim", lazy = false },
+  -- LAZY LOADING (01/10/2026), 4º grupo: stack de debug. lazy = true
+  -- (sem trigger próprio) — o lazy.nvim carrega cada plugin na PRIMEIRA
+  -- vez que algo faz require() do módulo dele. Isso já acontece só sob
+  -- demanda: config/keymaps.lua chama martini.plugins.debug.setup() (que
+  -- faz require("dap"), require("dapui") e, via languages/go.lua,
+  -- require("dap-go")) apenas na primeira ação de debug (<F5>, <leader>d*).
+  -- Nenhum arquivo muda além deste.
+  { "mfussenegger/nvim-dap",  lazy = true },
+  { "nvim-neotest/nvim-nio",  lazy = true },
+  { "rcarriga/nvim-dap-ui",   lazy = true },
+  { "leoluz/nvim-dap-go",     lazy = true },
+  -- LAZY LOADING (01/10/2026), 5º plugin: code_runner carrega no primeiro
+  -- :RunCode / :RunProject (<leader>r / <leader>rp). O config roda
+  -- plugins/runner.lua, que continua tendo o setup() e a tabela de
+  -- comandos por filetype — só deixou de ser chamado no boot (o require
+  -- saiu de plugins/init.lua).
+  {
+    "CRAG666/code_runner.nvim",
+    cmd = { "RunCode", "RunFile", "RunProject", "RunClose", "CRFiletype", "CRProjects" },
+    config = function()
+      require("martini.plugins.runner")
+    end,
+  },
 --   { "mistweaverco/kulala.nvim", lazy = false },
-  { "jake-stewart/multicursor.nvim", branch = "1.0", lazy = false },
+  -- LAZY LOADING (01/10/2026), 6º plugin: multicursor carrega no evento
+  -- VeryLazy (logo depois da UI abrir, fora do caminho crítico do boot).
+  -- Não dá pra usar keys = {...}: são ~20 atalhos + camada de keymap
+  -- dinâmica (addKeymapLayer). O config roda plugins/multicursor.lua,
+  -- que mantém o setup() e os atalhos como estavam.
+  {
+    "jake-stewart/multicursor.nvim",
+    branch = "1.0",
+    event = "VeryLazy",
+    config = function()
+      require("martini.plugins.multicursor")
+    end,
+  },
   { "ibhagwan/fzf-lua", lazy = false },
   -- Explorador de arquivos: oil.nvim edita o filesystem como buffer,
   -- substituindo o netrw por completo (ver nota "NETRW → OIL" acima).
@@ -204,15 +234,67 @@ local plugins = {
   -- Interface Git interativa (23/09/2026) — ver nota "NEOGIT" acima.
   -- plenary.nvim é dependência obrigatória do Neogit, exclusiva dele
   -- na lista (nenhum outro plugin aqui precisa dela).
-  { "nvim-lua/plenary.nvim", lazy = false },
-  { "NeogitOrg/neogit", dependencies = { "nvim-lua/plenary.nvim" }, lazy = false },
+  -- LAZY LOADING (01/10/2026), 1º plugin migrado: neogit só carrega
+  -- quando o comando :Neogit roda (<leader>v chama ele). plenary.nvim
+  -- não precisa mais de entrada própria — vem como dependência e só
+  -- carrega junto com o neogit. O setup() saiu de plugins/neogit.lua
+  -- (arquivo removido) e mora aqui, no config do próprio spec.
+  {
+    "NeogitOrg/neogit",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = "Neogit",
+    config = function()
+      require("neogit").setup({
+        integrations = {
+          fzf_lua = true,
+        },
+      })
+    end,
+  },
   -- Renderização de imagem no buffer (24/09/2026) — ver nota "VOLTA
   -- (24/09/2026)" acima e plugins/image.lua pro setup. Exige
   -- ImageMagick instalado no sistema (fora do controle do lazy.nvim).
-  { "3rd/image.nvim", lazy = false },
+  -- LAZY LOADING (01/10/2026), 3º plugin: image.nvim só carrega ao abrir
+  -- uma imagem (BufReadPre *.png etc., mesma lista de hijack_file_patterns)
+  -- ou um markdown. O setup() saiu de plugins/image.lua (arquivo removido):
+  -- aquele arquivo NUNCA era chamado — faltava o require em
+  -- plugins/init.lua, então o image.setup() nunca rodava. Agora o config
+  -- do spec garante que roda.
+  {
+    "3rd/image.nvim",
+    event = {
+      "BufReadPre *.png", "BufReadPre *.jpg", "BufReadPre *.jpeg",
+      "BufReadPre *.gif", "BufReadPre *.webp",
+    },
+    ft = "markdown",
+    config = function()
+      require("image").setup({
+        backend = "kitty",
+        integrations = {
+          markdown = {
+            enabled = true,
+            clear_in_insert_mode = false,
+            download_remote_images = true,
+            only_render_image_at_cursor = false,
+          },
+        },
+        hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp" },
+      })
+    end,
+  },
   -- Navegação por labels (25/09/2026) — ver nota "FLASH" acima e
   -- plugins/flash.lua pro setup.
-  { "folke/flash.nvim", lazy = false },
+  -- LAZY LOADING (01/10/2026), 7º plugin: flash em VeryLazy (não só por
+  -- tecla) porque modes.search.enabled = true integra com o "/" — se só
+  -- carregasse no primeiro "s", o "/" ficaria sem labels até lá. O
+  -- config roda plugins/flash.lua, que mantém setup() e atalhos.
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("martini.plugins.flash")
+    end,
+  },
   -- Text objects a/i genéricos (27/09/2026) — ver nota "MINI.AI"
   -- acima e plugins/mini-ai.lua pro setup.
   { "nvim-mini/mini.ai", lazy = false },
@@ -230,7 +312,33 @@ local plugins = {
   -- vim.ui.select se faltar — que no seu caso já é o fzf-lua
   -- (register_ui_select() em finder.lua); which-key é só cosmético
   -- (rótulo do grupo no menu), sem ele os atalhos funcionam igual.
-  { "selimacerbas/live-server.nvim", lazy = false },
+  -- LAZY LOADING (01/10/2026), 2º plugin: live-server só carrega no
+  -- primeiro comando :LiveServer* (os <leader>l* chamam esses comandos).
+  -- O setup() saiu de plugins/live-server.lua e mora aqui; lá ficaram
+  -- só os keymaps.
+  {
+    "selimacerbas/live-server.nvim",
+    cmd = {
+      "LiveServerStart", "LiveServerOpen", "LiveServerReload",
+      "LiveServerToggleLive", "LiveServerStatus", "LiveServerStop",
+      "LiveServerStopAll",
+    },
+    config = function()
+      require("live_server").setup({
+        default_port = 8000,
+        live_reload = {
+          enabled = true,
+          inject_script = true,
+          debounce = 120,
+          css_inject = true, -- troca CSS sem recarregar a página inteira
+        },
+        directory_listing = {
+          enabled = true,
+          show_hidden = false,
+        },
+      })
+    end,
+  },
   { "smart-splits-nvim/smart-splits.nvim", lazy = false },
 }
 

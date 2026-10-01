@@ -25,7 +25,24 @@
 
 local safe_require = require("martini.utils.safe_require")
 
-local ts_langs = { "lua", "javascript", "typescript", "tsx", "go", "c", "html", "css", "yaml" }
+-- CORREÇÃO (01/10/2026): parser ≠ filetype. "tsx" é nome de PARSER; o
+-- filetype de .tsx é "typescriptreact" (e de .jsx, "javascriptreact"),
+-- então o autocmd com pattern = "tsx" nunca disparava nesses arquivos.
+-- Agora a lista de parsers (install) e a de filetypes (autocmd) são
+-- separadas. "cpp" adicionado: clangd/clang-format já cobriam C++, mas
+-- faltava o parser.
+-- (01/10/2026) + markdown/markdown_inline (a integração de markdown do
+-- image.nvim depende do parser), json, bash e gomod.
+local ts_langs = {
+  "lua", "javascript", "typescript", "tsx", "go", "gomod", "c", "cpp",
+  "html", "css", "yaml", "json", "bash", "markdown", "markdown_inline",
+}
+
+local ts_filetypes = {
+  "lua", "javascript", "javascriptreact", "typescript", "typescriptreact",
+  "go", "gomod", "c", "cpp", "html", "css", "yaml", "json", "sh", "bash",
+  "markdown",
+}
 
 safe_require("nvim-treesitter", function(nvim_treesitter)
   nvim_treesitter.install(ts_langs)
@@ -34,7 +51,7 @@ end, "parsers do Treesitter (highlight de sintaxe)")
 -- Força o início do Treesitter highlight ao abrir arquivos.
 -- Necessário no 0.12 onde não existe mais highlight={enable=true}.
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = ts_langs,
+  pattern = ts_filetypes,
   callback = function(args)
     pcall(vim.treesitter.start, args.buf)
   end,

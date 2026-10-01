@@ -47,6 +47,7 @@
 require("martini.languages") -- go.lua + c.lua — ver nota acima
 require("martini.plugins.treesitter")
 require("martini.plugins.textobjects") -- depende dos parsers registrados acima
+require("martini.plugins.mini-ai") -- (01/10/2026) FALTAVA esse require -- mini.ai.setup() nunca rodava; select a/i vem daqui, move (]f/[f) fica em textobjects
 require("martini.plugins.editing")
 require("martini.plugins.completion")
 require("martini.plugins.tabout") -- (27/09/2026) FALTAVA esse require -- tabout.setup() nunca rodava, <Plug>(Tabout) nunca existia, <Tab> inseria o texto literal
@@ -55,15 +56,16 @@ require("martini.plugins.lsp")
 require("martini.plugins.tiny-inline-diagnostic") -- (27/09/2026) FALTAVA esse require -- setup() nunca rodava, diagnostico so aparecia na coluna de sinais
 require("martini.plugins.format")
 require("martini.plugins.debug")
-require("martini.plugins.runner")
+-- runner: lazy via cmd (RunCode/RunProject) em lazy.lua (01/10/2026)
 require("martini.plugins.http")
-require("martini.plugins.multicursor")
-require("martini.plugins.flash") -- ver nota "FLASH" acima
+-- multicursor: lazy via VeryLazy em lazy.lua (01/10/2026)
+-- flash: lazy via VeryLazy em lazy.lua (01/10/2026)
 require("martini.plugins.finder")
 require("martini.plugins.gitsigns") -- sinais de git no gutter — ver nota "GIT STATUS" em oil.lua
-require("martini.plugins.neogit")
+-- neogit: lazy via cmd = "Neogit" em lazy.lua (01/10/2026)
 require("martini.plugins.live-server") -- servidor HTTP local (htmx precisa de servidor de verdade, não file://)
 require("martini.plugins.smart-splits") -- navegação Neovim ↔ painéis do WezTerm (Alt+h/j/k/l)
 require("martini.plugins.oil") -- ver nota "NETRW → OIL" acima
 require("martini.plugins.lualine") -- ver nota "BLINK.CMP / MINI.PAIRS / MINI.SURROUND / LUALINE" em lazy.lua
 require("martini.plugins.dashboard")
+require("martini.plugins.tiny-cmdline") -- (01/10/2026) FALTAVA esse require; ui2 já é habilitado em martini/init.lua

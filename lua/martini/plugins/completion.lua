@@ -96,7 +96,7 @@ end, "autocomplete (blink.cmp)")
 -- (nao global) tem prioridade sobre o <Tab> global do tabout.nvim,
 -- entao nesses 5 filetypes o comportamento continua: menu do blink
 -- visivel → navega; senao → expande Emmet.
-local emmet_filetypes = { "html", "css", "scss", "jsx", "tsx" }
+local emmet_filetypes = { "html", "css", "scss", "javascriptreact", "typescriptreact" }
 vim.api.nvim_create_autocmd("FileType", {
   pattern = emmet_filetypes,
   callback = function(args)

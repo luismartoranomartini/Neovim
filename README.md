@@ -6,8 +6,8 @@ Configuração pessoal do Neovim, focada em Go, JavaScript/TypeScript (web) e C.
 
 - Neovim 0.12+, `git`, `curl`
 - Toolchain: `go` (pra compilar `gopls`/`dlv`), `node`+`npm` (LSPs web, `prettier`, runner de `.ts`), `gcc`/`g++` (runner de `.c`/`.cpp`)
-- LSP: `gopls`, `typescript-language-server`, `vscode-html-language-server`, `vscode-css-language-server`, `clangd`
-- Lint/format: `golangci-lint`, `prettier`, `clang-format`
+- LSP: `gopls`, `typescript-language-server`, `vscode-html-language-server`, `vscode-css-language-server`, `clangd`, `lua-language-server`
+- Lint/format: `golangci-lint`, `prettier`, `clang-format`, `stylua`, `gofmt` (vem com o Go)
 - Debug: `dlv` (Delve, Go), `codelldb` (C/C++)
 - Runner/busca: `fd`, `fzf`, `ripgrep` (`rg`), `bat` (preview)
 - `xdg-open` (abrir HTML no navegador via runner)
@@ -30,7 +30,10 @@ Testado em **Arch Linux** e **Fedora** (as duas máquinas reais em uso). Sem sup
 | `vscode-html-language-server`, `vscode-css-language-server` | LSP HTML/CSS | `npm i -g vscode-langservers-extracted` | idêntico |
 | `clangd`, `clang-format` | LSP C + formatação | `pacman -S clang` | `dnf install clang-tools-extra` |
 | `golangci-lint` | lint Go | script oficial: `curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \| sh -s -- -b $(go env GOPATH)/bin` | idêntico (não tem pacote `dnf` oficial) |
-| `prettier` | formatação JS/TS/HTML/CSS | `npm i -g prettier` | idêntico |
+| `lua-language-server` | LSP Lua (editar esta config) | `pacman -S lua-language-server` | `dnf install lua-language-server` |
+| `stylua` | formatação Lua | `pacman -S stylua` | `cargo install stylua` |
+| `imagemagick` | renderizar imagens no buffer (`image.nvim`, backend kitty no WezTerm) | `pacman -S imagemagick` | `dnf install ImageMagick` |
+| `prettier` | formatação JS/TS/HTML/CSS/JSON | `npm i -g prettier` | idêntico |
 | `tree-sitter-cli` | parser `.http`/`.rest` | `npm i -g tree-sitter-cli` | idêntico |
 | `dlv` (Delve) | debug Go | `go install github.com/go-delve/delve/cmd/dlv@latest` | idêntico |
 | `codelldb` | debug C/C++ | `yay -S codelldb-bin` (AUR) | sem pacote — baixe o `.vsix` da [release](https://github.com/vadimcn/codelldb/releases) pro seu SO, extraia, e coloque `extension/adapter/codelldb` no PATH |
@@ -55,7 +58,7 @@ Ao adicionar um plugin novo à lista existente (não é mais "primeiro boot"), a
 
 ```
 lua/martini/
-├── init.lua              -- patch 0.12.2 + bootstrap + ordem de carregamento
+├── init.lua              -- ui2 + bootstrap + ordem de carregamento
 ├── lazy.lua              -- lista de plugins + comando :MartiniUpdate
 ├── config/
 │   ├── init.lua          -- agregador
@@ -75,7 +78,6 @@ lua/martini/
 │   ├── debug.lua, runner.lua
 │   ├── editing.lua, finder.lua, multicursor.lua, http.lua
 │   ├── oil.lua           -- explorador de arquivos (edita o filesystem como buffer)
-│   ├── otter.lua         -- autocomplete de JS/CSS embutido em HTML
 │   └── dashboard.lua     -- tela inicial (snacks.nvim)
 └── utils/
     ├── path.lua               -- gf, criação de arquivo
@@ -90,8 +92,8 @@ lua/martini/
 | tokyonight.nvim | tema base |
 | snacks.nvim | dashboard (só esse módulo é usado) |
 | nvim-treesitter (+ textobjects) | highlight + seleção por função/struct/parâmetro |
-| nvim-cmp, cmp-nvim-lsp, cmp-buffer, LuaSnip, cmp_luasnip, friendly-snippets | autocomplete |
-| nvim-autopairs, nvim-ts-autotag, nvim-surround, emmet-vim | edição (fecha par, tag JSX/HTML, delimitadores, abreviação) |
+| blink.cmp, LuaSnip, friendly-snippets | autocomplete (blink usa LuaSnip como motor de snippet) |
+| mini.pairs, mini.surround, mini.ai, nvim-ts-autotag, emmet-vim | edição (fecha par, delimitadores, text objects, tag JSX/HTML, abreviação) |
 | conform.nvim | format on save |
 | nvim-lint | golangci-lint |
 | nvim-dap, nvim-dap-ui, nvim-nio, nvim-dap-go | debug (Go + C via codelldb) |
@@ -99,7 +101,6 @@ lua/martini/
 | kulala.nvim | cliente HTTP (`.http`/`.rest`) |
 | multicursor.nvim (branch `1.0`) | múltiplos cursores |
 | fzf-lua | busca fuzzy de arquivo/texto, com preview |
-| otter.nvim | LSP embutido (JS/CSS dentro de HTML) |
 | oil.nvim | explorador de arquivos — edita o filesystem como texto |
 | mini.icons | provedor de ícone (oil, fzf-lua) |
 
@@ -110,7 +111,8 @@ Sem `bufferline.nvim` de propósito: as abas visíveis no topo são a tabline na
 | Servidor | Filetypes | Formatação |
 |---|---|---|
 | gopls | go, gomod, gowork | gofmt (fallback) + organizeImports automático |
-| ts_ls | javascript, typescript, typescriptreact | prettier |
+| ts_ls | javascript, javascriptreact, typescript, typescriptreact | prettier |
+| lua_ls | lua | stylua |
 | html | html, gotmpl (templates Go) | prettier |
 | cssls | css, scss, less | prettier |
 | clangd | c, cpp, objc, objcpp | clang-format |

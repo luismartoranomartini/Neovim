@@ -58,7 +58,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "<leader>fu", vim.lsp.buf.references, opts)
 
     -- Ver nota "TABOUT vs <Tab> NATIVO DE SNIPPET" no topo do arquivo.
-    local emmet_filetypes = { html = true, css = true, scss = true, jsx = true, tsx = true }
+    local emmet_filetypes = { html = true, css = true, scss = true, javascriptreact = true, typescriptreact = true }
     if not emmet_filetypes[vim.bo[args.buf].filetype] then
       vim.keymap.set("i", "<Tab>", "<Plug>(Tabout)", opts)
     end
@@ -103,7 +103,7 @@ do
 end
 
 configurar_lsp("ts_ls", "typescript-language-server",
-  { "javascript", "typescript", "typescriptreact" },
+  { "javascript", "javascriptreact", "typescript", "typescriptreact" },
   { "package.json", "tsconfig.json", ".git" })
 
 configurar_lsp("html", "vscode-html-language-server",
@@ -139,5 +139,35 @@ do
     vim.lsp.enable("clangd")
   else
     vim.notify("LSP não encontrado: clangd", vim.log.levels.WARN)
+  end
+end
+
+-- lua_ls (01/10/2026): LSP de Lua pra editar esta própria config.
+-- Sem ele, treesitter destacava .lua mas não havia completion/hover/
+-- diagnóstico. Não usa --stdio. Avisa que `vim` é global e aponta o
+-- runtime do Neovim como biblioteca, senão cada `vim.*` vira warning
+-- de "undefined global". Instalar: pacman -S lua-language-server.
+do
+  local caminho = vim.fn.exepath("lua-language-server")
+  if caminho ~= "" then
+    vim.lsp.config["lua_ls"] = {
+      cmd = { caminho },
+      filetypes = { "lua" },
+      root_markers = { ".luarc.json", ".luarc.jsonc", "init.lua", ".git" },
+      settings = {
+        Lua = {
+          runtime = { version = "LuaJIT" },
+          diagnostics = { globals = { "vim" } },
+          workspace = {
+            checkThirdParty = false,
+            library = { vim.env.VIMRUNTIME },
+          },
+          telemetry = { enable = false },
+        },
+      },
+    }
+    vim.lsp.enable("lua_ls")
+  else
+    vim.notify("LSP não encontrado: lua-language-server", vim.log.levels.WARN)
   end
 end

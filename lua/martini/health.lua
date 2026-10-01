@@ -56,6 +56,7 @@ function M.check()
   checar("vscode-html-language-server", "npm i -g vscode-langservers-extracted")
   checar("vscode-css-language-server", "npm i -g vscode-langservers-extracted")
   checar("clangd", "Pacote 'clang' ou 'clangd' do seu gerenciador (ex.: pacman -S clang)")
+  checar("lua-language-server", "pacman -S lua-language-server (LSP de Lua, plugins/lsp.lua)")
   -- htmx-lsp (09/09/2026): suporte a Neovim não confirmado pelo
   -- próprio projeto (ver nota em plugins/lsp.lua) — a checagem aqui
   -- é só "o binário existe", não "está funcionando de verdade".
@@ -66,6 +67,8 @@ function M.check()
   checar("golangci-lint", "https://golangci-lint.run/welcome/install/")
   checar("prettier", "npm i -g prettier")
   checar("clang-format", "Pacote 'clang' do seu gerenciador")
+  checar("stylua", "pacman -S stylua (formatador de Lua, plugins/format.lua)")
+  checar("gofmt", "Vem com o toolchain Go: pacman -S go")
 
   -- ── Compiladores e runtimes (code runner) ────────────────
   vim.health.start("martini.nvim — Execução de código (plugins/runner.lua)")

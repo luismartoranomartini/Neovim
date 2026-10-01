@@ -24,23 +24,7 @@
 -- utils/terminal.lua).
 -- =========================================================
 
-local safe_require = require("martini.utils.safe_require")
-
-safe_require("live_server", function(live_server)
-  live_server.setup({
-    default_port = 8000,
-    live_reload = {
-      enabled = true,
-      inject_script = true,
-      debounce = 120,
-      css_inject = true, -- troca CSS sem recarregar a página inteira
-    },
-    directory_listing = {
-      enabled = true,
-      show_hidden = false,
-    },
-  })
-end, "servidor HTTP local com live-reload (<leader>l*)")
+-- setup() do plugin: ver spec em lazy.lua (lazy loading, 01/10/2026).
 
 local map = vim.keymap.set
 

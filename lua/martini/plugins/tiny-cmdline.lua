@@ -30,16 +30,8 @@
 
 local safe_require = require("martini.utils.safe_require")
 
-local ok_ui2, ui2 = pcall(require, "vim._core.ui2")
-if ok_ui2 then
-  ui2.enable({})
-else
-  vim.notify(
-    "martini.nvim: vim._core.ui2 não encontrado — tiny-cmdline.nvim não vai funcionar. "
-      .. "API interna do Neovim 0.12, pode ter mudado de nome/local (ver nota no topo de plugins/tiny-cmdline.lua).",
-    vim.log.levels.WARN
-  )
-end
+-- ui2.enable({}) já roda no topo de lua/martini/init.lua (ponto 2 da nota
+-- acima), antes do lazy.nvim; não repetir aqui (01/10/2026).
 
 safe_require("tiny-cmdline", function(tiny_cmdline)
   tiny_cmdline.setup({})

@@ -15,12 +15,13 @@
 -- deixar você descobrir via um traceback confuso mais adiante.
 -- =========================================================
 if vim.fn.has("nvim-0.12") == 0 then
-  vim.notify(
-    "martini.nvim requer Neovim 0.12+ (versão atual: " .. tostring(vim.version())
-      .. "). LSP/diagnostics usam APIs específicas do 0.12 — algumas partes da config"
-      .. " provavelmente vão falhar. Rode :checkhealth martini para mais detalhes.",
-    vim.log.levels.ERROR
-  )
+	vim.notify(
+		"martini.nvim requer Neovim 0.12+ (versão atual: "
+			.. tostring(vim.version())
+			.. "). LSP/diagnostics usam APIs específicas do 0.12 — algumas partes da config"
+			.. " provavelmente vão falhar. Rode :checkhealth martini para mais detalhes.",
+		vim.log.levels.ERROR
+	)
 end
 -- =========================================================
 -- =========================================================
@@ -31,45 +32,34 @@ end
 -- reabrir, antes de mexer em mais nada.
 -- =========================================================
 do
-  local ok_ui2, ui2 = pcall(require, "vim._core.ui2")
-  if ok_ui2 then
-    ui2.enable({})
-  else
-    vim.notify(
-      "martini.nvim: vim._core.ui2 nao encontrado - tiny-cmdline.nvim nao vai funcionar.",
-      vim.log.levels.WARN
-    )
-  end
+	local ok_ui2, ui2 = pcall(require, "vim._core.ui2")
+	if ok_ui2 then
+		ui2.enable({})
+	else
+		vim.notify(
+			"martini.nvim: vim._core.ui2 nao encontrado - tiny-cmdline.nvim nao vai funcionar.",
+			vim.log.levels.WARN
+		)
+	end
 end
 -- =========================================================
--- PATCH: Bug no Neovim 0.12.2 — chave 'buf' inválida
+-- PATCH 0.12.2 (chave 'buf' em nvim_create_autocmd) REMOVIDO em
+-- 01/10/2026: no 0.12.5 a chave é aceita nativamente (confirmado com
+-- pcall(nvim_create_autocmd, "User", { buf = 0, ... }) → true). Se
+-- voltar a usar esta config num Neovim 0.12.2, o bug volta — ver
+-- histórico git pra recuperar o patch.
 -- =========================================================
-do
-  local function corrigir_buf(opts)
-    if type(opts) == "table" and opts.buf ~= nil and opts.buffer == nil then
-      opts        = vim.tbl_extend("force", {}, opts)
-      opts.buffer = opts.buf
-      opts.buf    = nil
-    end
-    return opts
-  end
-  local orig_create = vim.api.nvim_create_autocmd
-  vim.api.nvim_create_autocmd = function(event, opts)
-    return orig_create(event, corrigir_buf(opts))
-  end
-  local orig_exec = vim.api.nvim_exec_autocmds
-  vim.api.nvim_exec_autocmds = function(event, opts)
-    return orig_exec(event, corrigir_buf(opts))
-  end
-end
 -- =========================================================
 -- PLUGINS — bootstrap via lazy.nvim (set/2026, substitui loader.lua)
 -- Ver lua/martini/lazy.lua pro motivo da troca e o que mudou.
 -- =========================================================
 local primeiro_boot = require("martini.lazy")
 if primeiro_boot then
-  vim.notify("Plugins sendo instalados pelo lazy.nvim. Aguarde a janela terminar e reinicie o Neovim.", vim.log.levels.WARN)
-  return
+	vim.notify(
+		"Plugins sendo instalados pelo lazy.nvim. Aguarde a janela terminar e reinicie o Neovim.",
+		vim.log.levels.WARN
+	)
+	return
 end
 -- =========================================================
 -- CONFIG — comportamento, aparência e atalhos

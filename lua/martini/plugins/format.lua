@@ -16,6 +16,12 @@ local safe_require = require("martini.utils.safe_require")
 safe_require("conform", function(conform)
   conform.setup({
     formatters_by_ft = {
+      -- (01/10/2026) lua → stylua (pacman -S stylua); go → gofmt (vem com
+      -- o toolchain Go); json → prettier. Go antes caía no fallback do
+      -- LSP (gopls), que continua valendo se o gofmt não estiver no PATH.
+      lua = { "stylua" },
+      go = { "gofmt" },
+      json = { "prettier" },
       javascript = { "prettier" },
       typescript = { "prettier" },
       typescriptreact = { "prettier" },
