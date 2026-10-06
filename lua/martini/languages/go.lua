@@ -247,7 +247,4 @@ function M.setup_debug()
   end, "debug de Go (F5/breakpoints em arquivos .go)")
 end
 
--- :GoDocPt e <leader>gk — go doc traduzido (ver languages/godoc-pt.lua)
-require("martini.languages.godoc-pt")
-
 return M
