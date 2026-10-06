@@ -57,8 +57,7 @@ vim.keymap.set("n", "<leader>w", ":tabclose<CR>", { desc = "Fechar aba atual" })
 -- junto do setup do oil.nvim — ver nota "NETRW → OIL" acima.
 
 -- Cria/abre arquivo sob o cursor em nova aba (ver utils/path.lua)
-vim.keymap.set("n", "gf", path.goto_or_create,
-  { desc = "Criar/Abrir arquivo sob o cursor (relativo à pasta atual)" })
+vim.keymap.set("n", "gf", path.goto_or_create, { desc = "Criar/Abrir arquivo sob o cursor (relativo à pasta atual)" })
 
 -- Comando explícito de "novo arquivo", separado do gf (que continua
 -- semanticamente "go to file"). Agrupado sob <leader>f = domínio Find.
@@ -66,7 +65,9 @@ vim.keymap.set("n", "<leader>fn", path.new_file, { desc = "Find: novo arquivo (c
 
 -- Reabre o dashboard (snacks.nvim) a qualquer momento, sem precisar
 -- fechar o Neovim e abrir de novo.
-vim.keymap.set("n", "<leader>fd", function() Snacks.dashboard() end, { desc = "Find: abrir dashboard" })
+vim.keymap.set("n", "<leader>fd", function()
+  Snacks.dashboard()
+end, { desc = "Find: abrir dashboard" })
 
 -- ── Buffers ───────────────────────────────────────────────
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Fechar buffer" })
@@ -100,21 +101,45 @@ local function dbg()
 end
 
 -- Teclas de função — convenção universal de debugger (VSCode, JetBrains, etc.)
-vim.keymap.set("n", "<F5>", function() dbg().continue() end, { desc = "Debug: continuar / iniciar" })
-vim.keymap.set("n", "<F10>", function() dbg().step_over() end, { desc = "Debug: passo sobre (step over)" })
-vim.keymap.set("n", "<F11>", function() dbg().step_into() end, { desc = "Debug: passo para dentro (step into)" })
-vim.keymap.set("n", "<F12>", function() dbg().step_out() end, { desc = "Debug: passo para fora (step out)" })
+vim.keymap.set("n", "<F5>", function()
+  dbg().continue()
+end, { desc = "Debug: continuar / iniciar" })
+vim.keymap.set("n", "<F10>", function()
+  dbg().step_over()
+end, { desc = "Debug: passo sobre (step over)" })
+vim.keymap.set("n", "<F11>", function()
+  dbg().step_into()
+end, { desc = "Debug: passo para dentro (step into)" })
+vim.keymap.set("n", "<F12>", function()
+  dbg().step_out()
+end, { desc = "Debug: passo para fora (step out)" })
 
 -- Aliases <leader>d* — mesmas ações, para quem prefere não tirar a mão
 -- da home row / não decorar teclas de função.
-vim.keymap.set("n", "<leader>db", function() dbg().toggle_breakpoint() end, { desc = "Debug: breakpoint (linha atual)" })
-vim.keymap.set("n", "<leader>dx", function() dbg().clear_breakpoints() end, { desc = "Debug: limpar TODOS os breakpoints" })
-vim.keymap.set("n", "<leader>dc", function() dbg().continue() end, { desc = "Debug: continuar / iniciar" })
-vim.keymap.set("n", "<leader>do", function() dbg().step_over() end, { desc = "Debug: passo sobre" })
-vim.keymap.set("n", "<leader>di", function() dbg().step_into() end, { desc = "Debug: passo para dentro" })
-vim.keymap.set("n", "<leader>dk", function() dbg().step_out() end, { desc = "Debug: passo para fora" })
-vim.keymap.set("n", "<leader>dr", function() dbg().repl.open() end, { desc = "Debug: abrir REPL" })
-vim.keymap.set("n", "<leader>dt", function() dbg().terminate() end, { desc = "Debug: encerrar sessão" })
+vim.keymap.set("n", "<leader>db", function()
+  dbg().toggle_breakpoint()
+end, { desc = "Debug: breakpoint (linha atual)" })
+vim.keymap.set("n", "<leader>dx", function()
+  dbg().clear_breakpoints()
+end, { desc = "Debug: limpar TODOS os breakpoints" })
+vim.keymap.set("n", "<leader>dc", function()
+  dbg().continue()
+end, { desc = "Debug: continuar / iniciar" })
+vim.keymap.set("n", "<leader>do", function()
+  dbg().step_over()
+end, { desc = "Debug: passo sobre" })
+vim.keymap.set("n", "<leader>di", function()
+  dbg().step_into()
+end, { desc = "Debug: passo para dentro" })
+vim.keymap.set("n", "<leader>dk", function()
+  dbg().step_out()
+end, { desc = "Debug: passo para fora" })
+vim.keymap.set("n", "<leader>dr", function()
+  dbg().repl.open()
+end, { desc = "Debug: abrir REPL" })
+vim.keymap.set("n", "<leader>dt", function()
+  dbg().terminate()
+end, { desc = "Debug: encerrar sessão" })
 vim.keymap.set("n", "<leader>du", function()
   require("martini.plugins.debug").setup()
   require("dapui").toggle()
@@ -130,3 +155,28 @@ vim.keymap.set("n", "<leader>rp", ":RunProject<CR>", { desc = "Executar projeto"
 -- ações usam as teclas nativas do próprio Neogit (s/u stage/unstage,
 -- c commit, p push, F pull...), sem precisar de mais atalhos aqui.
 vim.keymap.set("n", "<leader>v", ":Neogit<CR>", { desc = "Git: abrir Neogit" })
+
+-- ── Testes (neotest + neotest-golang) ─────────────────────
+-- Domínio "u". O require("neotest") dentro de cada função faz o
+-- lazy.nvim carregar o plugin na primeira vez que o atalho é usado.
+vim.keymap.set("n", "<leader>us", function()
+  require("neotest").run.run()
+end, { desc = "Teste: rodar o mais próximo" })
+vim.keymap.set("n", "<leader>uf", function()
+  require("neotest").run.run(vim.fn.expand("%"))
+end, { desc = "Teste: rodar arquivo" })
+vim.keymap.set("n", "<leader>ua", function()
+  require("neotest").run.run(vim.fn.getcwd())
+end, { desc = "Teste: rodar projeto" })
+vim.keymap.set("n", "<leader>ud", function()
+  require("neotest").run.run({ strategy = "dap" })
+end, { desc = "Teste: depurar o mais próximo" })
+vim.keymap.set("n", "<leader>ux", function()
+  require("neotest").run.stop()
+end, { desc = "Teste: parar" })
+vim.keymap.set("n", "<leader>uo", function()
+  require("neotest").output.open({ enter = true })
+end, { desc = "Teste: ver saída" })
+vim.keymap.set("n", "<leader>up", function()
+  require("neotest").summary.toggle()
+end, { desc = "Teste: painel de resumo" })

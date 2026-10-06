@@ -57,14 +57,24 @@ require("martini.utils.printf_highlight").register("go", "vTtbcdoOqxXUeEfFgGsp%"
 -- continua caindo no @type genérico (ver config/colors.lua).
 -- =========================================================
 require("martini.utils.type_highlight").register("go", "(type_identifier) @type", {
-  int = "TypeInt", int8 = "TypeInt", int16 = "TypeInt", int32 = "TypeInt", int64 = "TypeInt",
-  uint = "TypeInt", uint8 = "TypeInt", uint16 = "TypeInt", uint32 = "TypeInt", uint64 = "TypeInt",
+  int = "TypeInt",
+  int8 = "TypeInt",
+  int16 = "TypeInt",
+  int32 = "TypeInt",
+  int64 = "TypeInt",
+  uint = "TypeInt",
+  uint8 = "TypeInt",
+  uint16 = "TypeInt",
+  uint32 = "TypeInt",
+  uint64 = "TypeInt",
   uintptr = "TypeInt",
   string = "TypeString",
   bool = "TypeBool",
-  float32 = "TypeFloat", float64 = "TypeFloat",
+  float32 = "TypeFloat",
+  float64 = "TypeFloat",
   error = "TypeError",
-  byte = "TypeByteRune", rune = "TypeByteRune",
+  byte = "TypeByteRune",
+  rune = "TypeByteRune",
 })
 
 -- =========================================================
@@ -74,8 +84,12 @@ require("martini.utils.type_highlight").register("go", "(type_identifier) @type"
 -- visual. Mesmo caveat: matchadd() é por janela.
 -- =========================================================
 local function destacar_template_go()
-  if vim.bo.filetype ~= "html" then return end
-  if vim.w.martini_go_tmpl_hl then return end
+  if vim.bo.filetype ~= "html" then
+    return
+  end
+  if vim.w.martini_go_tmpl_hl then
+    return
+  end
   vim.fn.matchadd("GoTemplateAction", [=[{?_.{-?}}]=])
   vim.w.martini_go_tmpl_hl = true
 end
@@ -106,7 +120,9 @@ pcall(function()
 
   vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     pattern = "*.go",
-    callback = function() lint.try_lint() end,
+    callback = function()
+      lint.try_lint()
+    end,
   })
 end)
 
@@ -132,7 +148,9 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   callback = function()
     local clients = vim.lsp.get_clients({ bufnr = 0, name = "gopls" })
     local client = clients[1]
-    if not client then return end
+    if not client then
+      return
+    end
 
     local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
     params.context = { only = { "source.organizeImports" } }
@@ -202,11 +220,7 @@ vim.keymap.set("n", "<leader>gr", function()
   end
 
   local dir = vim.fn.expand("%:p:h")
-  local cmd = string.format(
-    "cd %s && go test -v -run ^%s$",
-    vim.fn.fnameescape(dir),
-    func_name
-  )
+  local cmd = string.format("cd %s && go test -v -run ^%s$", vim.fn.fnameescape(dir), func_name)
   vim.cmd("botright split | resize 15 | terminal " .. cmd)
 end, { desc = "Go: testar apenas a função de teste sob o cursor" })
 
@@ -232,5 +246,8 @@ function M.setup_debug()
     })
   end, "debug de Go (F5/breakpoints em arquivos .go)")
 end
+
+-- :GoDocPt e <leader>gk — go doc traduzido (ver languages/godoc-pt.lua)
+require("martini.languages.godoc-pt")
 
 return M

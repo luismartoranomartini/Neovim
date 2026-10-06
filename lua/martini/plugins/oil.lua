@@ -54,6 +54,13 @@ require("oil").setup({
   win_options = {
     signcolumn = "yes:2",
   },
+  -- <Tab> (03/10/2026): abre o arquivo sob o cursor, igual ao <CR>. Soma-se
+  -- aos atalhos padrão do oil (não há <Tab> padrão). Só vale dentro do
+  -- buffer do oil — fora dele, <Tab>/<C-i> (pular adiante na jumplist)
+  -- continua como sempre.
+  keymaps = {
+    ["<Tab>"] = "actions.select",
+  },
   view_options = {
     show_hidden = true,
     -- Pastas de sistema do NTFS (comuns em volumes Windows montados,
@@ -83,8 +90,12 @@ vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Explorador de arquivo
 
 -- <leader>fe: mesma coisa, mas em split vertical (ver nota acima) —
 -- o buffer em edição continua visível na janela original.
-vim.keymap.set("n", "<leader>fe", "<CMD>vsplit | Oil<CR>",
-  { desc = "Find: explorador de arquivos (oil, split vertical)" })
+vim.keymap.set(
+  "n",
+  "<leader>fe",
+  "<CMD>vsplit | Oil<CR>",
+  { desc = "Find: explorador de arquivos (oil, split vertical)" }
+)
 
 -- REMOVIDO (09/09/2026): override de number/relativenumber dentro do
 -- oil (herdado do repo de referência). relativenumber = false é

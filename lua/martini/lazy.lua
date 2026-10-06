@@ -149,7 +149,9 @@ local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local primeiro_boot_lazy = vim.fn.isdirectory(lazypath) == 0
 if primeiro_boot_lazy then
   vim.fn.system({
-    "git", "clone", "--filter=blob:none",
+    "git",
+    "clone",
+    "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
     "--branch=stable",
     lazypath,
@@ -165,7 +167,7 @@ local plugins = {
   -- Dashboard (snacks.nvim) — só o módulo dashboard é usado, ver
   -- plugins/dashboard.lua pro resto desligado de propósito.
   { "folke/snacks.nvim", priority = 1000, lazy = false },
-  { "nvim-treesitter/nvim-treesitter",             lazy = false },
+  { "nvim-treesitter/nvim-treesitter", lazy = false },
   { "nvim-treesitter/nvim-treesitter-textobjects", lazy = false },
   { "L3MON4D3/LuaSnip", version = "v2.*", lazy = false }, -- versao pinada, exigencia do blink.cmp — ver nota "BLINK.CMP" acima
   { "rafamadriz/friendly-snippets", lazy = false },
@@ -173,8 +175,8 @@ local plugins = {
   { "nvim-mini/mini.pairs", lazy = false },
   { "windwp/nvim-ts-autotag", lazy = false },
   { "nvim-mini/mini.surround", lazy = false },
-  { "mattn/emmet-vim",        lazy = false },
-  { "stevearc/conform.nvim",  lazy = false },
+  { "mattn/emmet-vim", lazy = false },
+  { "stevearc/conform.nvim", lazy = false },
   { "mfussenegger/nvim-lint", lazy = false },
   -- LAZY LOADING (01/10/2026), 4º grupo: stack de debug. lazy = true
   -- (sem trigger próprio) — o lazy.nvim carrega cada plugin na PRIMEIRA
@@ -183,10 +185,10 @@ local plugins = {
   -- faz require("dap"), require("dapui") e, via languages/go.lua,
   -- require("dap-go")) apenas na primeira ação de debug (<F5>, <leader>d*).
   -- Nenhum arquivo muda além deste.
-  { "mfussenegger/nvim-dap",  lazy = true },
-  { "nvim-neotest/nvim-nio",  lazy = true },
-  { "rcarriga/nvim-dap-ui",   lazy = true },
-  { "leoluz/nvim-dap-go",     lazy = true },
+  { "mfussenegger/nvim-dap", lazy = true },
+  { "nvim-neotest/nvim-nio", lazy = true },
+  { "rcarriga/nvim-dap-ui", lazy = true },
+  { "leoluz/nvim-dap-go", lazy = true },
   -- LAZY LOADING (01/10/2026), 5º plugin: code_runner carrega no primeiro
   -- :RunCode / :RunProject (<leader>r / <leader>rp). O config roda
   -- plugins/runner.lua, que continua tendo o setup() e a tabela de
@@ -199,7 +201,7 @@ local plugins = {
       require("martini.plugins.runner")
     end,
   },
---   { "mistweaverco/kulala.nvim", lazy = false },
+  --   { "mistweaverco/kulala.nvim", lazy = false },
   -- LAZY LOADING (01/10/2026), 6º plugin: multicursor carrega no evento
   -- VeryLazy (logo depois da UI abrir, fora do caminho crítico do boot).
   -- Não dá pra usar keys = {...}: são ~20 atalhos + camada de keymap
@@ -263,8 +265,11 @@ local plugins = {
   {
     "3rd/image.nvim",
     event = {
-      "BufReadPre *.png", "BufReadPre *.jpg", "BufReadPre *.jpeg",
-      "BufReadPre *.gif", "BufReadPre *.webp",
+      "BufReadPre *.png",
+      "BufReadPre *.jpg",
+      "BufReadPre *.jpeg",
+      "BufReadPre *.gif",
+      "BufReadPre *.webp",
     },
     ft = "markdown",
     config = function()
@@ -319,8 +324,12 @@ local plugins = {
   {
     "selimacerbas/live-server.nvim",
     cmd = {
-      "LiveServerStart", "LiveServerOpen", "LiveServerReload",
-      "LiveServerToggleLive", "LiveServerStatus", "LiveServerStop",
+      "LiveServerStart",
+      "LiveServerOpen",
+      "LiveServerReload",
+      "LiveServerToggleLive",
+      "LiveServerStatus",
+      "LiveServerStop",
       "LiveServerStopAll",
     },
     config = function()
@@ -340,6 +349,71 @@ local plugins = {
     end,
   },
   { "smart-splits-nvim/smart-splits.nvim", lazy = false },
+
+  -- =======================================================
+  -- PLUGINS NOVOS (03/10/2026) — ambos lazy. Atalhos novos:
+  --   u → testes (neotest)    ge/gs/gc → Go (domínio g, só em buffers .go)
+  -- =======================================================
+
+  -- neotest + neotest-golang: roda e mostra testes de Go com resultado
+  -- por teste (substitui, se você quiser, os <leader>gt/ga/gr que abrem
+  -- terminal; os dois podem coexistir). Carrega no primeiro atalho <leader>u* (ver config/keymaps.lua).
+  -- gotestsum é opcional: se existir no PATH, é usado como runner.
+  -- Debug de teste (<leader>ud) usa o nvim-dap-go que você já tem.
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "nvim-lua/plenary.nvim",
+      "antoinemadec/FixCursorHold.nvim",
+      {
+        "fredrikaverpil/neotest-golang",
+        version = "*",
+        build = function()
+          if vim.fn.executable("go") == 1 then
+            vim.system({ "go", "install", "gotest.tools/gotestsum@latest" }):wait()
+          end
+        end,
+      },
+    },
+    -- lazy = true: carrega no primeiro require("neotest"). Os atalhos
+    -- <leader>u* ficam em config/keymaps.lua (o `keys` do lazy não chegou
+    -- a registrar o mapeamento neste ambiente).
+    lazy = true,
+    config = function()
+      -- Só define runner quando o gotestsum existe (valor documentado);
+      -- sem ele, usa o padrão do próprio adaptador.
+      local golang_opts = {}
+      if vim.fn.executable("gotestsum") == 1 then
+        golang_opts.runner = "gotestsum"
+      end
+      require("neotest").setup({
+        adapters = {
+          require("neotest-golang")(golang_opts),
+        },
+      })
+    end,
+  },
+
+  -- gopher.nvim: geração de código Go (tags de struct, if err, testes,
+  -- impl, JSON→struct). Complementa o que você já tem (gofmt, imports,
+  -- lint, <leader>gt/ga/gr) — não substitui nada. Precisa de ferramentas
+  -- externas: rode :GoInstallDeps uma vez (gomodifytags, impl, gotests,
+  -- iferr, json2go). Comandos: :GoIfErr :GoTagAdd :GoTagRm :GoCmt :GoNew
+  -- :GoImpl :GoTestAdd :GoTestsAll :GoTestsExp :GoMod :GoGet :GoJson.
+  {
+    "olexsmir/gopher.nvim",
+    ft = "go",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("gopher").setup({})
+    end,
+    keys = {
+      { "<leader>ge", "<cmd>GoIfErr<cr>", ft = "go", desc = "Go: gerar if err != nil" },
+      { "<leader>gs", "<cmd>GoTagAdd json<cr>", ft = "go", desc = "Go: adicionar tag json na struct" },
+      { "<leader>gc", "<cmd>GoCmt<cr>", ft = "go", desc = "Go: gerar comentário de documentação" },
+    },
+  },
 }
 
 -- Detecta se algum plugin ainda não foi clonado ANTES de chamar setup()
@@ -363,7 +437,7 @@ require("lazy").setup(plugins, {
   -- checker fica desligado: a atualização agora é 100% manual, via
   -- :MartiniUpdate (ver comando abaixo) — não queremos nem o
   -- check+notify nativo do lazy.nvim rodando em background sozinho.
-  checker          = { enabled = false },
+  checker = { enabled = false },
   change_detection = { notify = false },
 })
 
