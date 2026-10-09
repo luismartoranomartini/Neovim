@@ -93,6 +93,10 @@ do
           analyses = { unusedparams = true },
           staticcheck = true,
           semanticTokens = true,
+          -- (08/10/2026) Orçamento de tempo por sugestão (padrão 100ms).
+          -- Em unidade externa/lenta (/run/media), o gopls estourava o
+          -- orçamento e cortava sugestões (ex.: pacotes sem import).
+          completionBudget = "500ms",
         },
       },
     }
@@ -102,17 +106,16 @@ do
   end
 end
 
-configurar_lsp("ts_ls", "typescript-language-server",
+configurar_lsp(
+  "ts_ls",
+  "typescript-language-server",
   { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-  { "package.json", "tsconfig.json", ".git" })
+  { "package.json", "tsconfig.json", ".git" }
+)
 
-configurar_lsp("html", "vscode-html-language-server",
-  { "html", "gotmpl" },
-  { ".git" })
+configurar_lsp("html", "vscode-html-language-server", { "html", "gotmpl" }, { ".git" })
 
-configurar_lsp("cssls", "vscode-css-language-server",
-  { "css", "scss", "less" },
-  { ".git" })
+configurar_lsp("cssls", "vscode-css-language-server", { "css", "scss", "less" }, { ".git" })
 
 -- htmx-lsp (09/09/2026): autocomplete de atributos hx-* em HTML e
 -- templates Go. ATENÇÃO — diferente dos outros LSPs acima, esse é
@@ -123,9 +126,7 @@ configurar_lsp("cssls", "vscode-css-language-server",
 -- lib que ele usa por baixo (vscode-languageserver — mesma base do
 -- html/cssls acima), não confirmado no README do htmx-lsp em si. Se
 -- não conectar, `:LspLog` é o primeiro lugar pra olhar.
-configurar_lsp("htmx", "htmx-lsp",
-  { "html", "gotmpl" },
-  { ".git" })
+configurar_lsp("htmx", "htmx-lsp", { "html", "gotmpl" }, { ".git" })
 
 -- clangd: LSP de C/C++. Não usa --stdio (já é o padrão).
 do
