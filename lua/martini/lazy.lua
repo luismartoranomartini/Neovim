@@ -172,9 +172,13 @@ local plugins = {
   { "L3MON4D3/LuaSnip", version = "v2.*", lazy = false }, -- versao pinada, exigencia do blink.cmp — ver nota "BLINK.CMP" acima
   { "rafamadriz/friendly-snippets", lazy = false },
   { "saghen/blink.cmp", version = "1.*", lazy = false }, -- idem — baixa binario pre-compilado da release
-  { "nvim-mini/mini.pairs", lazy = false },
+  -- mini.nvim (10/10/2026): UM repositório no lugar de quatro (mini.pairs,
+  -- mini.surround, mini.ai e mini.icons). Os require("mini.<modulo>")
+  -- em plugins/editing.lua, mini-ai.lua e oil.lua continuam iguais — só
+  -- muda de onde o lazy.nvim baixa. Depois do :Lazy sync, rode :Lazy clean
+  -- para remover as pastas antigas.
+  { "nvim-mini/mini.nvim", lazy = false },
   { "windwp/nvim-ts-autotag", lazy = false },
-  { "nvim-mini/mini.surround", lazy = false },
   { "mattn/emmet-vim", lazy = false },
   { "stevearc/conform.nvim", lazy = false },
   { "mfussenegger/nvim-lint", lazy = false },
@@ -221,7 +225,6 @@ local plugins = {
   -- mini.icons é o provedor de glyph/cor (não nvim-web-devicons — ver
   -- nota acima pro motivo da escolha).
   { "stevearc/oil.nvim", lazy = false },
-  { "echasnovski/mini.icons", lazy = false },
   -- Indicação visual de "arquivo mudou, falta git add/commit"
   -- (09/09/2026): gitsigns.nvim mostra +/~/- por LINHA na coluna de
   -- sinais, dentro do próprio arquivo aberto. oil-git-status.nvim
@@ -302,7 +305,6 @@ local plugins = {
   },
   -- Text objects a/i genéricos (27/09/2026) — ver nota "MINI.AI"
   -- acima e plugins/mini-ai.lua pro setup.
-  { "nvim-mini/mini.ai", lazy = false },
   -- Diagnóstico inline com mais destaque (27/09/2026) — ver nota
   -- "TINY-INLINE-DIAGNOSTIC" acima e plugins/tiny-inline-diagnostic.lua.
   { "rachartier/tiny-inline-diagnostic.nvim", lazy = false },
@@ -353,6 +355,7 @@ local plugins = {
   -- =======================================================
   -- PLUGINS NOVOS (03/10/2026) — ambos lazy. Atalhos novos:
   --   u → testes (neotest)    ge/gs/gc → Go (domínio g, só em buffers .go)
+  --   cc → seletor de cor (ccc.nvim)    j* → testes JS (languages/javascript.lua)
   -- =======================================================
 
   -- neotest + neotest-golang: roda e mostra testes de Go com resultado
@@ -413,6 +416,73 @@ local plugins = {
       { "<leader>gs", "<cmd>GoTagAdd json<cr>", ft = "go", desc = "Go: adicionar tag json na struct" },
       { "<leader>gc", "<cmd>GoCmt<cr>", ft = "go", desc = "Go: gerar comentário de documentação" },
     },
+  },
+
+  -- ccc.nvim (09/10/2026): seletor de cor (:CccPick) + cor desenhada no
+  -- próprio texto (highlighter). Atalho <leader>cc abre o seletor com o
+  -- cursor sobre uma cor (#00ff0d, rgb(), hsl()...). Dentro do seletor:
+  -- h/l move o slider, Enter confirma, q cancela.
+  -- O highlighter é ligado só em css/scss/html/js/ts (autocmd abaixo);
+  -- auto_enable fica false porque ele valeria para TODO buffer.
+  {
+    "uga-rosa/ccc.nvim",
+    cmd = { "CccPick", "CccConvert", "CccHighlighterToggle", "CccHighlighterEnable" },
+    keys = {
+      { "<leader>cc", "<cmd>CccPick<cr>", desc = "Cor: abrir seletor (ccc)" },
+    },
+    ft = { "css", "scss", "html", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+    config = function()
+      require("ccc").setup({
+        highlighter = { auto_enable = false },
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "css", "scss", "html", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+        callback = function(args)
+          vim.cmd("CccHighlighterEnable " .. args.buf)
+        end,
+      })
+      -- O FileType do buffer que carregou o plugin já passou: liga nele.
+      if
+        vim.tbl_contains(
+          { "css", "scss", "html", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+          vim.bo.filetype
+        )
+      then
+        vim.cmd("CccHighlighterEnable")
+      end
+    end,
+  },
+
+  -- nvim-hlslens (10/10/2026): mostra [posição/total] ao lado de cada
+  -- resultado de busca (/, ?, n, N, *, #, g*, g#). Os mapeamentos abaixo
+  -- são os do "Minimal configuration" do README do plugin (requer
+  -- Neovim >= 0.7.2). event = VeryLazy: carrega logo após o início, para
+  -- o marcador também aparecer na PRIMEIRA busca com / ou ?.
+  -- NÃO mapeei <leader>l (que o README usa para :noh) — <leader>l já é
+  -- o prefixo do live-server nesta config.
+  {
+    "kevinhwang91/nvim-hlslens",
+    event = "VeryLazy",
+    config = function()
+      require("hlslens").setup()
+      local kopts = { noremap = true, silent = true }
+      vim.keymap.set(
+        "n",
+        "n",
+        [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
+        kopts
+      )
+      vim.keymap.set(
+        "n",
+        "N",
+        [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
+        kopts
+      )
+      vim.keymap.set("n", "*", [[*<Cmd>lua require('hlslens').start()<CR>]], kopts)
+      vim.keymap.set("n", "#", [[#<Cmd>lua require('hlslens').start()<CR>]], kopts)
+      vim.keymap.set("n", "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], kopts)
+      vim.keymap.set("n", "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], kopts)
+    end,
   },
 }
 

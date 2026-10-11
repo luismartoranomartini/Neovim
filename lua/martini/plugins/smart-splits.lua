@@ -13,10 +13,23 @@
 -- =========================================================
 
 local ss = require("smart-splits")
-local map = vim.keymap.set
 
-map("n", "<M-h>", ss.move_cursor_left,  { desc = "Navegar split/painel: esquerda (Neovim ↔ WezTerm)" })
-map("n", "<M-j>", ss.move_cursor_down,  { desc = "Navegar split/painel: baixo (Neovim ↔ WezTerm)" })
-map("n", "<M-k>", ss.move_cursor_up,    { desc = "Navegar split/painel: cima (Neovim ↔ WezTerm)" })
-map("n", "<M-l>", ss.move_cursor_right, { desc = "Navegar split/painel: direita (Neovim ↔ WezTerm)" })
-map("n", "<M-\\>", ss.move_cursor_previous, { desc = "Navegar pro split/painel anterior" })
+-- (11/10/2026) Só mapeia a função que EXISTE na versão instalada do plugin.
+-- Antes, vim.keymap.set recebia nil quando ss.move_cursor_previous não
+-- existia (E5113: "rhs: expected string|function, got nil") e esse erro
+-- abortava TODO o carregamento depois deste arquivo em plugins/init.lua
+-- (oil, lualine, dashboard...). Agora a função ausente só gera um aviso.
+local function map(lhs, fn_name, desc)
+  local fn = ss[fn_name]
+  if type(fn) ~= "function" then
+    vim.notify("smart-splits: função ausente nesta versão: " .. fn_name, vim.log.levels.WARN)
+    return
+  end
+  vim.keymap.set("n", lhs, fn, { desc = desc })
+end
+
+map("<M-h>", "move_cursor_left", "Navegar split/painel: esquerda (Neovim ↔ WezTerm)")
+map("<M-j>", "move_cursor_down", "Navegar split/painel: baixo (Neovim ↔ WezTerm)")
+map("<M-k>", "move_cursor_up", "Navegar split/painel: cima (Neovim ↔ WezTerm)")
+map("<M-l>", "move_cursor_right", "Navegar split/painel: direita (Neovim ↔ WezTerm)")
+map("<M-\\>", "move_cursor_previous", "Navegar pro split/painel anterior")
