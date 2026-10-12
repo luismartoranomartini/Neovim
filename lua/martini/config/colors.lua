@@ -19,18 +19,21 @@
 
 local tn = {
   bg_dark = "#211934",
-  bg      = "#2e2440",
-  bg_hl   = "#453465",
-  fg      = "#f5faff",
-  white   = "#ffffff",
-  gray    = "#a3a9cc",
-  purple  = "#d6c4ff",
-  blue    = "#9cc2ff",
-  yellow  = "#ffd980",
-  green   = "#c2f0a4",
+  bg = "#2e2440",
+  bg_hl = "#453465",
+  fg = "#f5faff",
+  white = "#ffffff",
+  gray = "#a3a9cc",
+  purple = "#d6c4ff",
+  blue = "#9cc2ff",
+  yellow = "#ffd980",
+  green = "#c2f0a4",
+  -- (12/10/2026) verde mais escuro SÓ para strings, para os verbos
+  -- (amarelo) se destacarem. Quer ainda mais escuro? Troque este valor.
+  green_str = "#9ece6a",
   -- só sinais funcionais (não usados em sintaxe)
-  red     = "#f7768e",
-  orange  = "#ff9e64",
+  red = "#f7768e",
+  orange = "#ff9e64",
 }
 
 local function aplicar_highlights()
@@ -74,8 +77,8 @@ local function aplicar_highlights()
   hl(0, "@constant.builtin", { fg = tn.yellow })
   hl(0, "Boolean", { fg = tn.yellow })
 
-  hl(0, "String", { fg = tn.green })
-  hl(0, "@string", { fg = tn.green })
+  hl(0, "String", { fg = tn.green_str })
+  hl(0, "@string", { fg = tn.green_str })
 
   hl(0, "Identifier", { fg = tn.fg })
   hl(0, "@variable", { fg = tn.fg })
@@ -236,5 +239,7 @@ aplicar_highlights()
 
 vim.api.nvim_create_autocmd("ColorScheme", { callback = aplicar_highlights })
 vim.api.nvim_create_autocmd("LspAttach", {
-  callback = function() vim.defer_fn(aplicar_highlights, 300) end,
+  callback = function()
+    vim.defer_fn(aplicar_highlights, 300)
+  end,
 })

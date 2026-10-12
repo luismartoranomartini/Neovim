@@ -1,47 +1,48 @@
 # martini.nvim
 
-Configuração pessoal do Neovim, focada em Go, JavaScript/TypeScript (web) e C. Sem plugin manager hand-rolled — gerenciado via [lazy.nvim](https://github.com/folke/lazy.nvim).
+Configuração pessoal do Neovim, focada em **Go**, **JavaScript/TypeScript (web)** e **C**. Gerenciada pelo [lazy.nvim](https://github.com/folke/lazy.nvim), escrita em Lua e organizada em módulos pequenos (um assunto por arquivo).
 
 ## Requisitos
 
-- Neovim 0.12+, `git`, `curl`
-- Toolchain: `go` (pra compilar `gopls`/`dlv`), `node`+`npm` (LSPs web, `prettier`, runner de `.ts`), `gcc`/`g++` (runner de `.c`/`.cpp`)
-- LSP: `gopls`, `typescript-language-server`, `vscode-html-language-server`, `vscode-css-language-server`, `clangd`, `lua-language-server`
+- **Neovim 0.12+** (usa a API nativa `vim.lsp.config`/`vim.lsp.enable` e o `ui2`), `git`, `curl`
+- Toolchain: `go` (compila `gopls`/`dlv`), `node` + `npm` (LSPs web, `prettier`, runner de `.ts`), `gcc`/`g++` (runner de `.c`/`.cpp`)
+- LSP: `gopls`, `typescript-language-server`, `vscode-html-language-server`, `vscode-css-language-server`, `clangd`, `lua-language-server` (opcional: `htmx-lsp`, ver nota abaixo)
 - Lint/format: `golangci-lint`, `prettier`, `clang-format`, `stylua`, `gofmt` (vem com o Go)
 - Debug: `dlv` (Delve, Go), `codelldb` (C/C++)
-- Runner/busca: `fd`, `fzf`, `ripgrep` (`rg`), `bat` (preview)
+- Busca: `fd`, `fzf`, `ripgrep` (`rg`), `bat` (preview)
+- Testes: `go` (neotest-golang) e, opcionalmente, `gotestsum`; `node` 18.11+ para o `node --test` do módulo JavaScript
 - `xdg-open` (abrir HTML no navegador via runner)
-- `tree-sitter-cli` (parser do filetype `.http`/`.rest`, usado por `kulala.nvim`)
+- `imagemagick` (renderizar imagens no buffer; backend kitty no WezTerm)
 
-Rode `:checkhealth martini` depois de instalar tudo, pra conferir de uma vez o que falta.
+Rode `:checkhealth martini` depois de instalar tudo para conferir de uma vez o que falta.
 
-Testado em **Arch Linux** e **Fedora** (as duas máquinas reais em uso). Sem suporte a Windows documentado — não é mais uma plataforma em uso.
+Testado em **Arch Linux** e **Fedora**. Sem suporte a Windows documentado.
+
+> **htmx-lsp** é melhor esforço: o próprio projeto (rajasegar/htmx-lsp) não marca o Neovim como testado. Se não conectar, `:LspLog` é o primeiro lugar para olhar.
 
 ## Instalação das dependências (Arch / Fedora)
 
 | Ferramenta | Finalidade | Arch Linux | Fedora |
 |---|---|---|---|
 | `git`, `curl` | básico | `pacman -S git curl` | `dnf install git curl` |
-| `go` | toolchain Go (`gopls`, `dlv`) | `pacman -S go` | `dnf install golang` |
-| `nodejs`, `npm` | toolchain JS (LSPs web, prettier, runner `.ts`) | `pacman -S nodejs npm` | `dnf install nodejs` |
-| `gcc`, `g++` | compilar `.c`/`.cpp` no runner | `pacman -S gcc` | `dnf install gcc gcc-c++` |
+| `go` | toolchain Go | `pacman -S go` | `dnf install golang` |
+| `nodejs`, `npm` | toolchain JS | `pacman -S nodejs npm` | `dnf install nodejs` |
+| `gcc`, `g++` | compilar `.c`/`.cpp` | `pacman -S gcc` | `dnf install gcc gcc-c++` |
 | `gopls` | LSP Go | `go install golang.org/x/tools/gopls@latest` | idêntico |
 | `typescript-language-server` | LSP JS/TS | `npm i -g typescript-language-server typescript` | idêntico |
 | `vscode-html-language-server`, `vscode-css-language-server` | LSP HTML/CSS | `npm i -g vscode-langservers-extracted` | idêntico |
 | `clangd`, `clang-format` | LSP C + formatação | `pacman -S clang` | `dnf install clang-tools-extra` |
-| `golangci-lint` | lint Go | script oficial: `curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \| sh -s -- -b $(go env GOPATH)/bin` | idêntico (não tem pacote `dnf` oficial) |
-| `lua-language-server` | LSP Lua (editar esta config) | `pacman -S lua-language-server` | `dnf install lua-language-server` |
+| `golangci-lint` | lint Go | script oficial: `curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \| sh -s -- -b $(go env GOPATH)/bin` | idêntico |
+| `lua-language-server` | LSP Lua | `pacman -S lua-language-server` | `dnf install lua-language-server` |
 | `stylua` | formatação Lua | `pacman -S stylua` | `cargo install stylua` |
-| `imagemagick` | renderizar imagens no buffer (`image.nvim`, backend kitty no WezTerm) | `pacman -S imagemagick` | `dnf install ImageMagick` |
 | `prettier` | formatação JS/TS/HTML/CSS/JSON | `npm i -g prettier` | idêntico |
-| `tree-sitter-cli` | parser `.http`/`.rest` | `npm i -g tree-sitter-cli` | idêntico |
 | `dlv` (Delve) | debug Go | `go install github.com/go-delve/delve/cmd/dlv@latest` | idêntico |
-| `codelldb` | debug C/C++ | `yay -S codelldb-bin` (AUR) | sem pacote — baixe o `.vsix` da [release](https://github.com/vadimcn/codelldb/releases) pro seu SO, extraia, e coloque `extension/adapter/codelldb` no PATH |
-| `fd` | busca de arquivo (`<C-p>`) | `pacman -S fd` | `dnf install fd-find` (binário já sai como `fd`, sem alias) |
-| `fzf` | picker de busca | `pacman -S fzf` | `dnf install fzf` |
-| `ripgrep` (`rg`) | busca de texto (`<C-g>`) | `pacman -S ripgrep` | `dnf install ripgrep` |
-| `bat` | preview do fzf-lua | `pacman -S bat` | `dnf install bat` |
-| `xdg-utils` (`xdg-open`) | abrir HTML no navegador | `pacman -S xdg-utils` | `dnf install xdg-utils` |
+| `codelldb` | debug C/C++ | `yay -S codelldb-bin` (AUR) | baixe o `.vsix` da [release](https://github.com/vadimcn/codelldb/releases), extraia e coloque `extension/adapter/codelldb` no PATH |
+| `fd`, `fzf`, `ripgrep`, `bat` | busca e preview | `pacman -S fd fzf ripgrep bat` | `dnf install fd-find fzf ripgrep bat` |
+| `imagemagick` | imagens no buffer | `pacman -S imagemagick` | `dnf install ImageMagick` |
+| `xdg-utils` | abrir HTML no navegador | `pacman -S xdg-utils` | `dnf install xdg-utils` |
+
+As ferramentas do gopher.nvim (`gomodifytags`, `impl` e outras) são instaladas de dentro do Neovim com `:GoInstallDeps`. O `gotestsum` é instalado pelo `lazy.nvim` junto com o neotest-golang (`go install gotest.tools/gotestsum@latest`).
 
 ## Instalação
 
@@ -50,9 +51,9 @@ git clone https://github.com/luismartoranomartini/Neovim.git ~/.config/nvim
 nvim
 ```
 
-No primeiro boot, o `lazy.nvim` se instala sozinho, baixa todos os plugins e o Neovim **fecha o carregamento nesse ponto** (avisa via `vim.notify` e não chega a carregar `config`/`plugins`). Espere a janela de instalação terminar e reabra o Neovim — normal do primeiro boot, não é travamento.
+No primeiro boot o `lazy.nvim` se instala sozinho e baixa todos os plugins. O Neovim **interrompe o carregamento nesse ponto** (avisa via `vim.notify`). Espere a instalação terminar e reabra o Neovim — é normal do primeiro boot, não é travamento.
 
-Ao adicionar um plugin novo à lista existente (não é mais "primeiro boot"), a instalação roda em background de forma assíncrona; se algum `require` de plugin novo falhar com `module not found` logo depois de editar `lazy.lua`, rode `:Lazy` → `I` (install) e reabra o Neovim — é o clone ainda não ter terminado a tempo do boot.
+**Plugin novo adicionado ao `lazy.lua`:** rode `:Lazy sync` e **reinicie o Neovim**. A config só é lida na inicialização, e os atalhos de plugins carregados sob demanda só passam a existir depois disso.
 
 ## Estrutura
 
@@ -60,30 +61,49 @@ Ao adicionar um plugin novo à lista existente (não é mais "primeiro boot"), a
 lua/martini/
 ├── init.lua              -- ui2 + bootstrap + ordem de carregamento
 ├── lazy.lua              -- lista de plugins + comando :MartiniUpdate
+├── health.lua            -- :checkhealth martini
 ├── config/
 │   ├── init.lua          -- agregador
 │   ├── options.lua       -- vim.opt/vim.g
 │   ├── diagnostics.lua   -- vim.diagnostic.config()
 │   ├── colors.lua        -- tokyonight + highlights customizados (toda cor da UI mora aqui)
-│   ├── tabline.lua       -- tabline nativa customizada (lista buffers, sem plugin)
-│   └── keymaps.lua       -- atalhos globais
-├── languages/
+│   ├── tabline.lua       -- tabline nativa (lista buffers, sem plugin)
+│   ├── keymaps.lua       -- atalhos globais
+│   └── doc_keymaps.lua   -- :MartiniDocKeymaps (gera tabela de atalhos)
+├── languages/            -- tudo específico de uma linguagem
 │   ├── init.lua
-│   ├── go.lua            -- highlight, lint, imports, testes, dap-go
+│   ├── go.lua            -- filetypes, highlight, lint, imports, testes, dap-go
+│   ├── javascript.lua    -- testes com node --test (<leader>j*)
 │   └── c.lua             -- highlight de verbos printf/scanf
-├── plugins/
-│   ├── init.lua
-│   ├── treesitter.lua, textobjects.lua
-│   ├── completion.lua, lsp.lua, format.lua
-│   ├── debug.lua, runner.lua
-│   ├── editing.lua, finder.lua, multicursor.lua, http.lua
-│   ├── oil.lua           -- explorador de arquivos (edita o filesystem como buffer)
-│   └── dashboard.lua     -- tela inicial (snacks.nvim)
+├── plugins/              -- um arquivo por plugin/assunto
+│   ├── init.lua          -- ordem de carregamento (ver "Ordem de inicialização")
+│   ├── treesitter.lua, textobjects.lua, mini-ai.lua
+│   ├── completion.lua, lsp.lua, mason.lua, format.lua
+│   ├── debug.lua, runner.lua, http.lua
+│   ├── editing.lua, tabout.lua, multicursor.lua, flash.lua
+│   ├── finder.lua, oil.lua, dashboard.lua
+│   ├── gitsigns.lua, lualine.lua, tiny-cmdline.lua, tiny-inline-diagnostic.lua
+│   ├── smart-splits.lua, live-server.lua
+│   └── ...
 └── utils/
     ├── path.lua               -- gf, criação de arquivo
     ├── terminal.lua           -- abrir/toggle terminal
-    └── printf_highlight.lua   -- destaque de verbos %s/%d (Go, C)
+    ├── safe_require.lua       -- require com aviso claro quando falta um plugin
+    ├── printf_highlight.lua   -- destaque de verbos %s/%d (Go, C)
+    └── type_highlight.lua     -- cor própria por tipo builtin (via Treesitter)
 ```
+
+Os plugins pequenos ficam declarados direto no `lazy.lua` (`neotest`, `gopher.nvim`, `ccc.nvim`, `nvim-hlslens`), com o `config` no próprio spec.
+
+### Ordem de inicialização
+
+`plugins/init.lua` faz os `require` **em uma ordem que importa**:
+
+- `treesitter` antes de `textobjects` (que depende dos parsers registrados).
+- `mason` antes de `lsp`: o Mason coloca seus binários no `PATH`, e o `lsp.lua` procura os executáveis com `vim.fn.exepath()`.
+- `completion` antes de `lsp`: define `vim.lsp.config["*"].capabilities`, que os servidores herdam.
+
+Um `require` esquecido nessa lista já aconteceu mais de uma vez (o `setup()` do módulo simplesmente nunca rodava). Ao criar um módulo novo, **adicione o `require` em `plugins/init.lua`**.
 
 ## Plugins
 
@@ -91,72 +111,118 @@ lua/martini/
 |---|---|
 | tokyonight.nvim | tema base |
 | snacks.nvim | dashboard (só esse módulo é usado) |
+| lualine.nvim | statusline (com aviso de arquivo não salvo) |
 | nvim-treesitter (+ textobjects) | highlight + seleção por função/struct/parâmetro |
-| blink.cmp, LuaSnip, friendly-snippets | autocomplete (blink usa LuaSnip como motor de snippet) |
-| mini.pairs, mini.surround, mini.ai, nvim-ts-autotag, emmet-vim | edição (fecha par, delimitadores, text objects, tag JSX/HTML, abreviação) |
-| conform.nvim | format on save |
-| nvim-lint | golangci-lint |
+| blink.cmp, LuaSnip, friendly-snippets | autocomplete e snippets |
+| **mini.nvim** | `mini.pairs`, `mini.surround`, `mini.ai`, `mini.icons` (um repositório só) |
+| nvim-ts-autotag, emmet-vim | tags JSX/HTML e abreviações Emmet |
+| tabout.nvim | pular para fora de aspas/parênteses com `Tab` |
+| conform.nvim, nvim-lint | formatação ao salvar e lint |
+| mason.nvim | instala LSPs, linters e formatadores (apenas o `PATH`; sem mason-lspconfig) |
 | nvim-dap, nvim-dap-ui, nvim-nio, nvim-dap-go | debug (Go + C via codelldb) |
+| neotest, neotest-golang | rodar testes Go com resultado por caso de tabela |
+| gopher.nvim | `if err != nil`, tags de struct, comentário de doc |
 | code_runner.nvim | executa o arquivo atual |
-| kulala.nvim | cliente HTTP (`.http`/`.rest`) |
-| multicursor.nvim (branch `1.0`) | múltiplos cursores |
+| multicursor.nvim | múltiplos cursores |
+| flash.nvim | salto por labels |
 | fzf-lua | busca fuzzy de arquivo/texto, com preview |
-| oil.nvim | explorador de arquivos — edita o filesystem como texto |
-| mini.icons | provedor de ícone (oil, fzf-lua) |
+| oil.nvim, oil-git-status.nvim | explorador de arquivos como buffer, com status do git |
+| gitsigns.nvim, neogit | sinais de git por linha e interface de git |
+| tiny-inline-diagnostic, tiny-cmdline | diagnóstico inline e cmdline flutuante |
+| smart-splits.nvim | navegação contínua entre splits do Neovim e painéis do WezTerm |
+| live-server.nvim | servidor HTTP local com live-reload |
+| image.nvim | imagens no buffer (carrega só ao abrir imagem/markdown) |
+| ccc.nvim | seletor de cor + cor desenhada no texto (CSS/HTML/JS/TS) |
+| nvim-hlslens | `[posição/total]` ao lado dos resultados de busca |
 
-Sem `bufferline.nvim` de propósito: as abas visíveis no topo são a tabline nativa do Neovim, renderizada por `config/tabline.lua` (lista buffers abertos), sem dependência externa.
+> **kulala.nvim** (cliente HTTP, arquivos `.http`/`.rest`) está **desativado**: a linha está comentada em `lazy.lua`. O `plugins/http.lua` e os atalhos `<leader>h*` existem, mas só funcionam se o plugin for reativado (e ele precisa do `tree-sitter-cli`).
 
 ## LSP
 
 | Servidor | Filetypes | Formatação |
 |---|---|---|
-| gopls | go, gomod, gowork | gofmt (fallback) + organizeImports automático |
+| gopls | go, gomod, gowork | gofmt + organizeImports ao salvar |
 | ts_ls | javascript, javascriptreact, typescript, typescriptreact | prettier |
 | lua_ls | lua | stylua |
 | html | html, gotmpl (templates Go) | prettier |
 | cssls | css, scss, less | prettier |
+| htmx | html, gotmpl | — |
 | clangd | c, cpp, objc, objcpp | clang-format |
+
+O `gopls` está com `completionBudget = "500ms"` (padrão 100ms): em disco lento ou externo ele estourava o orçamento e cortava sugestões.
 
 ## Atalhos
 
-`<leader>` = `Espaço`. Gramática: `<leader>` + domínio + verbo — `b` buffers, `f` find/arquivo, `g` Go, `m` multicursor, `d` debug, `r` run, `h` HTTP. Fora da gramática, por convenção do ecossistema: `gd`/`K`/`[d`/`]d` (LSP), `]b`/`[b` (buffers), `]f`/`[f`/`]c`/`[c` (textobjects), `gf`.
+`<leader>` = `Espaço`. Gramática: `<leader>` + **domínio** + **verbo**.
+
+| Domínio | Assunto | Domínio | Assunto |
+|---|---|---|---|
+| `b` | buffers | `m` | multicursor |
+| `f` | find / arquivos / LSP | `d` | debug |
+| `g` | Go | `r` | run |
+| `j` | JavaScript | `u` | testes (neotest) |
+| `l` | live-server | `v` | git (Neogit) |
+| `t` | terminal | `e` | explorador (oil) |
+| `c` | cor (`<leader>cc`) | `h` | HTTP (desativado) |
+
+Fora da gramática, por convenção do ecossistema: `gd`/`K`/`[d`/`]d` (LSP), `]b`/`[b` (buffers), `]f`/`[f`/`]c`/`[c` (textobjects), `gf`, `s`/`S` (flash).
 
 ⚠️ Não confundir: `<leader>bd` (buffer → fechar) × `<leader>db` (debug → breakpoint).
 
-**Arquivos:** `<leader>e` explorador (oil, substitui o buffer) · `<leader>fe` explorador em split vertical · `gf` abrir/criar arquivo sob o cursor · `<leader>fn` novo arquivo · `<leader>fd` reabrir dashboard · `<leader>n`/`<leader>w` nova/fechar tabpage · `<C-p>` buscar arquivo · `<C-g>` buscar texto
+**Arquivos e busca:** `<leader>e` explorador (oil, substitui o buffer) · `<leader>fe` oil em split vertical · `<leader>ff` buscar arquivo pelo nome · `<leader>fg` buscar texto (grep) · `gf` abrir/criar o arquivo sob o cursor · `<leader>fn` novo arquivo · `<leader>fd` reabrir o dashboard · `<leader>n`/`<leader>w` nova/fechar tabpage
 
-**Buffers:** `<leader>bd` fechar · `<leader>bx` fechar forçado · `]b`/`[b` próximo/anterior — a tabline no topo lista os buffers abertos; clique esquerdo troca, clique do meio fecha
+**Buffers:** `<leader>bd` fechar · `<leader>bx` fechar forçado · `]b`/`[b` próximo/anterior (a tabline lista os buffers; clique esquerdo troca, clique do meio fecha)
 
-**LSP:** `gd` definição · `K` hover · `[d`/`]d` diagnóstico anterior/próximo · `<leader>fr` rename · `<leader>fu` references
+**LSP:** `gd` definição (`Ctrl+o` volta, `Ctrl+i` avança) · `K` hover · `[d`/`]d` diagnóstico anterior/próximo · `<leader>fr` rename · `<leader>fu` referências
 
-**Textobjects:** `af`/`if` função · `ac`/`ic` struct/class · `aa`/`ia` parâmetro · `]f`/`[f` e `]c`/`[c` navegação sem selecionar
+**Autocomplete:** `Enter` aceita · `Ctrl+Space` abre · `Ctrl+e` fecha · `↑`/`↓` e `Shift+Tab` navegam · `Ctrl+d`/`Ctrl+u` rolam a documentação · `Ctrl+j`/`Ctrl+k` avançam/voltam no snippet · `Tab` pula para fora de aspas/parênteses (em arquivos HTML/CSS/JSX/TSX avança na lista ou expande Emmet)
 
-**Go:** `<leader>gt` testar pacote · `<leader>ga` testar tudo · `<leader>gr` testar função sob o cursor
+**Textobjects:** `af`/`if` função · `ac`/`ic` struct/class · `aa`/`ia` parâmetro · `]f`/`[f` e `]c`/`[c` navegam sem selecionar
 
-**Debug:** `<F5>`/`<F10>`/`<F11>`/`<F12>` ou `<leader>d{b,x,c,o,i,k,r,t,u}` (breakpoint, limpar, continue, step over/into/out, REPL, terminar, UI)
+**Busca:** `n`/`N`/`*`/`#`/`g*`/`g#` com contador `[posição/total]` · `s` salto por labels (flash), `S` por treesitter, `Ctrl+s` liga o flash dentro de `/`
 
-**Multicursor:** `<C-Up>`/`<C-Down>` cursor acima/abaixo · `<leader>mn`/`mp` próxima/anterior ocorrência · `<leader>ma` todas · `<leader>mx` remover · `<Esc>` sair
+**Go:** `<leader>gt` testar pacote · `<leader>ga` testar tudo · `<leader>gr` testar a função sob o cursor · `<leader>ge` gerar `if err != nil` · `<leader>gs` adicionar tag `json` na struct (salve o arquivo antes) · `<leader>gc` gerar comentário de documentação
 
-**HTTP** (arquivos `.http`/`.rest`): `<leader>hs` enviar · `<leader>ha` enviar todas · `<leader>hb` scratchpad · `<leader>hc` copiar como curl · `<leader>hn`/`<leader>hp` próxima/anterior · `<leader>hq` fechar resposta
+**Testes (neotest, Go):** `<leader>us` o mais próximo · `uf` arquivo · `ua` projeto · `ud` depurar · `ux` parar · `uo` saída · `up` painel de resumo
 
-**Terminal:** `<leader>t` horizontal · `<leader>vs` vertical · `<C-t>` toggle
+**JavaScript** (`node --test`): `<leader>jt` arquivo · `<leader>ja` projeto (`npm test` se houver script `test`) · `<leader>jr` o teste sob o cursor · `<leader>jw` modo watch · `<leader>jn` REPL do Node
+
+**Debug:** `F5`/`F10`/`F11`/`F12` ou `<leader>d{b,x,c,o,i,k,r,t,u}` (breakpoint, limpar, continue, step over/into/out, REPL, terminar, UI)
+
+**Multicursor:** `Ctrl+↑`/`Ctrl+↓` (ou `Ctrl+k`/`Ctrl+j`) cursor acima/abaixo · `<leader>mn`/`mp` próxima/anterior ocorrência · `<leader>ma` todas · `<leader>mx` remover · `<leader>mq` ligar/desligar
+
+**Terminal:** `<leader>t` horizontal · `<leader>ts` vertical · `Ctrl+t` alterna · no modo terminal: `Esc` sai do modo, `Ctrl+w` navega splits, `Ctrl+q` fecha
 
 **Runner:** `<leader>r` executar arquivo · `<leader>rp` executar projeto
 
+**Git:** `<leader>v` abre o Neogit
+
+**Live-server:** `<leader>ls` iniciar · `lo` abrir · `lr` recarregar · `lt` ligar/desligar live-reload · `li` status · `lS` parar um · `lA` parar todos
+
+**Cor:** `<leader>cc` abre o seletor de cor com o cursor sobre uma cor (`h`/`l` ajustam o slider, `Enter` confirma, `q` cancela)
+
+**Splits e WezTerm:** `Alt+h/j/k/l` navegam entre splits do Neovim e painéis do WezTerm · `Alt+\` volta ao anterior (só se a versão instalada do `smart-splits` tiver essa função; senão aparece um aviso)
+
+A lista completa dos atalhos globais com `desc` pode ser gerada com `:MartiniDocKeymaps`.
+
 ## Explorador de arquivos (oil.nvim)
 
-Sem netrw: `oil.nvim` assume qualquer diretório aberto. Edita a listagem como texto normal — deletar linha deleta o arquivo, `yy`+`p` move, editar o texto renomeia, nada toca o disco até `:w` (que mostra um preview antes de aplicar). `g?` mostra os keymaps internos; `-` sobe um nível.
+Sem netrw: o `oil.nvim` assume qualquer diretório aberto. Ele edita a listagem como texto — apagar a linha apaga o arquivo, `yy` + `p` move, editar o nome renomeia — e **nada toca o disco até `:w`** (que mostra um resumo antes de aplicar). `Tab` ou `Enter` abre o arquivo sob o cursor, `-` sobe um nível, `g?` lista os atalhos internos.
 
-Pastas de sistema do NTFS (`$RECYCLE.BIN`, `System Volume Information`, `.Trash-<n>`) ficam sempre ocultas — abri-las derruba o oil com `assertion failed` em `vim.fs.abspath`, por falha de permissão em volumes Windows montados no Linux.
+Pastas de sistema do NTFS (`$RECYCLE.BIN`, `System Volume Information`, `.Trash-<n>`) ficam sempre ocultas: abri-las derruba o oil com `assertion failed` em volumes Windows montados no Linux.
 
 ## Busca (fzf-lua)
 
-Janela centralizada (60%×70% da tela), preview fixo à direita, cores integradas à paleta do `colors.lua`. Busca por **nome de arquivo** (`<C-p>`) ou **texto** (`<C-g>`) em todo o projeto a partir do diretório atual — não navega pastas (isso é papel do oil). Pra buscar a partir de outra pasta, navegue até lá pelo oil primeiro.
+Janela centralizada, preview à direita e cores integradas à paleta do `colors.lua`. Busca por **nome de arquivo** (`<leader>ff`) ou **texto** (`<leader>fg`) a partir da pasta atual do Neovim — não navega pastas (isso é papel do oil). Para buscar em outra pasta, abra o Neovim a partir dela ou use `:cd`.
 
 ## Dashboard
 
-Tela inicial via `snacks.nvim`: banner, menu, arquivos recentes, git status (cacheado 5 min) e tempo de boot. Reabra a qualquer momento com `<leader>fd`.
+Tela inicial via `snacks.nvim`: banner, menu (`n` novo, `f` buscar arquivo, `g` buscar texto, `e` explorador, `t` terminal, `l` Lazy, `c` config, `q` sair), arquivos recentes, git status (cacheado 5 min) e tempo de boot. Reabra com `<leader>fd`.
+
+## Cores
+
+Toda cor da interface mora em `config/colors.lua`. As strings usam um verde próprio (`green_str`), mais escuro que o verde dos demais elementos, para que os verbos de formatação (`%s`, `%d`, em amarelo) se destaquem.
 
 ## Atualização de plugins
 
-Sem atualização automática em background — decisão explícita, pra não regravar o `lazy-lock.json` sozinho a cada boot. `:MartiniUpdate` abre a UI do `lazy.nvim` (`require("lazy").update()`) pra você revisar e confirmar. Só atualiza o que já está instalado; pra instalar plugins novos recém-adicionados à lista, use `:Lazy` → `I`.
+Sem atualização automática em background — decisão explícita, para não regravar o `lazy-lock.json` sozinho. `:MartiniUpdate` abre a UI do `lazy.nvim` para você revisar e confirmar. Para instalar plugins recém-adicionados à lista use `:Lazy sync` e reinicie o Neovim.
