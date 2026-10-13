@@ -14,8 +14,8 @@
 -- propósito — convenção universal do ecossistema Neovim.
 --
 -- REDUÇÃO (set/2026): <leader>ff/<leader>fg (busca nativa via
--- :find/:grep) removidos daqui — fzf-lua (plugins/finder.lua,
--- <C-p>/<C-g>) já cobre os dois casos com preview visual, e manter
+-- :find/:grep) removidos daqui — o telescope (plugins/finder.lua,
+-- <leader>ff/<leader>fg) cobre os dois casos com preview visual, e manter
 -- os dois caminhos era duplicidade sem propósito real. Os comandos
 -- :find/:grep continuam disponíveis via linha de comando (ver
 -- config/options.lua), só sem atalho <leader> dedicado.

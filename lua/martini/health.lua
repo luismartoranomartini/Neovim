@@ -80,14 +80,15 @@ function M.check()
   -- ── Debug ────────────────────────────────────────────────
   vim.health.start("martini.nvim — Debug (plugins/debug.lua)")
   checar("dlv", "go install github.com/go-delve/delve/cmd/dlv@latest")
-  checar("codelldb", "yay -S codelldb-bin (AUR) — sem isso, debug de C/C++ fica desativado, mas o resto da config funciona normalmente")
+  checar(
+    "codelldb",
+    "yay -S codelldb-bin (AUR) — sem isso, debug de C/C++ fica desativado, mas o resto da config funciona normalmente"
+  )
 
   -- ── Busca e navegação ────────────────────────────────────
   vim.health.start("martini.nvim — Busca e navegação (plugins/finder.lua, plugins/oil.lua)")
-  checar("fd", "Necessário pra <C-p> (fzf-lua files)")
-  checar("fzf", "Necessário pra <C-p>/<C-g>")
-  checar("rg", "ripgrep — necessário pra <C-g> (fzf-lua live_grep)")
-  checar("bat", "Opcional — sem ele, o preview do fzf-lua cai pra 'cat' simples")
+  checar("fd", "Usado pelo <leader>ff (telescope find_files) — sem ele o telescope cai em find/git, mais lento")
+  checar("rg", "ripgrep — obrigatório pro <leader>fg (telescope live_grep)")
 
   -- ── HTTP (kulala.nvim) ───────────────────────────────────
   vim.health.start("martini.nvim — HTTP (plugins/http.lua)")

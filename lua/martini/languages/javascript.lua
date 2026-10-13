@@ -19,6 +19,14 @@
 
 local M = {}
 
+-- Verbos do console.log / util.format do Node: %s %d %i %f %j %o %O %c %%
+-- (nodejs.org/api/util.html#utilformatformat-args). Mecanismo
+-- compartilhado em utils/printf_highlight.lua. Registrado uma vez por
+-- filetype porque cada um tem a sua flag de janela.
+for _, ft in ipairs({ "javascript", "javascriptreact", "typescript", "typescriptreact" }) do
+  require("martini.utils.printf_highlight").register(ft, "sdifjoOc%")
+end
+
 local function terminal(cmd)
   vim.cmd("botright split | resize 15 | terminal " .. cmd)
 end

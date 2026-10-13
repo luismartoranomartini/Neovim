@@ -39,10 +39,11 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 -- =========================================================
 -- Highlight: verbos de formatação do Go (%s, %d, %v, %+v, %-10.2f,
 -- etc.) — mecanismo compartilhado, ver utils/printf_highlight.lua.
--- Conjunto de verbos do Go: v T t b c d o O q x X U e E f F g G s p %
+-- Conjunto de verbos do Go: v T t b c d o O q x X U e E f F g G s p w %
+-- (%w só vale em fmt.Errorf, mas é usado o tempo todo)
 -- (fmt package — https://pkg.go.dev/fmt)
 -- =========================================================
-require("martini.utils.printf_highlight").register("go", "vTtbcdoOqxXUeEfFgGsp%")
+require("martini.utils.printf_highlight").register("go", "vTtbcdoOqxXUeEfFgGspw%", nil, true)
 
 -- =========================================================
 -- Highlight: cada tipo builtin do Go (int, string, bool, error,

@@ -29,7 +29,9 @@ local M = {}
 --           "h", "z"), como alternação de regex do Vim separada por
 --           "\|" (ex.: "ll\|l\|hh\|h\|z\|j\|t\|L"). Go não usa isso;
 --           deixe nil/"" nesse caso.
-function M.register(filetype, verbos, modificadores)
+--   indice: opcional (boolean) — aceita índice de argumento do Go,
+--           como %[1]d e %[2]*[1]d. Só o Go tem isso.
+function M.register(filetype, verbos, modificadores, indice)
   local flag = "martini_printf_hl_" .. filetype
 
   local grupo_mod = ""
@@ -38,19 +40,40 @@ function M.register(filetype, verbos, modificadores)
     grupo_mod = [=[\%(]=] .. modificadores .. [=[\)\=]=]
   end
 
-  -- Estrutura do printf: %[flags][largura][.precisão][modificador][verbo]
+  -- Índice de argumento (Go): [1], [23]... opcional.
+  local idx = indice and [=[\%(\[[0-9]\+\]\)\=]=] or ""
+
+  -- Largura ou precisão: dígitos OU "*" (valor vindo de argumento,
+  -- ex.: %*d, %-*s, %.*f). \%(\*\|[0-9]*\) = "*" ou zero+ dígitos.
+  local num = [=[\%(\*\|[0-9]*\)]=]
+
+  -- Estrutura do printf: %[flags][idx][largura][.][idx][precisão][idx][modificador][verbo]
   --   [-+ #0]* → flags, todas opcionais
-  --   [0-9]*   → largura, opcional
-  --   \.\=[0-9]* → precisão opcional (\.\= = ponto literal opcional;
-  --                sem o \=, o "." casaria só se seguido de dígito,
-  --                perdendo casos como "%.2f")
+  --   num      → largura, opcional (dígitos ou *)
+  --   \.\=     → ponto da precisão, opcional (sem o \=, "%.2f" não casaria)
   --   grupo_mod → modificador de comprimento opcional (só em C)
-  local pattern = [=[%[-+ #0]*[0-9]*\.\=[0-9]*]=] .. grupo_mod .. [=[[]=] .. verbos .. [=[]]=]
+  local pattern = [=[%[-+ #0]*]=]
+    .. idx
+    .. num
+    .. [=[\.\=]=]
+    .. idx
+    .. num
+    .. idx
+    .. grupo_mod
+    .. [=[[]=]
+    .. verbos
+    .. [=[]]=]
 
   local function aplicar()
-    if vim.bo.filetype ~= filetype then return end
-    if vim.w[flag] then return end
-    vim.fn.matchadd("PrintfVerb", pattern)
+    if vim.bo.filetype ~= filetype then
+      return
+    end
+    if vim.w[flag] then
+      return
+    end
+    -- prioridade 200: acima dos extmarks do Treesitter (100), pra cor
+    -- do verbo não ser engolida pelo verde de @string
+    vim.fn.matchadd("PrintfVerb", pattern, 200)
     vim.w[flag] = true
   end
 

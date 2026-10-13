@@ -31,6 +31,7 @@ local tn = {
   -- (12/10/2026) verde mais escuro SÓ para strings, para os verbos
   -- (amarelo) se destacarem. Quer ainda mais escuro? Troque este valor.
   green_str = "#9ece6a",
+  yellow_verb = "#ffe600", -- verbos printf: amarelo forte, sem bold
   -- só sinais funcionais (não usados em sintaxe)
   red = "#f7768e",
   orange = "#ff9e64",
@@ -103,7 +104,7 @@ local function aplicar_highlights()
   end
 
   -- Verbos printf (Go, C) e ações de template Go
-  hl(0, "PrintfVerb", { fg = tn.yellow })
+  hl(0, "PrintfVerb", { fg = tn.yellow_verb, bold = false })
   hl(0, "GoTemplateAction", { fg = tn.purple })
 
   -- Tags HTML/CSS/JSX
@@ -160,24 +161,24 @@ local function aplicar_highlights()
   hl(0, "MartiniTabLineFill", { bg = tn.bg_dark })
   hl(0, "MartiniTabLineGit", { fg = tn.orange, bold = true })
 
-  -- fzf-lua
-  hl(0, "FzfLuaNormal", { bg = tn.bg_dark })
-  hl(0, "FzfLuaBorder", { fg = tn.gray, bg = tn.bg_dark })
-  hl(0, "FzfLuaTitle", { fg = tn.blue, bold = true })
-  hl(0, "FzfLuaFzfNormal", { bg = tn.bg_dark })
-  hl(0, "FzfLuaFzfBorder", { fg = tn.gray, bg = tn.bg_dark })
-  hl(0, "FzfLuaFzfPrompt", { fg = tn.blue, bold = true })
-  hl(0, "FzfLuaFzfQuery", { fg = tn.fg })
-  hl(0, "FzfLuaFzfMatch", { fg = tn.yellow, bold = true })
-  hl(0, "FzfLuaFzfPointer", { fg = tn.green })
-  hl(0, "FzfLuaFzfMarker", { fg = tn.purple })
-  hl(0, "FzfLuaFzfCursorLine", { bg = tn.bg_hl })
-  hl(0, "FzfLuaCursorLine", { bg = tn.bg_hl })
-  hl(0, "FzfLuaPreviewNormal", { bg = tn.bg_dark })
-  hl(0, "FzfLuaPreviewBorder", { fg = tn.gray, bg = tn.bg_dark })
-  hl(0, "FzfLuaPreviewTitle", { fg = tn.blue, bold = true })
-  hl(0, "FzfLuaHeaderText", { fg = tn.gray })
-  hl(0, "FzfLuaHeaderBind", { fg = tn.gray })
+  -- telescope.nvim (13/10/2026, trocou o fzf-lua) — mesma paleta de
+  -- antes: fundo escuro, borda cinza, títulos azuis, match em amarelo.
+  hl(0, "TelescopeNormal", { bg = tn.bg_dark })
+  hl(0, "TelescopeBorder", { fg = tn.gray, bg = tn.bg_dark })
+  hl(0, "TelescopePromptNormal", { bg = tn.bg_dark })
+  hl(0, "TelescopePromptBorder", { fg = tn.gray, bg = tn.bg_dark })
+  hl(0, "TelescopePromptTitle", { fg = tn.blue, bold = true })
+  hl(0, "TelescopePromptPrefix", { fg = tn.blue, bold = true })
+  hl(0, "TelescopeResultsNormal", { bg = tn.bg_dark })
+  hl(0, "TelescopeResultsBorder", { fg = tn.gray, bg = tn.bg_dark })
+  hl(0, "TelescopeResultsTitle", { fg = tn.blue, bold = true })
+  hl(0, "TelescopePreviewNormal", { bg = tn.bg_dark })
+  hl(0, "TelescopePreviewBorder", { fg = tn.gray, bg = tn.bg_dark })
+  hl(0, "TelescopePreviewTitle", { fg = tn.blue, bold = true })
+  hl(0, "TelescopeSelection", { bg = tn.bg_hl })
+  hl(0, "TelescopeSelectionCaret", { fg = tn.green, bg = tn.bg_hl })
+  hl(0, "TelescopeMultiSelection", { fg = tn.purple })
+  hl(0, "TelescopeMatching", { fg = tn.yellow, bold = true })
 end
 
 require("martini.utils.safe_require")("tokyonight", function(tokyonight)

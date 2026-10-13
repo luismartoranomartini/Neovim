@@ -60,7 +60,7 @@ vim.opt.foldlevel = 99 -- abre tudo por padrão ao abrir o arquivo — sem
 -- isso o Neovim abre o arquivo com tudo recolhido.
 -- Busca de arquivo/texto nativa (:find / :grep) — comandos sempre
 -- disponíveis, mesmo sem atalho <leader> dedicado (a busca fuzzy do
--- dia a dia é fzf-lua, ver plugins/finder.lua: <C-p>/<C-g>).
+-- dia a dia é telescope, ver plugins/finder.lua: <leader>ff/<leader>fg).
 -- "**" faz :find buscar recursivamente a partir do diretório de
 -- trabalho atual, não só na pasta do arquivo aberto.
 vim.opt.path:append("**")

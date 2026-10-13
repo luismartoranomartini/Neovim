@@ -32,4 +32,10 @@ map("<M-h>", "move_cursor_left", "Navegar split/painel: esquerda (Neovim ↔ Wez
 map("<M-j>", "move_cursor_down", "Navegar split/painel: baixo (Neovim ↔ WezTerm)")
 map("<M-k>", "move_cursor_up", "Navegar split/painel: cima (Neovim ↔ WezTerm)")
 map("<M-l>", "move_cursor_right", "Navegar split/painel: direita (Neovim ↔ WezTerm)")
-map("<M-\\>", "move_cursor_previous", "Navegar pro split/painel anterior")
+
+-- (13/10/2026) move_cursor_previous FOI REMOVIDA do smart-splits na v2
+-- ("could never work across a multiplexer boundary" — README, tabela
+-- "Drop what no longer exists"). Por isso o aviso no dashboard. A tecla
+-- Alt+\ continua existindo, mas agora usa o :wincmd p nativo do Neovim:
+-- volta pro split anterior, SÓ dentro do Neovim (não cruza pro WezTerm).
+vim.keymap.set("n", "<M-\\>", "<cmd>wincmd p<cr>", { desc = "Voltar pro split anterior (só dentro do Neovim)" })

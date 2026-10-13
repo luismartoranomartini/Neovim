@@ -4,7 +4,7 @@
 --
 -- Só o módulo "dashboard" fica ligado — todo o resto do snacks.nvim
 -- (explorer, picker, notifier, etc.) fica desligado de propósito,
--- porque já temos fzf-lua/nvim-dap/etc. cobrindo isso. Ligar módulos
+-- porque já temos telescope/nvim-dap/etc. cobrindo isso. Ligar módulos
 -- que se sobrepõem ao que já existe é a mesma duplicidade que já
 -- reduzimos antes (nvim-tree/fzf-lua, :find/<C-p>).
 --
@@ -85,12 +85,26 @@ require("snacks").setup({
         "/_/  /_/_/  |_/_/ |_| /_/ /___/_/ |_/___/   ",
       }, "\n"),
       -- Mesmas ações do menu que você já usa no resto da config —
-      -- fzf-lua pra arquivo/texto, oil pro explorador, :Lazy pros
+      -- telescope pra arquivo/texto, oil pro explorador, :Lazy pros
       -- plugins.
       keys = {
         { icon = " ", key = "n", desc = "New File", action = ":enew" },
-        { icon = " ", key = "f", desc = "Find File", action = function() require("fzf-lua").files() end },
-        { icon = " ", key = "g", desc = "Find Text", action = function() require("fzf-lua").live_grep() end },
+        {
+          icon = " ",
+          key = "f",
+          desc = "Find File",
+          action = function()
+            require("telescope.builtin").find_files()
+          end,
+        },
+        {
+          icon = " ",
+          key = "g",
+          desc = "Find Text",
+          action = function()
+            require("telescope.builtin").live_grep()
+          end,
+        },
         { icon = " ", key = "e", desc = "Explorer", action = ":Oil" },
         -- Terminal (09/09/2026) — abre DIRETO (open_horizontal), não
         -- usa toggle(). Motivo: toggle() varre as janelas existentes
@@ -101,7 +115,14 @@ require("snacks").setup({
         -- edição em andamento por trás), não existe cenário real de
         -- "alternar" — só faz sentido abrir. <C-t> global continua
         -- com toggle(), onde alternar faz sentido de verdade.
-        { icon = " ", key = "t", desc = "Terminal", action = function() require("martini.utils.terminal").open_horizontal() end },
+        {
+          icon = " ",
+          key = "t",
+          desc = "Terminal",
+          action = function()
+            require("martini.utils.terminal").open_horizontal()
+          end,
+        },
         { icon = "󰒲 ", key = "l", desc = "Plugins (Lazy)", action = ":Lazy" },
         { icon = " ", key = "c", desc = "Config", action = ":e $MYVIMRC" },
         { icon = " ", key = "q", desc = "Quit", action = ":qa" },

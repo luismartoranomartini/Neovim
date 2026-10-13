@@ -76,7 +76,7 @@
 -- referência (github.com/FractalCodeRicardo/dev-config/tree/master/
 -- nvim/lua/plugins/oil.lua), pedido explicitamente. Confirmado antes
 -- da troca que nada mais na config dependia de nvim-web-devicons:
--- fzf-lua detecta qualquer provedor de ícone instalado em runtime, e
+-- o telescope detecta qualquer provedor de ícone instalado em runtime, e
 -- os ícones do dashboard (plugins/dashboard.lua) são glyphs Unicode
 -- fixos no preset, não chamada a nenhuma lib de ícone.
 --
@@ -86,7 +86,8 @@
 -- nvim-lua/plenary.nvim (obrigatória, adicionada abaixo só por causa
 -- disso — nenhum outro plugin da lista precisava dela até agora) e
 -- reaproveita ibhagwan/fzf-lua (já instalado acima) pra seleção de
--- menus, sem precisar de telescope.nvim.
+-- menus (desde 13/10/2026 isso é o telescope.nvim — ver nota "Busca
+-- fuzzy" na lista de plugins; antes era o fzf-lua).
 --
 -- FLASH (25/09/2026): navegação por labels — ver plugins/flash.lua
 -- pro setup e as teclas (s/S/r/R/<C-s>, fora da gramática <leader>,
@@ -219,7 +220,22 @@ local plugins = {
       require("martini.plugins.multicursor")
     end,
   },
-  { "ibhagwan/fzf-lua", lazy = false },
+  -- Busca fuzzy (13/10/2026): telescope.nvim NO LUGAR de fzf-lua —
+  -- ver plugins/finder.lua. version = "*" fixa a última tag estável
+  -- (recomendação do README do plugin). plenary.nvim é obrigatória.
+  -- telescope-ui-select assume o vim.ui.select (F5 do dap-go, code
+  -- actions) — era o register_ui_select() do fzf-lua.
+  -- lazy = false porque finder.lua faz o setup + load_extension no
+  -- startup, e o ui-select precisa estar ativo desde o início.
+  {
+    "nvim-telescope/telescope.nvim",
+    version = "*",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope-ui-select.nvim",
+    },
+    lazy = false,
+  },
   -- Explorador de arquivos: oil.nvim edita o filesystem como buffer,
   -- substituindo o netrw por completo (ver nota "NETRW → OIL" acima).
   -- mini.icons é o provedor de glyph/cor (não nvim-web-devicons — ver
@@ -251,7 +267,7 @@ local plugins = {
     config = function()
       require("neogit").setup({
         integrations = {
-          fzf_lua = true,
+          telescope = true,
         },
       })
     end,
@@ -314,10 +330,10 @@ local plugins = {
   { "rachartier/tiny-cmdline.nvim", lazy = false },
   -- Servidor HTTP local, live-reload (09/09/2026) — necessário pra
   -- htmx (AJAX/fetch não funciona abrindo o HTML direto via file://,
-  -- que é o que o runner.lua faz hoje). Sem telescope.nvim nem
-  -- which-key.nvim: telescope é só "recomendado" pelo autor, cai em
-  -- vim.ui.select se faltar — que no seu caso já é o fzf-lua
-  -- (register_ui_select() em finder.lua); which-key é só cosmético
+  -- que é o que o runner.lua faz hoje). Sem which-key.nvim; o telescope
+  -- que o autor "recomenda" agora existe na config (13/10/2026) e o
+  -- seletor cai em vim.ui.select, que é o telescope-ui-select
+  -- (finder.lua); which-key é só cosmético
   -- (rótulo do grupo no menu), sem ele os atalhos funcionam igual.
   -- LAZY LOADING (01/10/2026), 2º plugin: live-server só carrega no
   -- primeiro comando :LiveServer* (os <leader>l* chamam esses comandos).

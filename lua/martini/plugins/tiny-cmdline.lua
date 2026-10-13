@@ -33,6 +33,12 @@ local safe_require = require("martini.utils.safe_require")
 -- ui2.enable({}) já roda no topo de lua/martini/init.lua (ponto 2 da nota
 -- acima), antes do lazy.nvim; não repetir aqui (01/10/2026).
 
+-- native_types (13/10/2026): por padrão o plugin deixa "/" e "?" (busca)
+-- na parte de baixo da tela, no jeito nativo; só ":" é centralizado.
+-- Lista vazia = tudo centralizado (":", "/", "?"). Pra voltar a busca
+-- pra baixo, use { "/", "?" }. (README do plugin, seção Configuration.)
 safe_require("tiny-cmdline", function(tiny_cmdline)
-  tiny_cmdline.setup({})
+  tiny_cmdline.setup({
+    native_types = {},
+  })
 end, "cmdline em janela flutuante centralizada (tiny-cmdline.nvim)")

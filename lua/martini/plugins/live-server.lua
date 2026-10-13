@@ -11,11 +11,10 @@
 --   s start · o open · r reload · t toggle live-reload
 --   i info/status · S stop um · A stop todos
 --
--- SEM telescope.nvim nem which-key.nvim (dependências só
--- "recomendadas" pelo autor, não obrigatórias): sem telescope, o
--- picker de caminho/porta cai em vim.ui.select — que no seu caso já
--- é o fzf-lua (register_ui_select(), ver plugins/finder.lua), sem
--- perda de funcionalidade real. which-key é só cosmético (rótulo do
+-- SEM which-key.nvim (dependência só "recomendada" pelo autor, não
+-- obrigatória). O picker de caminho/porta usa vim.ui.select — que
+-- desde 13/10/2026 é o telescope-ui-select (ver plugins/finder.lua),
+-- sem perda de funcionalidade real. which-key é só cosmético (rótulo do
 -- grupo no menu de atalhos), sem ele os atalhos funcionam idêntico.
 --
 -- auto_start deliberadamente OFF: preferi start manual (<leader>ls)
