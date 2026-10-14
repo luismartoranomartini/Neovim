@@ -225,8 +225,11 @@ local plugins = {
   -- (recomendação do README do plugin). plenary.nvim é obrigatória.
   -- telescope-ui-select assume o vim.ui.select (F5 do dap-go, code
   -- actions) — era o register_ui_select() do fzf-lua.
-  -- lazy = false porque finder.lua faz o setup + load_extension no
-  -- startup, e o ui-select precisa estar ativo desde o início.
+  -- LAZY (14/10/2026): lazy = true — o telescope só carrega no primeiro
+  -- <leader>ff/<leader>fg ou no primeiro vim.ui.select (o :Telescope
+  -- puro não está registrado: use os atalhos).
+  -- Economiza ~4 ms por boot (medido com --startuptime). Quem faz o
+  -- setup + load_extension sob demanda é finder.lua (função setup()).
   {
     "nvim-telescope/telescope.nvim",
     version = "*",
@@ -234,7 +237,7 @@ local plugins = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope-ui-select.nvim",
     },
-    lazy = false,
+    lazy = true,
   },
   -- Explorador de arquivos: oil.nvim edita o filesystem como buffer,
   -- substituindo o netrw por completo (ver nota "NETRW → OIL" acima).
@@ -270,6 +273,23 @@ local plugins = {
           telescope = true,
         },
       })
+    end,
+  },
+  -- SQL (14/10/2026): vim-dadbod-ui (interface) + vim-dadbod (executa
+  -- as queries via psql/mysql do sistema) + vim-dadbod-completion
+  -- (autocomplete de tabelas/colunas; fonte do blink entra no passo
+  -- seguinte). Spec copiada do README do plugin. lazy: só carrega no
+  -- primeiro :DBUI*; o completion só em arquivos sql/mysql/plsql.
+  -- As conexões ficam em plugins/sql.lua.
+  {
+    "kristijanhusak/vim-dadbod-ui",
+    dependencies = {
+      { "tpope/vim-dadbod", lazy = true },
+      { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true },
+    },
+    cmd = { "DBUI", "DBUIToggle", "DBUIAddConnection", "DBUIFindBuffer" },
+    init = function()
+      vim.g.db_ui_use_nerd_fonts = 1
     end,
   },
   -- Renderização de imagem no buffer (24/09/2026) — ver nota "VOLTA

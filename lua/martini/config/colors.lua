@@ -161,19 +161,22 @@ local function aplicar_highlights()
   hl(0, "MartiniTabLineFill", { bg = tn.bg_dark })
   hl(0, "MartiniTabLineGit", { fg = tn.orange, bold = true })
 
-  -- telescope.nvim (13/10/2026, trocou o fzf-lua) — mesma paleta de
-  -- antes: fundo escuro, borda cinza, títulos azuis, match em amarelo.
-  hl(0, "TelescopeNormal", { bg = tn.bg_dark })
-  hl(0, "TelescopeBorder", { fg = tn.gray, bg = tn.bg_dark })
-  hl(0, "TelescopePromptNormal", { bg = tn.bg_dark })
-  hl(0, "TelescopePromptBorder", { fg = tn.gray, bg = tn.bg_dark })
+  -- telescope.nvim (13/10/2026, trocou o fzf-lua) — borda cinza, títulos
+  -- azuis, match em amarelo. FUNDO TRANSPARENTE ("NONE"), como o resto
+  -- da config: o roxo é a imagem do WezTerm aparecendo por trás. Só a
+  -- linha selecionada tem fundo (bg_hl). Quer o painel sólido de volta?
+  -- Troque "NONE" por tn.bg_dark nas linhas abaixo.
+  hl(0, "TelescopeNormal", { bg = "NONE" })
+  hl(0, "TelescopeBorder", { fg = tn.gray, bg = "NONE" })
+  hl(0, "TelescopePromptNormal", { bg = "NONE" })
+  hl(0, "TelescopePromptBorder", { fg = tn.gray, bg = "NONE" })
   hl(0, "TelescopePromptTitle", { fg = tn.blue, bold = true })
   hl(0, "TelescopePromptPrefix", { fg = tn.blue, bold = true })
-  hl(0, "TelescopeResultsNormal", { bg = tn.bg_dark })
-  hl(0, "TelescopeResultsBorder", { fg = tn.gray, bg = tn.bg_dark })
+  hl(0, "TelescopeResultsNormal", { bg = "NONE" })
+  hl(0, "TelescopeResultsBorder", { fg = tn.gray, bg = "NONE" })
   hl(0, "TelescopeResultsTitle", { fg = tn.blue, bold = true })
-  hl(0, "TelescopePreviewNormal", { bg = tn.bg_dark })
-  hl(0, "TelescopePreviewBorder", { fg = tn.gray, bg = tn.bg_dark })
+  hl(0, "TelescopePreviewNormal", { bg = "NONE" })
+  hl(0, "TelescopePreviewBorder", { fg = tn.gray, bg = "NONE" })
   hl(0, "TelescopePreviewTitle", { fg = tn.blue, bold = true })
   hl(0, "TelescopeSelection", { bg = tn.bg_hl })
   hl(0, "TelescopeSelectionCaret", { fg = tn.green, bg = tn.bg_hl })

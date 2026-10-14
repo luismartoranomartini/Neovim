@@ -94,7 +94,7 @@ require("snacks").setup({
           key = "f",
           desc = "Find File",
           action = function()
-            require("telescope.builtin").find_files()
+            vim.api.nvim_feedkeys(vim.keycode("<leader>ff"), "m", false)
           end,
         },
         {
@@ -102,7 +102,7 @@ require("snacks").setup({
           key = "g",
           desc = "Find Text",
           action = function()
-            require("telescope.builtin").live_grep()
+            vim.api.nvim_feedkeys(vim.keycode("<leader>fg"), "m", false)
           end,
         },
         { icon = " ", key = "e", desc = "Explorer", action = ":Oil" },
