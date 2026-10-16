@@ -53,6 +53,7 @@ require("martini.plugins.completion")
 require("martini.plugins.tabout") -- (27/09/2026) FALTAVA esse require -- tabout.setup() nunca rodava, <Plug>(Tabout) nunca existia, <Tab> inseria o texto literal
 require("martini.plugins.mason") -- ver nota "MASON" acima — precisa vir antes de lsp
 require("martini.plugins.lsp")
+require("martini.plugins.otter") -- (15/10/2026) VOLTOU: completion de JS/CSS dentro de <script>/<style> em HTML; depois do lsp
 require("martini.plugins.tiny-inline-diagnostic") -- (27/09/2026) FALTAVA esse require -- setup() nunca rodava, diagnostico so aparecia na coluna de sinais
 require("martini.plugins.format")
 require("martini.plugins.debug")

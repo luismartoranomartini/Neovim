@@ -74,6 +74,18 @@ safe_require("blink.cmp", function(blink)
     },
     sources = {
       default = { "lsp", "path", "snippets", "buffer" },
+      -- SQL (14/10/2026): em arquivos sql/mysql/plsql entra a fonte
+      -- "dadbod" (tabelas/colunas do banco conectado via :DBUI). Forma
+      -- do README do vim-dadbod-completion; mysql/plsql são os outros
+      -- filetypes do spec do plugin em lazy.lua.
+      per_filetype = {
+        sql = { "snippets", "dadbod", "buffer" },
+        mysql = { "snippets", "dadbod", "buffer" },
+        plsql = { "snippets", "dadbod", "buffer" },
+      },
+      providers = {
+        dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
+      },
     },
     snippets = { preset = "luasnip" },
     fuzzy = { implementation = "prefer_rust_with_warning" },
@@ -83,10 +95,14 @@ safe_require("blink.cmp", function(blink)
   -- blink, mesmo comportamento de antes (ver nota no topo do arquivo).
   if luasnip then
     vim.keymap.set({ "i", "s" }, "<C-j>", function()
-      if luasnip.expand_or_jumpable() then luasnip.expand_or_jump() end
+      if luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      end
     end, { desc = "Snippet: expandir/avancar" })
     vim.keymap.set({ "i", "s" }, "<C-k>", function()
-      if luasnip.jumpable(-1) then luasnip.jump(-1) end
+      if luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      end
     end, { desc = "Snippet: voltar" })
   end
 end, "autocomplete (blink.cmp)")
@@ -97,6 +113,26 @@ end, "autocomplete (blink.cmp)")
 -- entao nesses 5 filetypes o comportamento continua: menu do blink
 -- visivel → navega; senao → expande Emmet.
 local emmet_filetypes = { "html", "css", "scss", "javascriptreact", "typescriptreact" }
+-- (15/10/2026) Dentro de <script> em .html o Emmet NÃO pode rodar: ele
+-- interpreta o texto da linha como abreviação e reescreve o código JS.
+-- Ali o <Tab> só identa. Só vale para filetype html (em jsx/tsx o
+-- Emmet continua, pois o parser "javascript" também cobre JSX).
+local function dentro_de_script_html(buf)
+  if vim.bo[buf].filetype ~= "html" then
+    return false
+  end
+  local ok, parser = pcall(vim.treesitter.get_parser, buf)
+  if not ok or not parser then
+    return false
+  end
+  parser:parse(true)
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local ok_lang, tree = pcall(function()
+    return parser:language_for_range({ row - 1, col, row - 1, col })
+  end)
+  return ok_lang and tree ~= nil and tree:lang() == "javascript"
+end
+
 vim.api.nvim_create_autocmd("FileType", {
   pattern = emmet_filetypes,
   callback = function(args)
@@ -104,11 +140,11 @@ vim.api.nvim_create_autocmd("FileType", {
       local ok_blink, blink = pcall(require, "blink.cmp")
       if ok_blink and blink.is_visible() then
         blink.select_next()
+      elseif dentro_de_script_html(args.buf) then
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, false, true), "n", false)
       else
         vim.schedule(function()
-          vim.fn.feedkeys(
-            vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), ""
-          )
+          vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<plug>(emmet-expand-abbr)", true, false, true), "")
         end)
       end
     end, { buffer = args.buf, desc = "blink: proximo item, ou expandir Emmet" })

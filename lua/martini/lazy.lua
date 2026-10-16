@@ -170,6 +170,9 @@ local plugins = {
   { "folke/snacks.nvim", priority = 1000, lazy = false },
   { "nvim-treesitter/nvim-treesitter", lazy = false },
   { "nvim-treesitter/nvim-treesitter-textobjects", lazy = false },
+  -- otter.nvim (15/10/2026): VOLTOU. Sem ele não há completion de JS dentro de
+  -- <script> em .html (ts_ls só conecta em js/ts; html-ls não completa JS).
+  { "jmbuhr/otter.nvim", lazy = false },
   { "L3MON4D3/LuaSnip", version = "v2.*", lazy = false }, -- versao pinada, exigencia do blink.cmp — ver nota "BLINK.CMP" acima
   { "rafamadriz/friendly-snippets", lazy = false },
   { "saghen/blink.cmp", version = "1.*", lazy = false }, -- idem — baixa binario pre-compilado da release
