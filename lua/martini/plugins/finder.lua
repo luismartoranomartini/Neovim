@@ -57,7 +57,6 @@ local function setup()
           width = 0.7,
           height = 0.6,
           prompt_position = "top",
-          preview_width = 0.45,
           -- O padrão do telescope ESCONDE o preview quando o Neovim tem
           -- menos de 120 colunas. 1 = preview sempre visível. (13/10/2026)
           preview_cutoff = 1,
@@ -69,7 +68,9 @@ local function setup()
         },
       },
       pickers = {
+        live_grep = { layout_config = { preview_width = 0.45 } },
         find_files = {
+          layout_config = { preview_width = 0.45 },
           -- Respeita .gitignore (o fd faz isso sozinho) e ignora .git
           find_command = { "fd", "--type", "f", "--hidden", "--exclude", ".git" },
         },

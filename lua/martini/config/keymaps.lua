@@ -180,3 +180,8 @@ end, { desc = "Teste: ver saída" })
 vim.keymap.set("n", "<leader>up", function()
   require("neotest").summary.toggle()
 end, { desc = "Teste: painel de resumo" })
+
+-- Tolera Shift preso ao digitar ":w" / ":wq" / ":q" (vira :W, :Wq, :Q)
+vim.api.nvim_create_user_command("W", "write<bang>", { bang = true })
+vim.api.nvim_create_user_command("Wq", "wq<bang>", { bang = true })
+vim.api.nvim_create_user_command("Q", "quit<bang>", { bang = true })
