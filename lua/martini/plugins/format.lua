@@ -27,6 +27,7 @@ safe_require("conform", function(conform)
       typescriptreact = { "prettier" },
       html = { "prettier" },
       css = { "prettier" },
+      python = { "ruff_organize_imports", "ruff_format" },
       c = { "clang-format" },
       cpp = { "clang-format" },
     },

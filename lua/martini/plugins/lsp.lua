@@ -117,6 +117,14 @@ configurar_lsp("html", "vscode-html-language-server", { "html", "gotmpl" }, { ".
 
 configurar_lsp("cssls", "vscode-css-language-server", { "css", "scss", "less" }, { ".git" })
 
+-- pyright (19/10/2026): LSP de Python. pyright-langserver usa --stdio.
+configurar_lsp(
+  "pyright",
+  "pyright-langserver",
+  { "python" },
+  { "pyproject.toml", "setup.py", "requirements.txt", ".git" }
+)
+
 -- htmx-lsp (09/09/2026): autocomplete de atributos hx-* em HTML e
 -- templates Go. ATENÇÃO — diferente dos outros LSPs acima, esse é
 -- melhor esforço, não confirmado: o próprio projeto

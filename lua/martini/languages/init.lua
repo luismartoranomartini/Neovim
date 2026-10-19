@@ -11,3 +11,4 @@
 require("martini.languages.go")
 require("martini.languages.c")
 require("martini.languages.javascript")
+require("martini.languages.python")
