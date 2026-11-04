@@ -9,7 +9,7 @@ local p = {}
 -- │  OMXTerm base + lavender text                    │
 -- └──────────────────────────────────────────────────┘
 p.bg = "#000000"
-p.fg = "#f0f0ff"
+p.fg = "#ffffff"
 p.selection = "#505064" -- OMXTerm selection background
 
 -- ┌──────────────────────────────────────────────────┐
@@ -46,43 +46,43 @@ p.gray_25 = "#d2d2ec"
 p.gray_26 = "#dadaf2"
 p.gray_27 = "#e2e2f6"
 
-p.white = "#f0f0ff"
+p.white = "#ffffff"
 
 -- Semantic alias
-p.comment = p.gray_08
+p.comment = "#7d8aa8"
 
 -- Accent source: omxterm/themes/omtheme.json.
 -- Keep a static copy so this colorscheme also works without OMXTerm installed.
 -- Syntax roles reuse ANSI colors, with peach-orange and violet accents.
-p.red = "#ff80aa"
-p.red_rose = "#ff99bb"
+p.red = "#ff5c5c"
+p.red_rose = "#ff7aa8"
 p.red_vivid = p.red
 
-p.yellow = "#ffd480"
-p.orange = "#ffbb99"
+p.yellow = "#ffd23f"
+p.orange = "#ffb000"
 p.peach = "#fee59a" -- ANSI bright yellow
 
-p.green = "#00ffbf"
-p.green_light = "#66ffd9"
+p.green = "#00ff9f"
+p.green_light = "#00ff9f"
 p.green_mint = p.green_light
 
-p.cyan = "#80d4ff"
+p.cyan = "#5cefff"
 p.teal = p.cyan
 p.teal_bright = "#99ddff"
 p.aqua = p.cyan
 
-p.blue = "#80aaff"
-p.blue_light = "#99bbff"
+p.blue = "#00e5ff"
+p.blue_light = "#4da6ff"
 p.blue_sky = p.teal_bright
 p.blue_soft = p.blue_light
 p.blue_vivid = p.blue
 
-p.magenta = "#e2a1f7"
-p.magenta_vivid = "#ebb4fd"
+p.magenta = "#ff4d8d"
+p.magenta_vivid = "#ff7aa8"
 p.purple = p.magenta
 p.lavender = p.blue_light
 p.purple_light = p.magenta_vivid
-p.violet = "#bd9efa"
+p.violet = "#6fd3ff"
 
 -- Dark shades of the ANSI accents keep highlighted text readable.
 p.blue_deep = "#405580"
@@ -253,6 +253,8 @@ do
   )
   hl("Character", { fg = p.green })
   hl("Constant", { fg = p.orange })
+  hl("Boolean", { fg = "#ff7a3d", bold = true })
+  hl("@boolean", { fg = "#ff7a3d", bold = true })
   hl("Identifier", { fg = p.magenta })
   hl("Statement", { fg = p.magenta })
   hl("Function", { fg = p.blue_light })
@@ -272,7 +274,7 @@ do
   -- ┌─────────────────────────────────────────────┐
   -- │  Treesitter: Syntax                         │
   -- └─────────────────────────────────────────────┘
-  hl("@variable", { fg = p.gray_20, italic = false })
+  hl("@variable", { fg = p.white, italic = false })
   hl("@variable.builtin", { fg = p.orange })
   hl("@variable.parameter", { fg = p.yellow })
   hl("@variable.parameter.builtin", { fg = p.yellow })

@@ -185,3 +185,10 @@ end, { desc = "Teste: painel de resumo" })
 vim.api.nvim_create_user_command("W", "write<bang>", { bang = true })
 vim.api.nvim_create_user_command("Wq", "wq<bang>", { bang = true })
 vim.api.nvim_create_user_command("Q", "quit<bang>", { bang = true })
+
+-- Mover linha(s) para baixo/cima com Alt+j / Alt+k
+-- Modo normal: linha atual. Modo visual: seleção. Reajusta a indentação.
+vim.keymap.set("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Mover linha para baixo" })
+vim.keymap.set("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Mover linha para cima" })
+vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Mover seleção para baixo" })
+vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Mover seleção para cima" })

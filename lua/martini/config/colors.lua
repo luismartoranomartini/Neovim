@@ -16,18 +16,18 @@
 local c = {
   bg_dark = "#141418", -- gray_01
   selection = "#505064",
-  fg = "#f0f0ff",
+  fg = "#ffffff",
   text = "#c0c0da", -- gray_22
-  gray = "#747496", -- gray_12 (legível sobre preto)
+  gray = "#7d8aa8", -- gray_12 (legível sobre preto)
   gray_border = "#9696b8", -- gray_16
-  red = "#ff80aa",
-  orange = "#ffbb99",
-  yellow = "#ffd480",
+  red = "#ff5c5c",
+  orange = "#ffb000",
+  yellow = "#ffd23f",
   yellow_verb = "#ffe600", -- verbos printf: amarelo forte
-  green = "#00ffbf",
-  cyan = "#80d4ff",
-  blue = "#80aaff",
-  blue_light = "#99bbff",
+  green = "#00ff9f",
+  cyan = "#5cefff",
+  blue = "#00e5ff",
+  blue_light = "#4da6ff",
 }
 
 local function aplicar_highlights()
@@ -43,18 +43,20 @@ local function aplicar_highlights()
   -- Verbos printf (Go, C) e ações de template Go
   hl(0, "PrintfVerb", { fg = c.yellow_verb, bold = false })
   hl(0, "GoTemplateAction", { fg = c.blue_light })
+  hl(0, "@lsp.type.string", {})
+  hl(0, "@string.escape", { fg = "#5cefff", bold = true })
   -- Tela inicial (snacks): caminhos dos arquivos recentes legíveis
   hl(0, "SnacksDashboardDir", { fg = c.gray_border })
   hl(0, "SnacksDashboardFile", { fg = c.text })
   -- Itálico (como era antes do omtheme): pacotes/módulos (fmt), funções, métodos e comentários
-  hl(0, "@module", { fg = c.blue, italic = true })
+  hl(0, "@module", { fg = "#ffffff", italic = true })
   hl(0, "Function", { fg = c.blue_light, italic = true })
   hl(0, "@function", { fg = c.blue_light, italic = true })
   hl(0, "@function.call", { fg = c.blue_light, italic = true })
   hl(0, "@function.method", { fg = c.blue_light, italic = true })
   hl(0, "@function.method.call", { fg = c.blue_light, italic = true })
-  hl(0, "Comment", { fg = "#505068", italic = true })
-  hl(0, "@comment", { fg = "#505068", italic = true })
+  hl(0, "Comment", { fg = "#7d8aa8", italic = true })
+  hl(0, "@comment", { fg = "#7d8aa8", italic = true })
 
   -- ---------- Sinais funcionais ----------
   -- nvim-dap

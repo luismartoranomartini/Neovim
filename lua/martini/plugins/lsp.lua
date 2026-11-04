@@ -6,8 +6,7 @@
 -- vim.lsp.config["*"].capabilities — os servidores abaixo herdam isso.
 --
 -- ESCOPO REDUZIDO (set/2026): gopls (Go), ts_ls (JS/TS), html/cssls
--- (web + templates Go), clangd (C). pyright removido — Python fora
--- do escopo atual.
+-- (web + templates Go), clangd (C), pyright (Python, 19/10/2026).
 --
 -- CORREÇÃO (07/09/2026): [d/]d usavam vim.diagnostic.goto_prev/
 -- goto_next diretamente. Ambos deprecados desde o Neovim 0.11 (ver
@@ -62,6 +61,34 @@ vim.api.nvim_create_autocmd("LspAttach", {
     if not emmet_filetypes[vim.bo[args.buf].filetype] then
       vim.keymap.set("i", "<Tab>", "<Plug>(Tabout)", opts)
     end
+  end,
+})
+
+-- ── Indicador de progresso (02/11/2026) ──────────────────
+-- Mostra o andamento do servidor (ex.: "gopls 45% Loading workspace")
+-- na parte de baixo da tela. Usa o evento LspProgress e o modo
+-- "progress" do nvim_echo() (Neovim 0.12). Cada servidor tem um id
+-- próprio, então a mesma mensagem é atualizada no lugar em vez de
+-- empilhar linhas. Ao terminar, o status vira "success" e some.
+vim.api.nvim_create_autocmd("LspProgress", {
+  callback = function(ev)
+    local params = ev.data and ev.data.params
+    local value = params and params.value
+    if not value then
+      return
+    end
+
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    local nome = client and client.name or "LSP"
+    local texto = value.message or value.title or ""
+
+    pcall(vim.api.nvim_echo, { { texto } }, false, {
+      id = "lsp-progress-" .. ev.data.client_id,
+      kind = "progress",
+      title = nome,
+      status = value.kind == "end" and "success" or "running",
+      percent = value.percentage,
+    })
   end,
 })
 
