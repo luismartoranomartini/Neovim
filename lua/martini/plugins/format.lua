@@ -28,8 +28,13 @@ safe_require("conform", function(conform)
       html = { "prettier" },
       css = { "prettier" },
       python = { "ruff_organize_imports", "ruff_format" },
+      java = { "google-java-format" },
       c = { "clang-format" },
       cpp = { "clang-format" },
+    },
+    formatters = {
+      -- estilo AOSP: indentação de 4 espaços (o padrão do Google é 2)
+      ["google-java-format"] = { prepend_args = { "--aosp" } },
     },
     format_on_save = {
       timeout_ms = 1000,

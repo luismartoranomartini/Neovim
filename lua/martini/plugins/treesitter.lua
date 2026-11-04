@@ -35,13 +35,13 @@ local safe_require = require("martini.utils.safe_require")
 -- image.nvim depende do parser), json, bash e gomod.
 local ts_langs = {
   "lua", "javascript", "typescript", "tsx", "go", "gomod", "c", "cpp",
-  "html", "css", "yaml", "json", "bash", "markdown", "markdown_inline", "python",
+  "html", "css", "yaml", "json", "bash", "markdown", "markdown_inline", "python", "java",
 }
 
 local ts_filetypes = {
   "lua", "javascript", "javascriptreact", "typescript", "typescriptreact",
   "go", "gomod", "c", "cpp", "html", "css", "yaml", "json", "sh", "bash",
-  "markdown", "python",
+  "markdown", "python", "java",
 }
 
 safe_require("nvim-treesitter", function(nvim_treesitter)

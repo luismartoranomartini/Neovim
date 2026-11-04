@@ -152,6 +152,30 @@ configurar_lsp(
   { "pyproject.toml", "setup.py", "requirements.txt", ".git" }
 )
 
+-- jdtls (04/11/2026): LSP de Java (instalado pelo Mason). Usa uma pasta
+-- de dados por projeto em ~/.cache/nvim/jdtls. Em arquivo solto, sem
+-- pom.xml/build.gradle, a raiz vira a própria pasta do arquivo.
+do
+  local caminho = vim.fn.exepath("jdtls")
+  if caminho ~= "" then
+    local marcadores = { "pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", ".git" }
+    vim.lsp.config["jdtls"] = {
+      cmd = function(dispatchers, config)
+        local raiz = config.root_dir or vim.fn.getcwd()
+        local dados = vim.fn.stdpath("cache") .. "/jdtls/" .. vim.fn.sha256(raiz):sub(1, 12)
+        return vim.lsp.rpc.start({ caminho, "-data", dados }, dispatchers)
+      end,
+      filetypes = { "java" },
+      root_dir = function(bufnr, on_dir)
+        on_dir(vim.fs.root(bufnr, marcadores) or vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr)))
+      end,
+    }
+    vim.lsp.enable("jdtls")
+  else
+    vim.notify("LSP não encontrado: jdtls (:MasonInstall jdtls)", vim.log.levels.WARN)
+  end
+end
+
 -- htmx-lsp (09/09/2026): autocomplete de atributos hx-* em HTML e
 -- templates Go. ATENÇÃO — diferente dos outros LSPs acima, esse é
 -- melhor esforço, não confirmado: o próprio projeto
