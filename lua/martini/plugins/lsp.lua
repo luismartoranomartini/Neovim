@@ -152,6 +152,28 @@ configurar_lsp(
   { "pyproject.toml", "setup.py", "requirements.txt", ".git" }
 )
 
+-- rust-analyzer (07/11/2026): LSP de Rust. O pacote rustup do Arch não cria o
+-- atalho rust-analyzer no PATH, então roda via "rustup run stable". Clippy no
+-- lugar do cargo check padrão (diagnósticos mais completos ao salvar).
+if vim.fn.executable("rustup") == 1 then
+  vim.lsp.config["rust_analyzer"] = {
+    cmd = { "rustup", "run", "stable", "rust-analyzer" },
+    filetypes = { "rust" },
+    root_dir = function(bufnr, on_dir)
+      on_dir(
+        vim.fs.root(bufnr, { "Cargo.toml", "rust-project.json", ".git" })
+          or vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+      )
+    end,
+    settings = {
+      ["rust-analyzer"] = { check = { command = "clippy" } },
+    },
+  }
+  vim.lsp.enable("rust_analyzer")
+else
+  vim.notify("rustup não encontrado: sudo pacman -S rustup", vim.log.levels.WARN)
+end
+
 -- jdtls (04/11/2026): LSP de Java (instalado pelo Mason). Usa uma pasta
 -- de dados por projeto em ~/.cache/nvim/jdtls. Em arquivo solto, sem
 -- pom.xml/build.gradle, a raiz vira a própria pasta do arquivo.
@@ -163,7 +185,7 @@ do
       cmd = function(dispatchers, config)
         local raiz = config.root_dir or vim.fn.getcwd()
         local dados = vim.fn.stdpath("cache") .. "/jdtls/" .. vim.fn.sha256(raiz):sub(1, 12)
-        return vim.lsp.rpc.start({ caminho, "-data", dados }, dispatchers)
+        return vim.lsp.rpc.start({ caminho, "-data", dados }, dispatchers, { env = { JAVA_HOME = "/usr/lib/jvm/java-25-openjdk" } })
       end,
       filetypes = { "java" },
       root_dir = function(bufnr, on_dir)

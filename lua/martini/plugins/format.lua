@@ -29,6 +29,7 @@ safe_require("conform", function(conform)
       css = { "prettier" },
       python = { "ruff_organize_imports", "ruff_format" },
       java = { "google-java-format" },
+      rust = { "rustfmt" },
       c = { "clang-format" },
       cpp = { "clang-format" },
     },

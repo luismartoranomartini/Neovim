@@ -66,8 +66,15 @@ local base_filetypes = {
 local go = require("martini.languages.go")
 local py = require("martini.languages.python")
 local java = require("martini.languages.java")
-local filetypes =
-  vim.tbl_extend("force", base_filetypes, go.runner_filetypes or {}, py.runner_filetypes or {}, java.runner_filetypes or {})
+local rust = require("martini.languages.rust")
+local filetypes = vim.tbl_extend(
+  "force",
+  base_filetypes,
+  go.runner_filetypes or {},
+  py.runner_filetypes or {},
+  java.runner_filetypes or {},
+  rust.runner_filetypes or {}
+)
 
 safe_require("code_runner", function(code_runner)
   code_runner.setup({

@@ -217,6 +217,7 @@ local plugins = {
   -- que mantém o setup() e os atalhos como estavam.
   {
     "jake-stewart/multicursor.nvim",
+    cond = function() return vim.fn.has("nvim-0.13") == 0 end, -- 0.13+ tem multicursor nativo (Q)
     branch = "1.0",
     event = "VeryLazy",
     config = function()
@@ -340,6 +341,15 @@ local plugins = {
     event = "VeryLazy",
     config = function()
       require("martini.plugins.flash")
+    end,
+  },
+  -- Linhas verticais de indentação (05/11/2026) — ver plugins/indent.lua.
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      require("martini.plugins.indent")
     end,
   },
   -- Text objects a/i genéricos (27/09/2026) — ver nota "MINI.AI"

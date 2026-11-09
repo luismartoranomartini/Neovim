@@ -93,3 +93,14 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.formatoptions:append("t")
   end,
 })
+
+-- Garante número de linha em arquivos normais: o dashboard (snacks) desliga
+-- "number" na janela dele, e arquivos abertos ali herdavam nonumber.
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = vim.api.nvim_create_augroup("martini_numero_linha", { clear = true }),
+  callback = function()
+    if vim.bo.buftype == "" then
+      vim.wo.number = true
+    end
+  end,
+})

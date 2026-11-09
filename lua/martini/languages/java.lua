@@ -91,4 +91,31 @@ vim.keymap.set("n", "<leader>kb", function()
   rodar_mvn({ "compile" })
 end, { desc = "Java: compilar projeto (mvn compile)" })
 
+-- =========================================================
+-- Modelo de arquivo novo: ao criar um .java vazio (inclusive um
+-- arquivo vazio que o oil.nvim já gravou no disco), preenche a
+-- classe com o main. O nome da classe é o nome do arquivo (o Java
+-- exige isso para classes public) e o cursor cai dentro do main.
+-- =========================================================
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
+  group = vim.api.nvim_create_augroup("martini_java_modelo", { clear = true }),
+  pattern = "*.java",
+  callback = function(ev)
+    -- só preenche se o buffer estiver totalmente vazio
+    if vim.api.nvim_buf_line_count(ev.buf) ~= 1 or vim.api.nvim_buf_get_lines(ev.buf, 0, 1, false)[1] ~= "" then
+      return
+    end
+    local classe = vim.fn.fnamemodify(ev.file, ":t:r"):gsub("[^%w_]", "_")
+    vim.api.nvim_buf_set_lines(ev.buf, 0, -1, false, {
+      "public class " .. classe .. " {",
+      "",
+      "    public static void main(String[] args) {",
+      "        ",
+      "    }",
+      "}",
+    })
+    vim.api.nvim_win_set_cursor(0, { 4, 8 })
+  end,
+})
+
 return M

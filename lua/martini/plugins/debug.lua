@@ -49,6 +49,7 @@ local function setup()
   -- de proteção duplicada aqui.
   require("martini.languages.go").setup_debug()
   require("martini.languages.python").setup_debug()
+  require("martini.languages.rust").setup_debug()
 
   -- C/C++: codelldb (binário único — instalado via AUR:
   -- yay -S codelldb-bin — NÃO é um plugin Lua, então não entra no
@@ -80,6 +81,7 @@ local function setup()
           end,
           cwd = "${workspaceFolder}",
           stopOnEntry = false,
+          terminal = "integrated",
           args = {},
         },
       }
