@@ -45,6 +45,10 @@ local function aplicar_highlights()
   hl(0, "GoTemplateAction", { fg = c.blue_light })
   hl(0, "@lsp.type.string", {})
   hl(0, "@string.escape", { fg = "#5cefff", bold = true })
+  for _, g in ipairs({ "String", "@string" }) do
+    local atual = vim.api.nvim_get_hl(0, { name = g, link = false })
+    hl(0, g, vim.tbl_extend("force", atual, { italic = true }))
+  end
   -- Tela inicial (snacks): caminhos dos arquivos recentes legíveis
   hl(0, "SnacksDashboardDir", { fg = c.gray_border })
   hl(0, "SnacksDashboardFile", { fg = c.text })
